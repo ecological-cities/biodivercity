@@ -1,0 +1,44 @@
+---
+title: "Get started with biodivercity"
+author: "Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started with biodivercity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+
+
+## Installation
+
+Install the development version of `biodivercity` from GitHub:
+
+```{r, eval = FALSE}
+devtools::install_github("ecological-cities/biodivercity", ref = "main")
+```
+
+## Setup
+
+Load the package:
+
+```{r eval = FALSE}
+library(biodivercity)
+```
+
+```{r include = FALSE, eval = FALSE}
+devtools::load_all() # to knit manually w latest changes (not built/installed yet)
+# vignette will be checked in R-CMD check & package build (should use library(home2park))
+```
+
+<br>

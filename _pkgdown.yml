@@ -1,0 +1,35 @@
+url: https://ecological-cities.github.io/biodivercity/
+title: biodivercity
+
+development:
+  mode: auto
+
+home:
+  title: R Package - Biodiversity indices for city landscapes
+  description: Assess the diversity of animal species in urban areas.
+  links:
+
+reference:
+- title: "Fauna: Process data"
+  desc: "Functions to wrangle data collected from animal surveys."
+- contents:
+  - filter_obs
+  - sptally_extractor
+  - check_taxongrps
+  - exclude_simulator
+- title: "Fauna: Regional summaries"
+  desc: "Summarise biodiversity within (the boundaries of) specified areal units."
+- contents:
+  - sac_extractor
+- title: "Landscape: Process data"
+  desc: "Functions to process and summarise landscape data at survey locations."
+- contents:
+  - get_roads_osm
+  - get_buildings_osm
+  - threshold_otsu
+  - lsm_perpoint
+- title: "Fauna: Predict"
+  desc: "Use landscape data to make biodiversity predictions."
+- contents:
+  - summarise_landscape_perpt
+

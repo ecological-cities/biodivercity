@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# biodivercity
+# biodivercity: Biodiversity indices for city landscapes
 
 <!-- badges: start -->
 
@@ -14,14 +14,14 @@ status](https://www.r-pkg.org/badges/version/biodivercity)](https://CRAN.R-proje
 [![R-CMD-check](https://github.com/ecological-cities/biodivercity/workflows/R-CMD-check/badge.svg)](https://github.com/ecological-cities/biodivercity/actions)
 <!-- badges: end -->
 
-Assess the diversity of animal species in urban areas. Refer to [package
+`biodivercity` is an R package for assessing the diversity of animal
+species in urban areas. Refer to [package
 website](https://ecological-cities.github.io/biodivercity/) for
 demonstrations of how the package may be used.
 
 ## Installation
 
-You can install the development version from
-[GitHub](https://github.com/) with:
+Install the development version of `biodivercity` from GitHub:
 
 ``` r
 # install.packages("devtools")
