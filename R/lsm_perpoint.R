@@ -23,9 +23,7 @@
 #'
 #'@import checkmate
 #'@import dplyr
-#'@import tibble
 #'@import sf
-#'@importFrom raster res nlayers
 #'@import landscapemetrics
 #'@import landscapetools
 #'@import foreach
@@ -33,6 +31,8 @@
 #'@importFrom rlang .data
 #'@importFrom methods is
 #'@importFrom tidyr separate pivot_wider
+#'@importFrom tibble deframe tibble
+#'@importFrom raster res nlayers
 #'
 #'@export
 lsm_perpoint <- function(raster, points, buffer_sizes,
@@ -106,7 +106,7 @@ lsm_perpoint <- function(raster, points, buffer_sizes,
                          dplyr::filter(!((.data$metric %in% c("lpi")) & (level == "landscape"))) %>% # largest patch in landscape
 
                          # new col for levels
-                         dplyr::mutate(levels = dplyr::case_when(!is.na(class) ~ tibble:deframe(tibble(class_values, class_names))[class], # class-lvl
+                         dplyr::mutate(levels = dplyr::case_when(!is.na(class) ~ tibble:deframe(tibble::tibble(class_values, class_names))[class], # class-lvl
                                                                  is.na(class) ~ paste0(landscape_name, "_l"))) %>% # landscape-lvl
 
                          # remove duplicated metrics at landscape lvl
