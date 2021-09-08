@@ -10,26 +10,27 @@ home:
   links:
 
 reference:
-- title: "Fauna: Process data"
-  desc: "Functions to wrangle data collected from animal surveys."
+- title: "Fauna: Build models"
+  desc: "Wrangle data collected from animal surveys."
 - contents:
   - filter_obs
   - sptally_extractor
   - check_taxongrps
   - exclude_simulator
-- title: "Fauna: Regional summaries"
+- title: "Fauna: Summarise data"
   desc: "Summarise biodiversity within (the boundaries of) specified areal units."
 - contents:
   - sac_extractor
-- title: "Landscape: Process data"
+- title: "Landscape: Build models"
   desc: "Functions to process and summarise landscape data at survey locations."
 - contents:
   - get_roads_osm
   - get_buildings_osm
   - threshold_otsu
   - lsm_perpoint
-- title: "Fauna: Predict"
-  desc: "Use landscape data to make biodiversity predictions."
+- title: "Apply models"
+  desc: "Process data and run models to make biodiversity predictions."
 - contents:
   - summarise_landscape_perpt
-
+- title: "Test model predictions"
+  desc: "Validation and accuracy assessments."
