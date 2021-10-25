@@ -3,6 +3,7 @@ title: "Get and process landscape metrics"
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+navbar: ~
 vignette: >
   %\VignetteIndexEntry{Get and process landscape metrics}
   %\VignetteEngine{knitr::rmarkdown}
@@ -25,9 +26,14 @@ knitr::opts_chunk$set(
 4. `lsm_perpoint` function summarises landscape metrics for provided geographical points at specified buffers.
 5. `get_roads_osm` and `get_buildings_osm` (`home2park` package is a dependency)
 
+Necessary input as sample dataset:
+- Sentinel-2 mosaic raster with NDVI and NDWI2
+- Sampling points geojson
+- Sampling area (e.g. town) boundaries geojson
+
 ## Using sen2r to get images (optional?)
 
-We use `sen2r`, it can be installed from [CRAN](https://cran.r-project.org/package=sen2r).
+Images were downloaded with `sen2r`, it can be installed from [CRAN](https://cran.r-project.org/package=sen2r).
 
 ```{r sen2r setup, eval = FALSE}
 # http://sen2r.ranghetti.info/articles/installation.html
@@ -40,7 +46,7 @@ install_sen2cor(force = TRUE) # install via command instead of GUI
 ```
 
 Using `sen2r`:
-- Check their vignette #E
+- Check their vignette
 
 Desired indices: **NDVI**, **NDWI2**
 
@@ -53,12 +59,10 @@ Desired indices: **NDVI**, **NDWI2**
 directories <- list.dirs(glue::glue("{dir_dataoutput}/processed/{which_round}"), recursive = FALSE)
 directories <- directories[!basename(directories) %in% c("CLD", "SCL", "RGB432B")] # rm directories not to be mosaiced
 
-
 # loop to process/export mosaic for each subdirectory
 # Note: doesn't make sense for SCL (surface classification map), CLD (cloud mask) & RGB432B (RGB, clouds are white not NA) 
 foreach(i = 1:length(directories), # parallel loop
                    .packages = c("terra", "raster")) %dopar% { # foreach loops
-# for(i in 1:length(directories)){ # normal loop
   
   # for each spectral index, import images as rasterStack
   filepaths <- dir(path = directories[i], full.names = TRUE, pattern="*.tif$")
@@ -111,8 +115,6 @@ foreach(i = 1:length(directories), # parallel loop
   rm(mosaic, images, filepaths, i, j)
   gc()
 }
-
-rm(directories)
 ```
 
 ## Otsu's thresholding for mosaicked images
@@ -125,7 +127,7 @@ files <- paste0(dir, rounds,  "/NDVI/mosaic.tif")
 # get threshold value via otsu method (assumes bimodal histogram)
 thresholds <- list()
 for(i in 1:length(rounds)){
-  thresholds[[i]] <- threshold_otsu(files[i], levels = 256)
+  thresholds[[i]] <- threshold_otsu(files[i], levels = 256) #default levels = 256 for 8-bit images
   rm(i)
 }
 
@@ -150,23 +152,11 @@ thresholds[[2]]
 
 ![**Distribution of NDVI values across Singapore in Survey Round One (light green bars, dashed vertical lines) and Two (dark green bars, solid vertical lines).** Based on image mosaic composed of data captured for Survey Round One and Survey Round Two. Vegetation was classified as pixel with values >0.35 for Round One and >0.36 for Round Two, via Otsu's thresholding. Dense vegetation was classified as pixels with values >0.62 for Round One and >0.64 for Round Two, using the same method after the first round of classification.](./images/otsu-sample-plot.png){#id .class width=60% height=60%}
 
-```{r ndvi histograms, include = FALSE, eval = FALSE}
-
-plot(plots[[1]], col = rgb(178/255,223/255,138/255, 0.5), xlim = c(-1, 1), xlab = "NDVI", main = "", yaxt = 'n')
-plot(plots[[2]], col = rgb(51/255,160/255,44/255, 0.5), xlim = c(-1, 1), xlab = "NDVI", main = "", yaxt = 'n', add = TRUE)
-abline(v = thresholds[[1]], col="black", lwd=2, lty = 2)
-abline(v = thresholds[[2]], col="black", lwd=2)
-abline(v = thresholds2[[1]], col="black", lwd=2, lty = 2)
-abline(v = thresholds2[[2]], col="black", lwd=2)
-
-```
-
 ## Summarising mosaic landscape metrics within buffer distance of a point
 
 To build a model with point survey data, landscape metrics have to be isolated from a buffer distance around fauna sampling points. The `lsm_perpoint` function accepts a geographical input of sampling points and extracts surrounding landscape metrics from the processed mosaic into an output dataframe. Mosaicked rasters should be processed to classify respective land cover types as discrete values (e.g. vegetation classes may be classified `0` for non-vegetation; `1` for sparse; `2` for dense).
 
 ```{r load sampling points w landcover data, eval = FALSE}
-
 points <- st_read(glue::glue("{dir_dataoutput}/sampling/points.geojson"), quiet = TRUE) 
 
 circles_sf <- list()
@@ -245,13 +235,6 @@ for(i in 1:length(circles)){ # append to circles2 info to circles
                 dplyr::select(-percentage_inside), 
               by = c("point_id", "round"))
 }
-rm(circles2, i)
-
-```
-
-```{r eval = FALSE}
-rm(veg_classified, urban_classified, water_classified,
-   lsm_perpoint)
 
 # combine geometry of circles_sf with circles
 for(i in 1:length(circles)){
@@ -260,7 +243,6 @@ for(i in 1:length(circles)){
                 mutate(round = as.numeric(round)))
   rm(i)
 }
-rm(circles_sf)
 ```
 
 ## Retrieving OSM data on urban metrics

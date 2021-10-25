@@ -3,6 +3,7 @@ title: "Cross-validation of models"
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+navbar: ~
 vignette: >
   %\VignetteIndexEntry{Cross-validation of models}
   %\VignetteEngine{knitr::rmarkdown}

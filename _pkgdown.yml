@@ -2,7 +2,7 @@ url: https://ecological-cities.github.io/biodivercity/
 title: biodivercity
 
 development:
-  mode: auto
+  mode: devel
 
 home:
   title: R Package - Biodiversity indices for city landscapes
@@ -34,3 +34,21 @@ reference:
   - summarise_landscape_perpt
 - title: "Test model predictions"
   desc: "Validation and accuracy assessments."
+
+articles:
+- title: "Fauna: Summarise data and build models"
+  navbar: ~
+  contents:
+  - build-model_process-fauna
+- title: "Landscape: Build models"
+  navbar: ~
+  contents:
+  - build-model_process-landscape
+- title: "Apply models"
+  navbar: ~
+  contents:
+  - apply-model_predict-fauna
+- title: "Test model predictions"
+  navbar: ~
+  contents:
+  - apply-model_validation

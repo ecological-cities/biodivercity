@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 
 Install the development version of `biodivercity` from GitHub:
 
-``` {r eval = FALSE}
+``` {r, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("ecological-cities/biodivercity", ref = "main")
 ```
@@ -40,11 +40,11 @@ devtools::install_github("ecological-cities/biodivercity", ref = "main")
 
 Load the package:
 
-```{r eval = FALSE}
+```{r, eval = FALSE}
 library(biodivercity)
 ```
 
-```{r include = FALSE, eval = TRUE}
+```{r, include = FALSE, eval = TRUE}
 devtools::load_all() # to knit manually w latest changes (not built/installed yet)
 ```
 

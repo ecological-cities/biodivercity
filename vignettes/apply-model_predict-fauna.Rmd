@@ -3,6 +3,7 @@ title: "Predict fauna spatially"
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+navbar: ~
 vignette: >
   %\VignetteIndexEntry{Predict fauna spatially}
   %\VignetteEngine{knitr::rmarkdown}
