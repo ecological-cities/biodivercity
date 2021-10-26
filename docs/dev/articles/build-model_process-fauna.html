@@ -1787,14 +1787,7 @@ NA
                           rep <span class="op">=</span> <span class="va">rep</span><span class="op">)</span></code></pre></div>
 <p>The results can be visualised as a boxplot:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># plot boxplot of affected species</span>
-<span class="va">plot_bird</span> <span class="op">&lt;-</span> <span class="va">boot</span> <span class="op">%&gt;%</span>
-  <span class="fu">pivot_longer</span><span class="op">(</span>cols <span class="op">=</span> <span class="fu">num_range</span><span class="op">(</span><span class="st">"iter"</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">boot</span><span class="op">)</span><span class="op">)</span>, <span class="co"># transform for plotting</span>
-               names_to <span class="op">=</span> <span class="st">"iteration"</span>, values_to <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>town <span class="op">=</span> <span class="st">"PG"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>priority <span class="op">=</span> <span class="st">"Aves"</span><span class="op">)</span>
-
-<span class="co"># sp richness</span>
+<code class="sourceCode R"><span class="co"># sp richness</span>
 <span class="va">sp_rich</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">colSums</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">boot</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
 <span class="co"># mean(sp_rich) / nrow(boot)</span>
 <span class="co"># quantile(sp_rich)</span>

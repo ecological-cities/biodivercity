@@ -32,6 +32,7 @@ bound_grid <- geom_to_grid(geom = bound,
                            buffer_dist = 126,
                            grid_dim = c(50, 50))
 ```
+![Visualisation of the `geom_to_grid` function.](./images/geom-to-grid.png){#id .class width=60% height=60%}
 
 ## Summarising landscape metrics for grid centers
 

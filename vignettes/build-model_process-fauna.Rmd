@@ -126,13 +126,6 @@ boot <- exclude_simulator(bird, surveys,
 The results can be visualised as a boxplot:
 
 ```{r exclude_simulator plot, eval = FALSE}
-# plot boxplot of affected species
-plot_bird <- boot %>%
-  pivot_longer(cols = num_range("iter", 1:ncol(boot)), # transform for plotting
-               names_to = "iteration", values_to = "n") %>%
-  mutate(town = "PG") %>%
-  mutate(priority = "Aves")
-
 # sp richness
 sp_rich <- colSums(!is.na(boot[,-1]))
 # mean(sp_rich) / nrow(boot)
