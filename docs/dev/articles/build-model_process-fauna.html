@@ -92,7 +92,7 @@
       <h1 data-toc-skip>Process fauna survey data</h1>
                         <h4 class="author">Author</h4>
             
-            <h4 class="date">2021-10-21</h4>
+            <h4 class="date">2021-10-26</h4>
       
       
       <div class="hidden name"><code>build-model_process-fauna.Rmd</code></div>
@@ -1226,9 +1226,10 @@ Urban (water)
 <span class="va">tampines</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_obs.html">filter_obs</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna</span>, survey_ref <span class="op">=</span> <span class="va">surveys</span>,
                    specify_town <span class="op">=</span> <span class="st">"TP"</span><span class="op">)</span>
 <span class="va">round_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_obs.html">filter_obs</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna</span>, survey_ref <span class="op">=</span> <span class="va">surveys</span>,
-                     specify_round <span class="op">=</span> <span class="st">"2"</span><span class="op">)</span>
-
-<span class="va">butterflies_tampines_round_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_obs.html">filter_obs</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna</span>, survey_ref <span class="op">=</span> <span class="va">surveys</span>,
+                     specify_round <span class="op">=</span> <span class="st">"2"</span><span class="op">)</span></code></pre></div>
+<p>For example, a specific set of surveys (i.e. butterfly surveys in Tampines from 2020-2021) can be filtered as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">butterflies_tampines_round_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_obs.html">filter_obs</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna</span>, survey_ref <span class="op">=</span> <span class="va">surveys</span>,
                    specify_priority <span class="op">=</span> <span class="st">"Lepidoptera"</span>,
                    specify_town <span class="op">=</span> <span class="st">"TP"</span>,
                    specify_round <span class="op">=</span> <span class="st">"2"</span><span class="op">)</span>
@@ -1767,9 +1768,9 @@ NA
 <a href="#assessing-missing-data-with-past-records" class="anchor"></a>Assessing missing data with past records</h2>
 <p>When COVID-19 hit, fauna surveys scheduled within the Circuit Breaker period (Punggol and Queenstown Survey Round 2, Cycle 5) were not conducted. To simulate the effect on the loss in observed species richness and density with less surveys, the same number of surveys were randomly removed from the total survey number conducted during the same window of the previous survey year (Round 1, 2016/17). To examine the possible variation in species richness/density, bootstrapped repetitions were made for the respective number of missed surveys for each taxon.</p>
 <ul>
-<li>e.g. <strong>Aves (birds):</strong> 15 (PG) surveys excluded with 100 bootstrapping scenarios</li>
+<li>i.e. <strong>Aves (birds):</strong> 15 (PG) surveys were excluded with 100 bootstrapping scenarios</li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">exclude_bird_pg</span> <span class="op">&lt;-</span> <span class="fl">15</span>
 <span class="va">rep</span> <span class="op">&lt;-</span> <span class="fl">100</span>
 
@@ -1783,43 +1784,15 @@ NA
                           town_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"QT"</span>,<span class="st">"TP"</span>, <span class="st">"JW"</span>, <span class="st">"BS"</span>, <span class="st">"WL"</span><span class="op">)</span>, <span class="co"># for PG</span>
                           round_ignore <span class="op">=</span> <span class="st">"2"</span>, 
                           cycle_ignore <span class="op">=</span> <span class="cn">NULL</span>,
-                          rep <span class="op">=</span> <span class="va">rep</span><span class="op">)</span>
-
-<span class="co"># plot boxplot of affected species</span>
+                          rep <span class="op">=</span> <span class="va">rep</span><span class="op">)</span></code></pre></div>
+<p>The results can be visualised as a boxplot:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># plot boxplot of affected species</span>
 <span class="va">plot_bird</span> <span class="op">&lt;-</span> <span class="va">boot</span> <span class="op">%&gt;%</span>
   <span class="fu">pivot_longer</span><span class="op">(</span>cols <span class="op">=</span> <span class="fu">num_range</span><span class="op">(</span><span class="st">"iter"</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">boot</span><span class="op">)</span><span class="op">)</span>, <span class="co"># transform for plotting</span>
                names_to <span class="op">=</span> <span class="st">"iteration"</span>, values_to <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">mutate</span><span class="op">(</span>town <span class="op">=</span> <span class="st">"PG"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">mutate</span><span class="op">(</span>priority <span class="op">=</span> <span class="st">"Aves"</span><span class="op">)</span>
-
-<span class="va">plot_bird</span> <span class="op">&lt;-</span> <span class="va">plot_bird</span> <span class="op">%&gt;%</span>
-  
-  <span class="co"># get order</span>
-  <span class="fu">left_join</span><span class="op">(</span><span class="va">plot_bird</span> <span class="op">%&gt;%</span>
-              <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-              <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span><span class="op">)</span> <span class="op">%&gt;%</span>
-              <span class="fu">summarise</span><span class="op">(</span>order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">full</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">drop_na</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">%&gt;%</span>
-
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html">reorder</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">order</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    
-    <span class="fu">facet_grid</span><span class="op">(</span><span class="va">priority</span> <span class="op">~</span> <span class="va">town</span><span class="op">)</span> <span class="op">+</span>
-  
-    <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="va">full</span><span class="op">)</span>, shape<span class="op">=</span><span class="fl">4</span>, size<span class="op">=</span><span class="fl">2.0</span>,
-                 color <span class="op">=</span> <span class="st">"blue"</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span>
-    
-    <span class="fu">geom_boxplot</span><span class="op">(</span>width<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span><span class="st">"black"</span>, alpha<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">stat_summary</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">mean</span>, geom <span class="op">=</span> <span class="st">"point"</span>, shape<span class="op">=</span><span class="fl">5</span>, size<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> <span class="co">#mean value</span>
-  
-    <span class="fu">xlab</span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">ylab</span><span class="op">(</span><span class="st">"No. of sampling points"</span><span class="op">)</span> <span class="op">+</span> 
-    <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">theme</span><span class="op">(</span>panel.grid.major.y <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,
-          panel.grid.minor.y <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,
-          panel.grid.minor.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">coord_flip</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">scale_y_continuous</span><span class="op">(</span>expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-
 
 <span class="co"># sp richness</span>
 <span class="va">sp_rich</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">colSums</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">boot</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
@@ -1873,12 +1846,12 @@ NA
 <div id="summarising-fauna-data-entries" class="section level2">
 <h2 class="hasAnchor">
 <a href="#summarising-fauna-data-entries" class="anchor"></a>Summarising fauna data entries</h2>
-<p>To generate summary figures quickly for large survey data accumulated throughout the study period, <code>sptally_extractor</code> and <code>sac_extractor</code> can calculate the mean species richness and species accumulation curves respectively. <code>sptally_extractor</code> can be specific to the point or individual survey levels, while <code>sac_extractor</code> is calculated at the broader spatial grouping of <code>town</code> to represent surveys as sampling effort. Similar to the <code>filter_obs</code> function covered above, the same parameters of <code>town</code>, <code>round</code> and <code>priority</code> can be specified.</p>
+<p>To generate summary figures quickly for large survey data accumulated throughout the study period, <code>sptally_extractor</code> and <code>sac_extractor</code> can calculate the <strong>mean species richness</strong> and <strong>species accumulation curves</strong> respectively. <code>sptally_extractor</code> can be specific to the point or individual survey levels, while <code>sac_extractor</code> is calculated at the broader spatial grouping of <code>town</code> to represent surveys as sampling effort. Similar to the <code>filter_obs</code> function covered above, the same parameters of <code>town</code>, <code>round</code> and <code>priority</code> can be specified.</p>
 <div id="stacked-bar-plots-with-error" class="section level3">
 <h3 class="hasAnchor">
 <a href="#stacked-bar-plots-with-error" class="anchor"></a>Stacked bar plots with error</h3>
 <p>An example of the sample dataset summarised with <code>sptally_extractor</code> to create a stacked bar plot for each <code>town</code> and <code>priority</code> (taxon):</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># BY POINT</span>
 <span class="va">normalised_perpt</span> <span class="op">&lt;-</span> 
   <span class="fu">foreach</span><span class="op">(</span>i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span><span class="op">(</span><span class="va">fauna_normalised</span><span class="op">)</span>, 
@@ -1935,7 +1908,7 @@ NA
 <h3 class="hasAnchor">
 <a href="#species-accumulation-curves" class="anchor"></a>Species accumulation curves</h3>
 <p>An example of the sample dataset summarised with <code>sac_extractor</code> to create a species accumulation curve for each <code>town</code> and <code>priority</code> (taxon):</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># loop across all bootstrapped iterations</span>
 

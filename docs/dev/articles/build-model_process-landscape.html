@@ -91,7 +91,7 @@
       <h1 data-toc-skip>Get and process landscape metrics</h1>
                         <h4 class="author">Author</h4>
             
-            <h4 class="date">2021-10-21</h4>
+            <h4 class="date">2021-10-26</h4>
       
       
       <div class="hidden name"><code>build-model_process-landscape.Rmd</code></div>
@@ -200,32 +200,18 @@
 <a href="#otsus-thresholding-for-mosaicked-images" class="anchor"></a>Otsu’s thresholding for mosaicked images</h2>
 <p>To make sense of the raster data, the important information (e.g. landscape metrics) has to be isolated from the noise. Otsu’s thresholding (<a href="https://cw.fel.cvut.cz/wiki/_media/courses/a6m33bio/otsu.pdf">Otsu, 1979</a>) is an automated threshold finder that outperforms other techniques in terms of stability of results and processing speed, even with the presence of &gt;2 peaks in the histogram (<a href="https://www.tandfonline.com/doi/abs/10.1080/10106049.2018.1497094">Bouhennache et al., 2019</a>). The NDVI threshold for vegetation typically ranges from 0.2 to 0.4 (<a href="https://link.springer.com/article/10.1186/s40562-019-0132-4">Wong et al, 2019</a>; <a href="https://www.mdpi.com/2072-4292/11/2/105">Akbar et al, 2019</a>). A second thresholding is performed for the vegetation class to separate sparse from dense vegetation.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">rounds</span>,  <span class="st">"/NDVI/mosaic.tif"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">veg_classified</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">mosaic</span><span class="op">)</span>
 
 <span class="co"># get threshold value via otsu method (assumes bimodal histogram)</span>
-<span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">threshold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>
 <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">rounds</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-  <span class="va">thresholds</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold_otsu.html">threshold_otsu</a></span><span class="op">(</span><span class="va">files</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, levels <span class="op">=</span> <span class="fl">256</span><span class="op">)</span> <span class="co">#default levels = 256 for 8-bit images</span>
+  <span class="va">thresholds</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold_otsu.html">threshold_otsu</a></span><span class="op">(</span><span class="va">veg_classified</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, levels <span class="op">=</span> <span class="fl">256</span><span class="op">)</span> <span class="co">#default levels = 256 for 8-bit images</span>
   <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>
-<span class="op">}</span>
-
-<span class="co"># apply first threshold &amp; get sub-classification threshold</span>
-<span class="va">thresholds2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-  
-  <span class="va">raster</span> <span class="op">&lt;-</span> <span class="fu">rast</span><span class="op">(</span><span class="va">files</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
-  <span class="va">raster</span><span class="op">[</span><span class="va">raster</span> <span class="op">&lt;</span> <span class="va">thresholds</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span> <span class="co"># mask away those below threshold value</span>
-  
-  <span class="co"># second thresholding</span>
-  <span class="va">thresholds2</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold_otsu.html">threshold_otsu</a></span><span class="op">(</span><span class="va">raster</span>, levels <span class="op">=</span> <span class="fl">256</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">raster</span>, <span class="va">i</span><span class="op">)</span>
 <span class="op">}</span>
 
 <span class="co"># view thresholds</span>
 <span class="va">thresholds</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
-<span class="co">#[value 1]</span>
-<span class="va">thresholds</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>
-<span class="co">#[value 2]</span></code></pre></div>
+<span class="co">#[value 1]</span></code></pre></div>
 <div class="figure">
 <img src="images/otsu-sample-plot.png" id="id" class="class" style="width:60.0%;height:60.0%" alt=""><p class="caption"><strong>Distribution of NDVI values across Singapore in Survey Round One (light green bars, dashed vertical lines) and Two (dark green bars, solid vertical lines).</strong> Based on image mosaic composed of data captured for Survey Round One and Survey Round Two. Vegetation was classified as pixel with values &gt;0.35 for Round One and &gt;0.36 for Round Two, via Otsu’s thresholding. Dense vegetation was classified as pixels with values &gt;0.62 for Round One and &gt;0.64 for Round Two, using the same method after the first round of classification.</p>
 </div>
@@ -235,96 +221,23 @@
 <a href="#summarising-mosaic-landscape-metrics-within-buffer-distance-of-a-point" class="anchor"></a>Summarising mosaic landscape metrics within buffer distance of a point</h2>
 <p>To build a model with point survey data, landscape metrics have to be isolated from a buffer distance around fauna sampling points. The <code>lsm_perpoint</code> function accepts a geographical input of sampling points and extracts surrounding landscape metrics from the processed mosaic into an output dataframe. Mosaicked rasters should be processed to classify respective land cover types as discrete values (e.g. vegetation classes may be classified <code>0</code> for non-vegetation; <code>1</code> for sparse; <code>2</code> for dense).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span><span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"{dir_dataoutput}/sampling/points.geojson"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> 
+<code class="sourceCode R"><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">survey</span><span class="op">-</span><span class="va">points</span><span class="op">)</span>
+<span class="va">veg_classified</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">mosaic</span><span class="op">)</span>
 
-<span class="va">circles_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">sen2r_points_buffers</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-  
-  <span class="va">circles_sf</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">st_buffer</span><span class="op">(</span><span class="va">points</span>, 
-                            dist <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">sen2r_points_buffers</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="co"># buffer distance</span>
-                            nQuadSegs <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="co"># line segments per quadrant</span>
-  
-  <span class="co"># circles_sf[[i]]$area_m2 &lt;- st_area(circles_sf[[i]]) # calc area</span>
-  
-  <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">circles_sf</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">$</span><span class="va">sen2r_points_buffers</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
-  
-  <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
-<p><strong>ATTN</strong>: urban_classified no longer relevant as NVBI is not used?</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
 <span class="va">circles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lsm_perpoint.html">lsm_perpoint</a></span><span class="op">(</span>raster <span class="op">=</span> <span class="va">veg_classified</span>, points <span class="op">=</span> <span class="va">points</span>, 
-                        buffer_sizes <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">sen2r_points_buffers</span>,
+                        buffer_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">100</span>, <span class="fl">126</span>, <span class="fl">200</span>, <span class="fl">400</span>, <span class="fl">600</span>, <span class="fl">800</span>, <span class="fl">1000</span><span class="op">)</span>,
                         class_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"vegSparse"</span>, <span class="st">"vegDense"</span><span class="op">)</span>,
                         class_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,
                         landscape_name <span class="op">=</span> <span class="st">"veg"</span>,
-                        level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"class"</span>, <span class="st">"landscape"</span><span class="op">)</span><span class="op">)</span> 
-
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">circles</span><span class="op">)</span><span class="op">)</span><span class="op">{</span> <span class="co"># append to circles2 info to circles</span>
-  <span class="va">circles</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">circles</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">%&gt;%</span>
-    <span class="fu">mutate</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span>.cols <span class="op">=</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"lsm_"</span><span class="op">)</span>, <span class="co"># make NA if percentage_inside &lt; 90</span>
-                  <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">percentage_inside</span> <span class="op">&lt;</span> <span class="fl">90</span>, <span class="cn">NA</span>, <span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">percentage_inside</span><span class="op">)</span>
-<span class="op">}</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">" Veg cover: Processed for sampling points\n"</span><span class="op">)</span>, 
-          file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"parallel-processing-log.txt"</span><span class="op">)</span>, append<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-
-
-
-<span class="co"># circles2 &lt;- lsm_perpoint(raster = urban_classified, points = points, </span>
-<span class="co">#                         buffer_sizes = params$sen2r_points_buffers,</span>
-<span class="co">#                         class_names = c("urban"),</span>
-<span class="co">#                         class_values = c(1),</span>
-<span class="co">#                         landscape_name = "urban",</span>
-<span class="co">#                         level = c("class", "landscape"))</span>
-<span class="co"># cat(paste0(Sys.time(), " Urban cover: Processed for sampling points\n"), </span>
-<span class="co">#           file=paste0("parallel-processing-log.txt"), append=TRUE)</span>
-<span class="co"># </span>
-<span class="co"># for(i in 1:length(circles)){ # append to circles2 info to circles</span>
-<span class="co">#   circles[[i]] &lt;- circles[[i]] %&gt;%</span>
-<span class="co">#     full_join(circles2[[i]] %&gt;% </span>
-<span class="co">#                  mutate(across(.cols = starts_with("lsm_"), </span>
-<span class="co">#                   ~ifelse(percentage_inside &lt; 90, NA, .))) %&gt;%</span>
-<span class="co">#                 dplyr::select(-percentage_inside), </span>
-<span class="co">#               by = c("point_id", "round"))</span>
-<span class="co"># }</span>
-<span class="co"># rm(circles2, i)</span>
-
-
-
-<span class="va">circles2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lsm_perpoint.html">lsm_perpoint</a></span><span class="op">(</span>raster <span class="op">=</span> <span class="va">water_classified</span>, points <span class="op">=</span> <span class="va">points</span>, 
-                        buffer_sizes <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">sen2r_points_buffers</span>,
-                        class_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"water"</span><span class="op">)</span>,
-                        class_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,
-                        landscape_name <span class="op">=</span> <span class="st">"water"</span>,
-                        level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"class"</span>, <span class="st">"landscape"</span><span class="op">)</span><span class="op">)</span> 
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">" Water cover: Processed for sampling points\n"</span><span class="op">)</span>, 
-          file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"parallel-processing-log.txt"</span><span class="op">)</span>, append<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">circles</span><span class="op">)</span><span class="op">)</span><span class="op">{</span> <span class="co"># append to circles2 info to circles</span>
-  <span class="va">circles</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">circles</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">%&gt;%</span>
-    <span class="fu">full_join</span><span class="op">(</span><span class="va">circles2</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">%&gt;%</span> 
-                 <span class="fu">mutate</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span>.cols <span class="op">=</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"lsm_"</span><span class="op">)</span>, 
-                  <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">percentage_inside</span> <span class="op">&lt;</span> <span class="fl">90</span>, <span class="cn">NA</span>, <span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-                <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">percentage_inside</span><span class="op">)</span>, 
-              by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"point_id"</span>, <span class="st">"round"</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span>
-
-<span class="co"># combine geometry of circles_sf with circles</span>
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">circles</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-  <span class="va">circles</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">circles_sf</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">%&gt;%</span>
-    <span class="fu">full_join</span><span class="op">(</span><span class="va">circles</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">%&gt;%</span>
-                <span class="fu">mutate</span><span class="op">(</span>round <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">round</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+                        level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"class"</span>, <span class="st">"landscape"</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
 </div>
 <div id="retrieving-osm-data-on-urban-metrics" class="section level2">
 <h2 class="hasAnchor">
 <a href="#retrieving-osm-data-on-urban-metrics" class="anchor"></a>Retrieving OSM data on urban metrics</h2>
 <p>Urban landscape elements are retrieved from the freely-available OpenStreetMap (OSM) database. In the Sentinel-2 images, buildings would be represented by their building footprint as opposed to three-dimensional structures. The number of above-ground levels from OSM can act as a proxy for building height, especially in the residential buildings of Singapore where the floor-to-floor height is standardised, and complements the two-dimensional footprint. (Building height data may also be supplied by government databases if available (e.g. <a href="https://data.gov.sg/dataset/hdb-property-information">HDB Property Information from data.gov.sg</a>), otherwise OSM can be a great “universal” source.)</p>
 <p>In this example, the building polygons and road lines are extracted from a set geographical boundary with the functions <code>get_buildings_osm</code> and <code>get_roads_osm</code>. <code>home2park</code>, a GitHub package, and <code>osmextract</code> are required dependencies for these functions and this package. Building <code>levels</code> was derived from <code>building:levels</code>; values were set to <code>1</code> if the extracted value was empty or <code>NA</code>, and set to <code>NA</code> if ≤ 0 (i.e. underground); values were then rounded up to the nearest whole number.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">osm_boundaries</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span><span class="st">"&lt;geo-boundaries&gt;.geojson"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="co"># ATTN: come back with sample dataset</span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">osm_boundaries</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">boundaries</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="co"># st_union() %&gt;% # merge all subzones</span>
   <span class="fu">st_as_sf</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">st_make_valid</span><span class="op">(</span><span class="op">)</span>

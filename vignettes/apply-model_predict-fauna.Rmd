@@ -23,32 +23,20 @@ knitr::opts_chunk$set(
 - `geom_to_grid.R`
 - `heatmap_raster.R`
 
-## Creating landscape metrics dateframe for heatmap predictions
+## Overlaying a grid 
 
-Creating a grid (**ATTN**: This is the function of `geom_to_grid.R` (untested))
+`geom_to_grid` overlays a grid over a target area where species richness predictions are desired. This function is a wrapper for the `st_make_grid` function with `what == "centers"`, from the package `sf`. The output is an object of class `sfc` that comprise of points at which landscape metrics are extracted from their respective distance buffers. Grid dimensions are variable and can be specified with `grid_dim`. `buffer_dist` is an optional argument for situations where landscape data is limited to the target area or smaller. The distance value for this argument should correspond to the largest buffer present in the variables, so as to not include areas with no landscape data.
 ```{r create grid for each UGS town, eval = FALSE}
 # subset to regions where predictions can be made: >126m inwards from boundaries
-bound_diff <- st_buffer(bound, dist = -126)
-
-bound_grid <- bound_diff %>% 
-  st_make_grid(cellsize = params$grid_dim, # regular grid across entire region
-               what = "centers", square = T, 
-               crs = st_crs(bound)) %>% 
-  st_intersection(bound_diff) %>% # subset to only within regions of interest
-  st_as_sf() %>% 
-  st_join(bound_diff) # add back col info
-  
+bound_grid <- geom_to_grid(geom = bound,
+                           buffer_dist = 126,
+                           grid_dim = c(50, 50))
 ```
 
-**Note**: This function is made for manually-mapped landscape data. For Sentinel-2 mosaic rasters, `lsm_perpoint.R` should work (untested)
-```{r run function to summarise landscape vars per grid point, eval = FALSE}
-bound_grid <- bound_grid %>% 
-  group_by(sites) %>% 
-  mutate(id = row_number()) %>% 
-  mutate(site_id = paste0(sites, id)) %>% 
-  dplyr::select(sites, site_id, geometry) %>% 
-  ungroup()
+## Summarising landscape metrics for grid centers
 
+**Note**: This function is made for manually-mapped landscape data. For Sentinel-2 mosaic rasters, `lsm_perpoint.R` should work **BUT** variables need to match with variables used to create the model. It should be compatible with models built on remotely-sensed data.
+```{r run function to summarise landscape vars per grid point, eval = FALSE}
 grid_landscape <-
   summarise_landscape_perpt(
     points = bound_grid,
@@ -65,4 +53,24 @@ grid_landscape <-
 
 ## Rasterising predictions
 
-**ATTN**: `heatmap_raster.R` is untested
+The `heatmap_raster` function is a combination of multiple functions that result in a final raster of species richness predictions for one taxon. A breakdown of the function is as follows:
+
+1. Species richness is predicted at each point provided in the `geom` argument with the objects specified in `mods`, `env_df` and `landscape`.
+2. A second grid is created using `st_make_grid` with `what == "polygons"` as a template for the final raster.
+3. The grid template and prediction values are combined with `rasterize` from the `terra` package.
+
+**Note**: Variables used in `landscape` should match variables in `env_df`.
+```{r heatmap_raster, eval = FALSE}
+# Minor edits to the env_df had to be made
+# bird_env <- birds %>% 
+#   dplyr::select(where(is.numeric) & !sprich) %>% 
+#   dplyr::select(!r50m_man_GnPR) # non-GnPR dataset
+
+bird_hm <- heatmap_raster(env_df = bird_env,
+                          mods = birdmods,
+                          landscape = grid_landscape,
+                          geom = bound,
+                          buffer_dist = 126,
+                          grid_dim = c(50, 50),
+                          name = "bird_hm") # optional
+```

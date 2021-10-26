@@ -122,32 +122,18 @@ foreach(i = 1:length(directories), # parallel loop
 To make sense of the raster data, the important information (e.g. landscape metrics) has to be isolated from the noise. Otsu's thresholding ([Otsu, 1979](https://cw.fel.cvut.cz/wiki/_media/courses/a6m33bio/otsu.pdf)) is an automated threshold finder that outperforms other techniques in terms of stability of results and processing speed, even with the presence of >2 peaks in the histogram ([Bouhennache et al., 2019](https://www.tandfonline.com/doi/abs/10.1080/10106049.2018.1497094)). The NDVI threshold for vegetation typically ranges from 0.2 to 0.4 ([Wong et al, 2019](https://link.springer.com/article/10.1186/s40562-019-0132-4); [Akbar et al, 2019](https://www.mdpi.com/2072-4292/11/2/105)). A second thresholding is performed for the vegetation class to separate sparse from dense vegetation.
 
 ```{r otsu thresholding, eval = FALSE}
-files <- paste0(dir, rounds,  "/NDVI/mosaic.tif")
+veg_classified <- data(mosaic)
 
 # get threshold value via otsu method (assumes bimodal histogram)
-thresholds <- list()
+threshold <- list()
 for(i in 1:length(rounds)){
-  thresholds[[i]] <- threshold_otsu(files[i], levels = 256) #default levels = 256 for 8-bit images
+  thresholds[[i]] <- threshold_otsu(veg_classified[i], levels = 256) #default levels = 256 for 8-bit images
   rm(i)
-}
-
-# apply first threshold & get sub-classification threshold
-thresholds2 <- list()
-for(i in 1:length(files)){
-  
-  raster <- rast(files[i])
-  raster[raster < thresholds[[i]]] <- NA # mask away those below threshold value
-  
-  # second thresholding
-  thresholds2[[i]] <- threshold_otsu(raster, levels = 256)
-  rm(raster, i)
 }
 
 # view thresholds
 thresholds[[1]]
 #[value 1]
-thresholds[[2]]
-#[value 2]
 ```
 
 ![**Distribution of NDVI values across Singapore in Survey Round One (light green bars, dashed vertical lines) and Two (dark green bars, solid vertical lines).** Based on image mosaic composed of data captured for Survey Round One and Survey Round Two. Vegetation was classified as pixel with values >0.35 for Round One and >0.36 for Round Two, via Otsu's thresholding. Dense vegetation was classified as pixels with values >0.62 for Round One and >0.64 for Round Two, using the same method after the first round of classification.](./images/otsu-sample-plot.png){#id .class width=60% height=60%}
@@ -156,103 +142,26 @@ thresholds[[2]]
 
 To build a model with point survey data, landscape metrics have to be isolated from a buffer distance around fauna sampling points. The `lsm_perpoint` function accepts a geographical input of sampling points and extracts surrounding landscape metrics from the processed mosaic into an output dataframe. Mosaicked rasters should be processed to classify respective land cover types as discrete values (e.g. vegetation classes may be classified `0` for non-vegetation; `1` for sparse; `2` for dense).
 
-```{r load sampling points w landcover data, eval = FALSE}
-points <- st_read(glue::glue("{dir_dataoutput}/sampling/points.geojson"), quiet = TRUE) 
-
-circles_sf <- list()
-for(i in 1:length(params$sen2r_points_buffers)){
-  
-  circles_sf[[i]] <- st_buffer(points, 
-                            dist = params$sen2r_points_buffers[i], # buffer distance
-                            nQuadSegs = 30) # line segments per quadrant
-  
-  # circles_sf[[i]]$area_m2 <- st_area(circles_sf[[i]]) # calc area
-  
-  names(circles_sf)[i] <- params$sen2r_points_buffers[i]
-  
-  rm(i)
-}
-
-```
-
-**ATTN**: urban_classified no longer relevant as NVBI is not used?
-
-```{r append landcover-related data to sampling points - use sample_lsm, eval = FALSE}
+```{r lsm_perpoint, eval = FALSE}
+points <- data(survey-points)
+veg_classified <- data(mosaic)
 
 circles <- lsm_perpoint(raster = veg_classified, points = points, 
-                        buffer_sizes = params$sen2r_points_buffers,
+                        buffer_sizes = c(50, 100, 126, 200, 400, 600, 800, 1000),
                         class_names = c("vegSparse", "vegDense"),
                         class_values = c(1, 2),
                         landscape_name = "veg",
                         level = c("class", "landscape")) 
-
-for(i in 1:length(circles)){ # append to circles2 info to circles
-  circles[[i]] <- circles[[i]] %>%
-    mutate(across(.cols = starts_with("lsm_"), # make NA if percentage_inside < 90
-                  ~ifelse(percentage_inside < 90, NA, .))) %>%
-    dplyr::select(-percentage_inside)
-}
-cat(paste0(Sys.time(), " Veg cover: Processed for sampling points\n"), 
-          file=paste0("parallel-processing-log.txt"), append=TRUE)
-
-
-
-# circles2 <- lsm_perpoint(raster = urban_classified, points = points, 
-#                         buffer_sizes = params$sen2r_points_buffers,
-#                         class_names = c("urban"),
-#                         class_values = c(1),
-#                         landscape_name = "urban",
-#                         level = c("class", "landscape"))
-# cat(paste0(Sys.time(), " Urban cover: Processed for sampling points\n"), 
-#           file=paste0("parallel-processing-log.txt"), append=TRUE)
-# 
-# for(i in 1:length(circles)){ # append to circles2 info to circles
-#   circles[[i]] <- circles[[i]] %>%
-#     full_join(circles2[[i]] %>% 
-#                  mutate(across(.cols = starts_with("lsm_"), 
-#                   ~ifelse(percentage_inside < 90, NA, .))) %>%
-#                 dplyr::select(-percentage_inside), 
-#               by = c("point_id", "round"))
-# }
-# rm(circles2, i)
-
-
-
-circles2 <- lsm_perpoint(raster = water_classified, points = points, 
-                        buffer_sizes = params$sen2r_points_buffers,
-                        class_names = c("water"),
-                        class_values = c(1),
-                        landscape_name = "water",
-                        level = c("class", "landscape")) 
-cat(paste0(Sys.time(), " Water cover: Processed for sampling points\n"), 
-          file=paste0("parallel-processing-log.txt"), append=TRUE)
-
-for(i in 1:length(circles)){ # append to circles2 info to circles
-  circles[[i]] <- circles[[i]] %>%
-    full_join(circles2[[i]] %>% 
-                 mutate(across(.cols = starts_with("lsm_"), 
-                  ~ifelse(percentage_inside < 90, NA, .))) %>%
-                dplyr::select(-percentage_inside), 
-              by = c("point_id", "round"))
-}
-
-# combine geometry of circles_sf with circles
-for(i in 1:length(circles)){
-  circles[[i]] <- circles_sf[[i]] %>%
-    full_join(circles[[i]] %>%
-                mutate(round = as.numeric(round)))
-  rm(i)
-}
 ```
 
 ## Retrieving OSM data on urban metrics
 
-Urban landscape elements are retrieved from the freely-available OpenStreetMap (OSM) database. In the Sentinel-2 images, buildings would be represented by their building footprint as opposed to three-dimensional structures. The number of above-ground levels from OSM can act as a proxy for building height, especially in the residential buildings of Singapore where the floor-to-floor height is standardised, and complements the two-dimensional footprint. (Building height data may also be supplied by government databases if available (e.g. [HDB Property Information from data.gov.sg](https://data.gov.sg/dataset/hdb-property-information)), otherwise OSM can be a great "universal" source.) 
+Urban landscape elements are retrieved from the freely-available OpenStreetMap (OSM) database. In the Sentinel-2 images, buildings would be represented by their building footprint as opposed to three-dimensional structures. The number of above-ground levels from OSM can act as a proxy for building height, especially in the residential buildings of Singapore where the floor-to-floor height is standardised, and complements the two-dimensional footprint. (Building height data may also be supplied by government databases if available (e.g. [HDB Property Information from data.gov.sg](https://data.gov.sg/dataset/hdb-property-information)), otherwise OSM can be a great "universal" source.)     
 
 In this example, the building polygons and road lines are extracted from a set geographical boundary with the functions `get_buildings_osm` and `get_roads_osm`. `home2park`, a GitHub package, and `osmextract` are required dependencies for these functions and this package. Building `levels` was derived from `building:levels`; values were set to `1` if the extracted value was empty or `NA`, and set to `NA` if ≤ 0 (i.e. underground); values were then rounded up to the nearest whole number. 
 
 ```{r download urban elements w parallel loops, eval = FALSE}
-osm_boundaries <- st_read("<geo-boundaries>.geojson", quiet = TRUE) %>% # ATTN: come back with sample dataset
+osm_boundaries <- data(boundaries) %>% 
   # st_union() %>% # merge all subzones
   st_as_sf() %>%
   st_make_valid()

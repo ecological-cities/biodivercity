@@ -24,6 +24,8 @@ knitr::opts_chunk$set(
 - `check_taxongrps`
 - `sptally_extractor` and `sac_extractor` allow users to generate quick summaries of collected fauna data in the forms of mean species richness and species accumulation curves respectively. 
 
+
+
 ## Quick subset of fauna survey data
 
 The `filter_obs` function is meant for quick subsetting of fauna survey data and metadata that follows the following formats:
@@ -52,7 +54,6 @@ knitr::kable(head(fauna), caption = "**Sample survey data format**") %>%
   kable_styling("striped", font_size = 10) %>% scroll_box(width = "100%")
 ```
 
-
 ```{r sample info table, echo = FALSE, message = FALSE}
 # show sample info in kable
 load("../data/surveys.RData")
@@ -63,18 +64,20 @@ surveys <- surveys_normalised[[1]]
 knitr::kable(head(surveys), caption = "**Sample survey info format**") %>%
   kable_styling("striped", font_size = 10) %>% scroll_box(width = "100%")
 ```
+  
+  `filter_obs` can be used to easily subset the data with respect to `town`, `round` and/or `priority`. In the context of this package, the parameters `town`, `round` and `priority` refer to the spatial, temporal and taxonomic grouping of the input data. Alternatively, these parameters can also be arbitrarily assigned to any existing groups.
 
-
-`filter_obs` can be used to easily subset the data with respect to `town`, `round` and/or `priority`. In the context of this package, the parameters `town`, `round` and `priority` refer to the spatial, temporal and taxonomic grouping of the input data. Alternatively, these parameters can also be arbitrarily assigned to any existing groups.
-
-```{r filter_obs vignette, eval = FALSE}
+```{r filter_obs sample, eval = FALSE}
 butterflies <- filter_obs(observations = fauna, survey_ref = surveys,
                    specify_priority = "Lepidoptera")
 tampines <- filter_obs(observations = fauna, survey_ref = surveys,
                    specify_town = "TP")
 round_2 <- filter_obs(observations = fauna, survey_ref = surveys,
                      specify_round = "2")
+```
 
+For example, a specific set of surveys (i.e. butterfly surveys in Tampines from 2020-2021) can be filtered as follows:
+```{r filter_obs example, eval = FALSE}
 butterflies_tampines_round_2 <- filter_obs(observations = fauna, survey_ref = surveys,
                    specify_priority = "Lepidoptera",
                    specify_town = "TP",
@@ -96,11 +99,12 @@ knitr::kable(head(butterflies_tampines_round_2), caption = "**Observations of *b
 ```
 
 
+
 ## Assessing missing data with past records
 
 When COVID-19 hit, fauna surveys scheduled within the Circuit Breaker period (Punggol and Queenstown Survey Round 2, Cycle 5) were not conducted. To simulate the effect on the loss in observed species richness and density with less surveys, the same number of surveys were randomly removed from the total survey number conducted during the same window of the previous survey year (Round 1, 2016/17). To examine the possible variation in species richness/density, bootstrapped repetitions were made for the respective number of missed surveys for each taxon.
 
-- e.g. **Aves (birds):** 15 (PG) surveys excluded with 100 bootstrapping scenarios
+- i.e. **Aves (birds):** 15 (PG) surveys were excluded with 100 bootstrapping scenarios
 
 ```{r exclude_simulator, eval = FALSE}
 exclude_bird_pg <- 15
@@ -117,42 +121,17 @@ boot <- exclude_simulator(bird, surveys,
                           round_ignore = "2", 
                           cycle_ignore = NULL,
                           rep = rep)
+```
 
+The results can be visualised as a boxplot:
+
+```{r exclude_simulator plot, eval = FALSE}
 # plot boxplot of affected species
 plot_bird <- boot %>%
   pivot_longer(cols = num_range("iter", 1:ncol(boot)), # transform for plotting
                names_to = "iteration", values_to = "n") %>%
   mutate(town = "PG") %>%
   mutate(priority = "Aves")
-
-plot_bird <- plot_bird %>%
-  
-  # get order
-  left_join(plot_bird %>%
-              ungroup() %>%
-              group_by(species) %>%
-              summarise(order = mean(full))) %>%
-  drop_na(n) %>%
-
-  ggplot(aes(x = reorder(species, order), y = n)) +
-    
-    facet_grid(priority ~ town) +
-  
-    geom_point(aes(y = full), shape=4, size=2.0,
-                 color = "blue", alpha = 0.2) +
-    
-    geom_boxplot(width=0.1, color="black", alpha=0.2) +
-    stat_summary(fun = mean, geom = "point", shape=5, size=1.5) + #mean value
-  
-    xlab("") +
-    ylab("No. of sampling points") + 
-    theme_bw() +
-    theme(panel.grid.major.y = element_blank(),
-          panel.grid.minor.y = element_blank(),
-          panel.grid.minor.x = element_blank()) +
-    coord_flip() +
-    scale_y_continuous(expand = c(0,0))
-
 
 # sp richness
 sp_rich <- colSums(!is.na(boot[,-1]))
@@ -198,13 +177,19 @@ sp_rich %>%
 
 ![**Regenerate with sample dataset.** Boxplot of no. of species (species richness) at Punggol in the first Survey Round (2016/17), if similar no. of missed surveys were randomly excluded in Cycle 5 (COVID-19 circuit breaker period in Survey Round 2, 2019/20). The blue cross denotes the counts across full dataset, while the diamond symbol denotes the mean counts across the 100 bootstrapped repetitions of scenarios with excluded data.](./images/exclude-sim-sample-plot.png)
 
+
+
 ## Checking fauna data entries for repeats or outdated names
 
 **ATTN**: `check_taxongrps.R` no longer used in `0_Process-fauna.Rmd`?
 
+
+
 ## Summarising fauna data entries
 
-To generate summary figures quickly for large survey data accumulated throughout the study period, `sptally_extractor` and `sac_extractor` can calculate the mean species richness and species accumulation curves respectively. `sptally_extractor` can be specific to the point or individual survey levels, while `sac_extractor` is calculated at the broader spatial grouping of `town` to represent surveys as sampling effort. Similar to the `filter_obs` function covered above, the same parameters of `town`, `round` and `priority` can be specified.
+To generate summary figures quickly for large survey data accumulated throughout the study period, `sptally_extractor` and `sac_extractor` can calculate the **mean species richness** and **species accumulation curves** respectively. `sptally_extractor` can be specific to the point or individual survey levels, while `sac_extractor` is calculated at the broader spatial grouping of `town` to represent surveys as sampling effort. Similar to the `filter_obs` function covered above, the same parameters of `town`, `round` and `priority` can be specified.
+
+
 
 ### Stacked bar plots with error
 
@@ -263,6 +248,8 @@ normalised_perpt <- normalised_perpt %>%
 
 ![Mean species richness (no. of species) per sampling point and survey, for each town and taxon. The error bars denote two standard deviations of the mean across all iterations. Note that the scale of the y-axis varies between the plots.](./images/sample-stacked-bar-plot.png){#id .class width=80% height=80%}
 
+
+
 ### Species accumulation curves
 
 An example of the sample dataset summarised with `sac_extractor` to create a species accumulation curve for each `town` and `priority` (taxon):
@@ -309,3 +296,5 @@ plot_sac <- plot_sac %>%
 ```
 
 ![Species accumulation curves compare total, or ‘gamma’, diversity for the total sampling area, while accounting for differences in sampling effort. The mean species richness (line) and two standard deviations of the mean (shaded region) across all iterations are shown. Note that the scale of the y-axis varies between taxa.](./images/sac-sample-plot.png){#id .class width=80% height=80%}
+
+
