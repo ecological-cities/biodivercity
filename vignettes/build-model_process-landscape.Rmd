@@ -21,17 +21,17 @@ knitr::opts_chunk$set(
 **Sections that require attention are marked with <u>ATTN</u>**
 
 1. Sentinel-2 data is first downloaded from the free and open-access Copernicus Open Access Hub via the package `sen2r`.
-2. Images are mosaiced with the `insert-mosaic-function-here` function from this package.
-3. Otsu thresholding is performed with the `threshold_otsu` function from this package.
+2. Images are mosaicked with the `mosaic_sen2r` function from this package for spectral indices.
+3. Otsu thresholding is performed with the `threshold_otsu` function and then classified with `classify_mosaic`.
 4. `lsm_perpoint` function summarises landscape metrics for provided geographical points at specified buffers.
-5. `get_roads_osm` and `get_buildings_osm` (`home2park` package is a dependency)
+5. `get_roads_osm` and `get_buildings_osm` functions are used to retrieve further urban landscape data from OpenStreetMap.
 
 Necessary input as sample dataset:
 - Sentinel-2 mosaic raster with NDVI and NDWI2
 - Sampling points geojson
 - Sampling area (e.g. town) boundaries geojson
 
-## Using sen2r to get images (optional?)
+## Using sen2r to get images
 
 Images were downloaded with `sen2r`, it can be installed from [CRAN](https://cran.r-project.org/package=sen2r).
 
@@ -43,78 +43,39 @@ install.packages("sen2r")
 library(sen2r)
 check_sen2r_deps() # check dependencies
 install_sen2cor(force = TRUE) # install via command instead of GUI
+
+out_dir  <- glue::glue("{dir_dataoutput}/spatial/satellite-images/sen2r/sen2r_", {as.character(params$sen2r_date_range[1])}, "-to-", {as.character(params$sen2r_date_range[2])})
+
+# run this after every successful download if there are still files in LTA not yet online, then subsequently check with provided safe_is_online() and sen2r():
+out_paths <- sen2r(
+  param_list = params$sen2r_params,
+  timewindow = c(as.Date(params$sen2r_date_range[1]), as.Date(params$sen2r_date_range[2])),
+  path_l2a = params$sen2r_dir_rawdata, # level-2A SAFE products
+  path_l1c = params$sen2r_dir_rawdata, # level-1C SAFE products
+  path_out = out_dir,
+  path_indices = out_dir,
+  extent_as_mask = TRUE,
+  list_rgb = "RGB432B" # output RGB image
+  # max_mask = 15,
+  # list_indices = c("NDVI", "ARI")
+  )
 ```
 
-Using `sen2r`:
-- Check their vignette
 
-Desired indices: **NDVI**, **NDWI2**
-
-## Processing mosaics of downloaded images
-
-**NOTE**: This parallel-processed mosaic generation can be a new function? 
-**ATTN**: would be difficult to include as sample since file sizes are large
+## Creating mosaics of downloaded images
 
 ```{r mosaic generation, eval = FALSE}
-directories <- list.dirs(glue::glue("{dir_dataoutput}/processed/{which_round}"), recursive = FALSE)
-directories <- directories[!basename(directories) %in% c("CLD", "SCL", "RGB432B")] # rm directories not to be mosaiced
+ mosaic_sen2r(parent_dir = out_dir,
+              exclude = NULL,
+              rm_outlier = TRUE)
+```
 
-# loop to process/export mosaic for each subdirectory
-# Note: doesn't make sense for SCL (surface classification map), CLD (cloud mask) & RGB432B (RGB, clouds are white not NA) 
-foreach(i = 1:length(directories), # parallel loop
-                   .packages = c("terra", "raster")) %dopar% { # foreach loops
-  
-  # for each spectral index, import images as rasterStack
-  filepaths <- dir(path = directories[i], full.names = TRUE, pattern="*.tif$")
-  filepaths <- filepaths[!grepl("mosaic", filepaths)] # exclude previously generated/processed mosaics
-  
-  images <- lapply(filepaths, rast) # import as list
-  
-  # don't run these for non-spectral indices
-  if(!grepl(c("BOA"), directories[i])){
-    images <- lapply(images, function(x) x/10000) # re-scale
-  }
-  
-  # remove outliers (for specific spectral indices)
-  if(basename(directories[i]) %in% c("NDVI", "NDWI2")){
-    
-    for(j in 1:length(images)){
-        images[[j]][images[[j]] < -1] <- NA
-        images[[j]][images[[j]] > 1] <- NA
-    }
-  }
-  
-  # MOSAIC IMAGES
-  if(basename(directories[i]) %in% c("BOA")){ # if multiband, use raster::mosaic (weird error if use terra::mosaic)
-    
-    images <- lapply(filepaths, raster::stack) # import as list, overwrite var
-    images$fun <- mean
-    images$na.rm <- TRUE
-    mosaic <- do.call(raster::mosaic, images)
-    
-    raster::writeRaster(mosaic, 
-                paste0(directories[i], "/mosaic.tif"),
-                overwrite = TRUE)
-    
-    
-  }else{ # single band spectral index mosaics
-  
-    mosaic <- do.call(terra::mosaic, c(images, 
-                                       list(fun = "mean"))) 
-    writeRaster(mosaic, 
-                paste0(directories[i], "/mosaic.tif"),
-                  wopt = list(gdal=c("COMPRESS=LZW")),
-                  overwrite = TRUE)
-  }
-  
-  cat(paste0(Sys.time(), " Exported mosaic for: "), filepaths, 
-      sep = "\n", 
-      file=paste0("parallel-processing-log.txt"), append=TRUE)
-  
-  
-  rm(mosaic, images, filepaths, i, j)
-  gc()
-}
+## Classfifying mosaics
+
+```{r mosaic classification, eval = FALSE}
+classify_mosaic(x = "out_dir/index/mosaic.tif",
+                otsu = TRUE,
+                output = "out_dir/classified/")
 ```
 
 ## Otsu's thresholding for mosaicked images

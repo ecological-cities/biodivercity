@@ -24,11 +24,12 @@ knitr::opts_chunk$set(
 - `check_taxongrps`
 - `sptally_extractor` and `sac_extractor` allow users to generate quick summaries of collected fauna data in the forms of mean species richness and species accumulation curves respectively. 
 
-
+To include:
+- Function for sampling point generation
 
 ## Quick subset of fauna survey data
 
-The `filter_obs` function is meant for quick subsetting of fauna survey data and metadata that follows the following formats:
+The `filter_obs` function allows for the quick subsetting of fauna survey data and metadata that follows the following formats:
 
 ```{r replacement code for vignette, eval = FALSE}
 fauna <- data(fauna)
@@ -86,7 +87,7 @@ butterflies_tampines_round_2 <- filter_obs(observations = fauna, survey_ref = su
 head(butterflies_tampines_round_2)
 ```
 
-```{r filter_obs, echo = FALSE, message = FALSE}
+```{r filter_obs, eval = FALSE, echo = FALSE, message = FALSE}
 source("../R/filter_obs.R")
 
 butterflies_tampines_round_2 <- filter_obs(observations = fauna, survey_ref = surveys,

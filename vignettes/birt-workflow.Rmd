@@ -1,0 +1,47 @@
+---
+title: "BIRT Workflow"
+author: "Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{BIRT Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+The project objectives are to:
+
+This package facilitates existing analyses
+
+### Sampling point generation
+To determine sampling points, we first stratify land cover into two main classes of *natural vegetation* and *urban* land cover. These two mutually exclusive land cover types were then randomly sampled at a point density of one point per 50 hectares of land. 
+
+The function `random_pt_gen` in this package can be used to read landcover shapefiles and randomly sample at a specified point density.
+
+<insert image of generated points here>
+
+**In-situ recce**
+
+### Process survey data
+
+- Data processing for traditional CBI methods end here with raw data summaries.
+
+### Process landscape data
+
+
+### Building of models
+
+
+### Spatial predictions
+
+
+### Cross-validation
