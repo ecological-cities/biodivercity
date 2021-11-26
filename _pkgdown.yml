@@ -10,6 +10,10 @@ home:
   links:
 
 reference:
+- title: "Fauna: Generate sampling points"
+  desc: "Randomly generate survey points within an area."
+- contents:
+  - random_pt_gen
 - title: "Fauna: Build models"
   desc: "Wrangle data collected from animal surveys."
 - contents:
@@ -24,10 +28,12 @@ reference:
 - title: "Landscape: Build models"
   desc: "Functions to process and summarise landscape data at survey locations."
 - contents:
-  - get_roads_osm
-  - get_buildings_osm
+  - mosaic_sen2r
+  - classify_mosaic
   - threshold_otsu
   - lsm_perpoint
+  - get_roads_osm
+  - get_buildings_osm
 - title: "Apply models"
   desc: "Process data and run models to make biodiversity predictions."
 - contents:

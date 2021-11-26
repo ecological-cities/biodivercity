@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cross-validation of models • biodivercity</title>
+<title>BIRT Workflow • biodivercity</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Cross-validation of models">
+<script src="../pkgdown.js"></script><meta property="og:title" content="BIRT Workflow">
 <meta property="og:description" content="biodivercity">
 <meta name="robots" content="noindex">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -85,16 +85,16 @@
 
       
 
-      </header><script src="apply-model_validation_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><script src="birt-workflow_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Cross-validation of models</h1>
+      <h1 data-toc-skip>BIRT Workflow</h1>
                         <h4 class="author">Author</h4>
             
             <h4 class="date">2021-11-26</h4>
       
       
-      <div class="hidden name"><code>apply-model_validation.Rmd</code></div>
+      <div class="hidden name"><code>birt-workflow.Rmd</code></div>
 
     </div>
 
@@ -103,9 +103,39 @@
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
+<p>The project objectives are to:</p>
+<p>This package facilitates existing analyses</p>
+<div id="sampling-point-generation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#sampling-point-generation" class="anchor"></a>Sampling point generation</h3>
+<p>To determine sampling points, we first stratify land cover into two main classes of <em>natural vegetation</em> and <em>urban</em> land cover. These two mutually exclusive land cover types were then randomly sampled at a point density of one point per 50 hectares of land.</p>
+<p>The function <code>random_pt_gen</code> in this package can be used to read landcover shapefiles and randomly sample at a specified point density.</p>
+<p><insert image of generated points here></insert></p>
+<p><strong>In-situ recce</strong></p>
+</div>
+<div id="process-survey-data" class="section level3">
+<h3 class="hasAnchor">
+<a href="#process-survey-data" class="anchor"></a>Process survey data</h3>
 <ul>
-<li>Function not created</li>
+<li>Data processing for traditional CBI methods end here with raw data summaries.</li>
 </ul>
+</div>
+<div id="process-landscape-data" class="section level3">
+<h3 class="hasAnchor">
+<a href="#process-landscape-data" class="anchor"></a>Process landscape data</h3>
+</div>
+<div id="building-of-models" class="section level3">
+<h3 class="hasAnchor">
+<a href="#building-of-models" class="anchor"></a>Building of models</h3>
+</div>
+<div id="spatial-predictions" class="section level3">
+<h3 class="hasAnchor">
+<a href="#spatial-predictions" class="anchor"></a>Spatial predictions</h3>
+</div>
+<div id="cross-validation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#cross-validation" class="anchor"></a>Cross-validation</h3>
+</div>
 </div>
   </div>
 
