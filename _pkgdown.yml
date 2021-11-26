@@ -5,7 +5,7 @@ development:
   mode: auto
 
 home:
-  title: R Package - Biodiversity indices for city landscapes
+  title: Biodiversity indices for city landscapes
   description: Assess the diversity of animal species in urban areas.
   links:
 
