@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">biodivercity</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
 
@@ -97,16 +97,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/apply-model_predict-fauna.html">Predict fauna spatially</a>
+      <a href="../articles/birt-workflow.html">BIRT Workflow</a>
     </li>
     <li>
-      <a href="../articles/apply-model_validation.html">Cross-validation of models</a>
+      <a href="../articles/survey-methods.html">Survey methodology</a>
     </li>
     <li>
-      <a href="../articles/build-model_process-fauna.html">Process fauna survey data</a>
+      <a href="../articles/otsu-thresholding.html">Otsu's thresholding</a>
     </li>
     <li>
-      <a href="../articles/build-model_process-landscape.html">Get and process landscape metrics</a>
+      <a href="../articles/heatmap-resolutions.html">Alpha diversity heatmap comparisons</a>
+    </li>
+    <li>
+      <a href="../articles/covid-19_missed-surveys.html">Missing surveys from COVID-19 measures</a>
     </li>
   </ul>
 </li>
@@ -141,6 +144,25 @@
     </colgroup>
 
     <tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-fauna-generate-sampling-points" class="hasAnchor"><a href="#section-fauna-generate-sampling-points" class="anchor"></a>Fauna: Generate sampling points</h2>
+          <p class="section-desc"><p>Randomly generate survey points within an area.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="random_pt_gen.html">random_pt_gen()</a></code> </p>
+        </td>
+        <td><p>Randomly generate sampling points within supplied area</p></td>
+      </tr>
+    </tbody><tbody>
       <tr>
         <th colspan="2">
           <h2 id="section-fauna-build-models" class="hasAnchor"><a href="#section-fauna-build-models" class="anchor"></a>Fauna: Build models</h2>
@@ -211,15 +233,15 @@
       <tr>
         
         <td>
-          <p><code><a href="get_roads_osm.html">get_roads_osm()</a></code> </p>
+          <p><code><a href="mosaic_sen2r.html">mosaic_sen2r()</a></code> </p>
         </td>
-        <td><p>Get road lines from OpenStreetMap</p></td>
+        <td><p>Create mosaics of Sentinel-2 images downloaded via the sen2r package</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_buildings_osm.html">get_buildings_osm()</a></code> </p>
+          <p><code><a href="classify_mosaic.html">classify_mosaic()</a></code> </p>
         </td>
-        <td><p>Get building polygons from OpenStreetMap</p></td>
+        <td><p>Binary classification of a spectral index mosaic image with a threshold value.</p></td>
       </tr><tr>
         
         <td>
@@ -232,6 +254,18 @@
           <p><code><a href="lsm_perpoint.html">lsm_perpoint()</a></code> </p>
         </td>
         <td><p>Calculate landscape metrics at sampling points</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_roads_osm.html">get_roads_osm()</a></code> </p>
+        </td>
+        <td><p>Get road lines from OpenStreetMap</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_buildings_osm.html">get_buildings_osm()</a></code> </p>
+        </td>
+        <td><p>Get building polygons from OpenStreetMap</p></td>
       </tr>
     </tbody><tbody>
       <tr>

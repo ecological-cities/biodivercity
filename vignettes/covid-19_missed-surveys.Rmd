@@ -1,0 +1,80 @@
+---
+title: "Missing surveys from COVID-19 measures"
+author: "Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Missing surveys from COVID-19 measures}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Assessing missing data with past records
+
+When COVID-19 hit, fauna surveys scheduled within the Circuit Breaker period (Punggol and Queenstown Survey Round 2, Cycle 5) were not conducted. To simulate the effect on the loss in observed species richness and density with less surveys, the same number of surveys were randomly removed from the total survey number conducted during the same window of the previous survey year (Round 1, 2016/17). To examine the possible variation in species richness/density, bootstrapped repetitions were made for the respective number of missed surveys for each taxon.
+
+- i.e. **Aves (birds):** 15 (PG) surveys were excluded with 100 bootstrapping scenarios
+
+```{r exclude_simulator, eval = FALSE}
+exclude_bird_pg <- 15
+rep <- 100
+
+set.seed(123)
+
+boot <- exclude_simulator(bird, surveys,
+                          exclude_num = exclude_bird_pg, 
+                          exclude_level = "survey",
+                          specify_points = NULL, specify_towns = NULL,
+                          specify_rounds = NULL, specify_cycles = 5, 
+                          town_ignore = c("QT","TP", "JW", "BS", "WL"), # for PG
+                          round_ignore = "2", 
+                          cycle_ignore = NULL,
+                          rep = rep)
+```
+
+The results can be visualised as a boxplot:
+
+```{r exclude_simulator plot, eval = FALSE}
+# sp richness
+sp_rich <- colSums(!is.na(boot[,-1]))
+# mean(sp_rich) / nrow(boot)
+# quantile(sp_rich)
+sp_rich <- sp_rich %>%
+  as_tibble() %>%
+  rename(n = "value") %>%
+  mutate(full = nrow(boot)) %>%
+  mutate(priority = "Aves") %>%
+  mutate(town = "PG")
+
+# A function factory for getting integer y-axis values.
+integer_breaks <- function(n = 5, ...) {
+  fxn <- function(x) {
+  breaks <- floor(pretty(x, n, ...))
+  names(breaks) <- attr(breaks, "labels")
+  breaks
+  }
+  return(fxn)
+  }
+
+# plot boxplot of expected species
+sp_rich %>%
+  mutate(priority = factor(priority, levels = c("Aves"))) %>%
+
+  ggplot(aes(x = town, y = n)) +
+    
+    facet_wrap( ~ priority, scales = "free") +
+    
+    geom_point(aes(y = full), shape=4, size=3.0,
+               color = "blue", alpha = 0.2) +
+    geom_boxplot(width=0.2, color="black", alpha=0.2) +
+    stat_summary(fun = mean, geom = "point", shape=5, size=2.0) + #mean value
+  
+    scale_y_continuous(breaks = integer_breaks()) +
+    xlab("") +
+    ylab("No. of species") + 
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.y = element_blank())
+```
+
+![**Regenerate with sample dataset.** Boxplot of no. of species (species richness) at Punggol in the first Survey Round (2016/17), if similar no. of missed surveys were randomly excluded in Cycle 5 (COVID-19 circuit breaker period in Survey Round 2, 2019/20). The blue cross denotes the counts across full dataset, while the diamond symbol denotes the mean counts across the 100 bootstrapped repetitions of scenarios with excluded data.](./images/exclude-sim-sample-plot.png)

@@ -2,12 +2,13 @@ pandoc: 2.11.4
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  apply-model_predict-fauna: apply-model_predict-fauna.html
-  apply-model_validation: apply-model_validation.html
   biodivercity: biodivercity.html
-  build-model_process-fauna: build-model_process-fauna.html
-  build-model_process-landscape: build-model_process-landscape.html
-last_built: 2021-10-19T08:24Z
+  birt-workflow: birt-workflow.html
+  covid-19_missed-surveys: covid-19_missed-surveys.html
+  heatmap-resolutions: heatmap-resolutions.html
+  otsu-thresholding: otsu-thresholding.html
+  survey-methods: survey-methods.html
+last_built: 2021-12-13T00:35Z
 urls:
   reference: https://ecological-cities.github.io/biodivercity//reference
   article: https://ecological-cities.github.io/biodivercity//articles
