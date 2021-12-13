@@ -10,7 +10,6 @@
 #'
 #'@return The .tif raster `classified_<index>.tif` in the output folder.
 #'
-#'@import threshold_otsu
 #'@import terra
 #'
 #'@export

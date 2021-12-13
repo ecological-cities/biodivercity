@@ -1,4 +1,4 @@
-#'Randomly generate fauna sampling points within supplied area
+#'Randomly generate sampling points within supplied area
 #'
 #'Randomly generate fauna sampling points at a density of one point per specified area of supplied boundaries.
 #'
