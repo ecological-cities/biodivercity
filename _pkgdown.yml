@@ -1,9 +1,6 @@
 url: https://ecological-cities.github.io/biodivercity/
 title: biodivercity
 
-development:
-  mode: devel
-
 home:
   title: R Package - Biodiversity indices for city landscapes
   description: Assess the diversity of animal species in urban areas.
@@ -42,19 +39,23 @@ reference:
   desc: "Validation and accuracy assessments."
 
 articles:
-- title: "Fauna: Summarise data and build models"
+- title: "BIRT Workflow"
   navbar: ~
   contents:
-  - build-model_process-fauna
-- title: "Landscape: Build models"
+  - birt-workflow
+- title: "Survey methods"
   navbar: ~
   contents:
-  - build-model_process-landscape
-- title: "Apply models"
+  - survey-methods
+- title: "Otsu's thresholding"
   navbar: ~
   contents:
-  - apply-model_predict-fauna
-- title: "Test model predictions"
+  - otsu-thresholding
+- title: "Heatmap resolutions"
   navbar: ~
   contents:
-  - apply-model_validation
+  - heatmap-resolutions
+- title: "Missed surveys during COVID-19"
+  navbar: ~
+  contents:
+  - covid-19_missed-surveys
