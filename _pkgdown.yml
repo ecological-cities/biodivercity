@@ -13,6 +13,9 @@ template:
       src: man/figures/logo.png
       alt: "Biodiversity Indices for City Landscapes"
 
+development:
+  mode: auto
+
 authors:
   Kwek Yan Chong:
     href: https://github.com/kwekiii
@@ -25,6 +28,18 @@ authors:
   Hong Jhun Sim:
     href: https://github.com/hongjhun
 
+home:
+  title: Biodiversity indices for city landscapes
+  description: Assess the diversity of animal species in urban areas.
+  links:
+  sidebar:
+    structure: [license, citation, authors, community, links, custom, dev]
+    roles: [cre, aut]
+    components:
+      custom:
+        title: Funding
+        text: The Singapore Ministry of National Development Research Fund funded the grant project (2016 to 2022) that contributed to the development of this package. The grant was awarded to the National University of Singapore, in partnership with the Singapore Housing Development Board.
+
 footer:
   structure:
     left: team
@@ -33,22 +48,7 @@ footer:
     organisation: _biodivercity_ is a part of [__ecological-cities__](https://github.com/ecological-cities)
     team: Copyright &copy; 2022 [Kwek Yan Chong](https://github.com/kwekiii), [Xiao Ping Song](https://xp-song.github.io), [Justin Nai](https://github.com/JustinNai), [Edwin Tan](https://github.com/edwintyw), [Hong Jhun Sim](https://github.com/hongjhun) and contributors.
 
-sidebar:
-  roles: [cre, aut]
 
-development:
-  mode: auto
-
-home:
-  title: Biodiversity indices for city landscapes
-  description: Assess the diversity of animal species in urban areas.
-  links:
-  sidebar:
-    structure: [license, citation, authors, community, links, custom, dev]
-    components:
-      custom:
-        title: Funding
-        text: The Singapore Ministry of National Development Research Fund funded the grant project (2016 to 2022) that contributed to the development of this package. The grant was awarded to the National University of Singapore, in partnership with the Singapore Housing Development Board.
 
 navbar:
   structure:
