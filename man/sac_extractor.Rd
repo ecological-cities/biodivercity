@@ -7,13 +7,13 @@
 sac_extractor(
   observations,
   survey_ref,
-  specify_town,
-  specify_round,
-  specify_priority,
+  specify_area,
+  specify_period,
+  specify_taxon,
   survey_id = "survey_id",
-  town = "town",
-  round = "round",
-  priority = "priority",
+  area = "area",
+  period = "period",
+  taxon = "taxon",
   species = "species",
   genus = "genus",
   family = "family",
@@ -22,28 +22,28 @@ sac_extractor(
 }
 \arguments{
 \item{observations}{Dataframe of species observations.
-It should include columns for \code{survey_id}, \code{town}, \code{round}, \code{priority}, \code{species} and \code{abundance}.}
+It should include columns for \code{survey_id}, \code{area}, \code{period}, \code{taxon}, \code{species} and \code{abundance}.}
 
 \item{survey_ref}{Dataframe of all surveys conducted. Values in the column
 \code{survey_id} should correspond to those in the \code{observations}.}
 
-\item{specify_town}{Specify the \code{town}.}
+\item{specify_area}{Specify the \code{area}.}
 
-\item{specify_round}{Specify the survey \code{round}.}
+\item{specify_period}{Specify the survey \code{period}.}
 
-\item{specify_priority}{Specify the \code{priority} taxon.}
+\item{specify_taxon}{Specify the \code{taxon} group of interest.}
 
 \item{survey_id}{Column name of the unique identifier for each survey in \code{observations} and
 \code{survey_ref}. Defaults to \code{survey_id}.}
 
-\item{town}{Column name of the town specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{town}.}
+\item{area}{Column name of the area specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{area}.}
 
-\item{round}{Column name of the sampling round specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{round}.}
+\item{period}{Column name of the sampling period specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{period}.}
 
-\item{priority}{Column name of the priority taxon specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{priority}.}
+\item{taxon}{Column name of the taxon of interest specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{taxon}.}
 
 \item{species}{Column name of the species specified in \code{observations}.
 Defaults to \code{species}.}
@@ -61,12 +61,12 @@ Defaults to \code{abundance}.}
 }
 \value{
 A dataframe with columns for the \code{sites}, species \code{richness} and \code{sd} (standard deviation)
-of results, as well as the information specified in \code{specify_town}, \code{specify_round} and \code{specify_priority}.
+of results, as well as the information specified in \code{specify_area}, \code{specify_period} and \code{specify_taxon}.
 }
 \description{
 Wrapper function to \code{filter_obs()} which filters species observations from biodiversity surveys, based on specified criteria.
 Subsequently forms community matrix, and removes taxon group-level (genus/family)
-if all species within group are observed in the town (& round), using the function \code{check_taxongrps()}.
+if all species within group are observed in the area (& period), using the function \code{check_taxongrps()}.
 Finally, runs the function \code{specaccum()} in package \code{vegan}, and extracts output
 data. Data on both the biodiversity surveys and their species observations (and respective abundances)
 must be provided.

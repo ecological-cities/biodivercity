@@ -1,5 +1,40 @@
 url: https://ecological-cities.github.io/biodivercity/
 title: biodivercity
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  bslib:
+    link-decoration: none
+    font-size-base: 1rem
+    h2-font-size: $font-size-base * 1.9
+    h3-font-size: $font-size-base * 1.75
+  opengraph:
+    image:
+      src: man/figures/logo.png
+      alt: "Biodiversity Indices for City Landscapes"
+
+authors:
+  Kwek Yan Chong:
+    href: https://github.com/kwekiii
+  Xiao Ping Song:
+    href: https://xp-song.github.io
+  Justin Nai:
+    href: https://github.com/JustinNai
+  Edwin Tan:
+    href: https://github.com/edwintyw
+  Hong Jhun Sim:
+    href: https://github.com/hongjhun
+
+footer:
+  structure:
+    left: team
+    right: [organisation]
+  components:
+    organisation: Part of __ecological-cities__ https://github.com/ecological-cities
+    team: Copyright &copy; 2022 [Kwek Yan Chong](https://github.com/kwekiii), [Xiao Ping Song](https://xp-song.github.io), [Justin Nai](https://github.com/JustinNai), [Edwin Tan](https://github.com/edwintyw), [Hong Jhun Sim](https://github.com/hongjhun) and contributors.
+
+sidebar:
+  roles: [cre, aut]
 
 development:
   mode: auto
@@ -8,8 +43,53 @@ home:
   title: Biodiversity indices for city landscapes
   description: Assess the diversity of animal species in urban areas.
   links:
+  sidebar:
+    structure: [license, citation, authors, community, links, custom, dev]
+    components:
+      custom:
+        title: Funding
+        text: The Singapore Ministry of National Development Research Fund funded the grant project (2016 to 2022) that contributed to the development of this package. The grant was awarded to the National University of Singapore, in partnership with the Singapore Housing Development Board.
+
+navbar:
+  structure:
+    left:  [intro, articles, more, reference, news]
+    right: [about, github]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: 1. Process landscape data
+        href:
+      - text: 2. Process animal data
+        href:
+      - text: 3. Build models
+        href:
+      - text: 4. Apply models
+        href: articles/apply-models.html
+    more:
+      text: More details
+      menu:
+      - text: Animal Surveys - Protocols
+        href: articles/more/animal-survey-protocols.html
+      - text: Animal Surveys - Raw Data Summaries
+        href: articles/more/animal-survey-summarise.html
+      - text: Landscapes - Classify Land Cover
+        href: articles/more/landscapes-classify-landcover.html
+    reference:
+      text: Functions
+      href: reference/index.html
+    news:
+      text: News
+      href: news/index.html
+    about:
+      text: About
+      href: https://xp-song.github.io/project/birt/
 
 reference:
+- title: "Fauna: Generate sampling points"
+  desc: "Randomly generate survey points within an area."
+- contents:
+  - random_pt_gen
 - title: "Fauna: Build models"
   desc: "Wrangle data collected from animal surveys."
 - contents:
@@ -24,10 +104,12 @@ reference:
 - title: "Landscape: Build models"
   desc: "Functions to process and summarise landscape data at survey locations."
 - contents:
-  - get_roads_osm
-  - get_buildings_osm
+  - mosaic_sen2r
+  - classify_mosaic
   - threshold_otsu
   - lsm_perpoint
+  - get_roads_osm
+  - get_buildings_osm
 - title: "Apply models"
   desc: "Process data and run models to make biodiversity predictions."
 - contents:

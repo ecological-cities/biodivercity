@@ -1,0 +1,15 @@
+pandoc: 2.14.0.3
+pkgdown: 2.0.1
+pkgdown_sha: ~
+articles:
+  apply-models: apply-models.html
+  biodivercity: biodivercity.html
+  covid-19_missed-surveys: covid-19_missed-surveys.html
+  animal-survey-protocols: more/animal-survey-protocols.html
+  animal-survey-summarise: more/animal-survey-summarise.html
+  landscapes-classify-landcover: more/landscapes-classify-landcover.html
+last_built: 2021-12-14T14:16Z
+urls:
+  reference: https://ecological-cities.github.io/biodivercity/reference
+  article: https://ecological-cities.github.io/biodivercity/articles
+

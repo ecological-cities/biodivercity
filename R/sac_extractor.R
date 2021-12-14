@@ -2,26 +2,26 @@
 #'
 #'Wrapper function to `filter_obs()` which filters species observations from biodiversity surveys, based on specified criteria.
 #'Subsequently forms community matrix, and removes taxon group-level (genus/family)
-#'if all species within group are observed in the town (& round), using the function `check_taxongrps()`.
+#'if all species within group are observed in the area (& period), using the function `check_taxongrps()`.
 #'Finally, runs the function `specaccum()` in package `vegan`, and extracts output
 #'data. Data on both the biodiversity surveys and their species observations (and respective abundances)
 #'must be provided.
 #'
 #'@param observations Dataframe of species observations.
-#'It should include columns for `survey_id`, `town`, `round`, `priority`, `species` and `abundance`.
+#'It should include columns for `survey_id`, `area`, `period`, `taxon`, `species` and `abundance`.
 #'@param survey_ref Dataframe of all surveys conducted. Values in the column
 #'  `survey_id` should correspond to those in the `observations`.
-#'@param specify_town Specify the `town`.
-#'@param specify_round Specify the survey `round`.
-#'@param specify_priority Specify the `priority` taxon.
+#'@param specify_area Specify the `area`.
+#'@param specify_period Specify the survey `period`.
+#'@param specify_taxon Specify the `taxon` group of interest.
 #'@param survey_id Column name of the unique identifier for each survey in `observations` and
 #'`survey_ref`. Defaults to `survey_id`.
-#'@param town Column name of the town specified in `observations` and `survey_ref`.
-#'Defaults to `town`.
-#'@param round Column name of the sampling round specified in `observations` and `survey_ref`.
-#'Defaults to `round`.
-#'@param priority Column name of the priority taxon specified in `observations` and `survey_ref`.
-#'Defaults to `priority`.
+#'@param area Column name of the area specified in `observations` and `survey_ref`.
+#'Defaults to `area`.
+#'@param period Column name of the sampling period specified in `observations` and `survey_ref`.
+#'Defaults to `period`.
+#'@param taxon Column name of the taxon of interest specified in `observations` and `survey_ref`.
+#'Defaults to `taxon`.
 #'@param species Column name of the species specified in `observations`.
 #'Defaults to `species`.
 #'@param family Column name of the family specified in `observations`.
@@ -34,7 +34,7 @@
 #'Defaults to `abundance`.
 #'
 #'@return A dataframe with columns for the `sites`, species `richness` and `sd` (standard deviation)
-#'of results, as well as the information specified in `specify_town`, `specify_round` and `specify_priority`.
+#'of results, as well as the information specified in `specify_area`, `specify_period` and `specify_taxon`.
 #'
 #'@import checkmate
 #'@import dplyr
@@ -44,9 +44,9 @@
 #'
 #'@export
 sac_extractor <- function(observations, survey_ref,
-                          specify_town, specify_round, specify_priority,
+                          specify_area, specify_period, specify_taxon,
                           survey_id = "survey_id",
-                          town = "town", round = "round", priority = "priority",
+                          area = "area", period = "period", taxon = "taxon",
                           species = "species", genus = "genus", family = "family",
                           abundance = "abundance"){
 
@@ -67,16 +67,16 @@ sac_extractor <- function(observations, survey_ref,
 
   # subset
   obs_subset <- filter_obs(observations, survey_ref,
-                           specify_town = specify_town,
-                           specify_round = specify_round,
-                           specify_priority = specify_priority,
+                           specify_area = specify_area,
+                           specify_period = specify_period,
+                           specify_taxon = specify_taxon,
                            survey_id = survey_id,
-                           town = town, round = round, priority = priority)
+                           area = area, period = period, taxon = taxon)
 
 
 
   # run check_taxongrps()
-  rmspp <- check_taxongrps(obs_subset, level = "town")
+  rmspp <- check_taxongrps(obs_subset, level = "area")
 
 
   # overwrite colnames if names are different from default
@@ -100,9 +100,9 @@ sac_extractor <- function(observations, survey_ref,
                           gamma = "chao") # extrapolation mtd
 
   # extract data
-  sac_data <- data.frame(town = specify_town,
-                         round = specify_round,
-                         priority = specify_priority,
+  sac_data <- data.frame(area = specify_area,
+                         period = specify_period,
+                         taxon = specify_taxon,
                          sites = sac$sites,
                          richness = sac$richness,
                          sd = sac$sd)

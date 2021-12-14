@@ -22,7 +22,7 @@
 #'@param ... Other arguments passed to `osmextract::oe_read()`.
 #'@param filename character (optional). File path to export output data.
 #'@param driver character (optional). Name of driver used to export output data, passed to `sf::st_write()`.
-#'Defaults to "GeoJSON".
+#'Defaults to 'GeoJSON'.
 #'@param delete_dsn logical (optional). Passed to `sf::st_write()`.
 #'@param append defaults to `NA`, which raises an error if a layer exists. Passed to `sf::st_write()`.
 #'
@@ -57,20 +57,21 @@
 #' }
 #'
 #'@export
-get_buildings_osm <- function(place, date = NULL, dir_raw = osmextract::oe_download_directory(), filename = NULL, driver = "GeoJSON", delete_dsn = TRUE,
-                              append = NA, ...) {
+get_buildings_osm <- function(place, date = NULL, dir_raw = osmextract::oe_download_directory(),
+    filename = NULL, driver = "GeoJSON", delete_dsn = TRUE, append = NA,
+    ...) {
 
     # Error checking ------------------
 
     coll <- checkmate::makeAssertCollection()
 
     # data type
-    checkmate::assert_date(date, any.missing = FALSE, all.missing = FALSE, len = 1, null.ok = TRUE,
-        add = coll)
+    checkmate::assert_date(date, any.missing = FALSE, all.missing = FALSE,
+        len = 1, null.ok = TRUE, add = coll)
 
     # file paths
-    checkmate::assert_character(filename, min.len = 1, any.missing = FALSE, all.missing = FALSE,
-        null.ok = TRUE, add = coll)
+    checkmate::assert_character(filename, min.len = 1, any.missing = FALSE,
+        all.missing = FALSE, null.ok = TRUE, add = coll)
 
     checkmate::reportAssertions(coll)
 
@@ -87,33 +88,36 @@ get_buildings_osm <- function(place, date = NULL, dir_raw = osmextract::oe_downl
 
 
     # parameters to filter data after download ----
-    osmkeys <- c("building:levels", "building:use", "building:architecture", "height")  # building & levels already default keys
+    osmkeys <- c("building:levels", "building:use", "building:architecture",
+        "height")  # building & levels already default keys
 
     q <- "SELECT * FROM 'multipolygons' WHERE building IS NOT NULL"
 
-    # to extract features that intersect bounding box (geographic crs)
+    # to extract features that intersect bounding box (geographic
+    # crs)
     bb <- sf::st_transform(place, sf::st_crs(4326)) %>%
         sf::st_geometry() %>%
         sf::st_as_text()
 
 
 
-    # download and filter data ---- filter by st_read() instead of using
-    # vectortranslate_option
-    results <- osmextract::oe_read(link, download_directory = dir_raw, layer = "multipolygons",
-        extra_tags = osmkeys, force_vectortranslate = TRUE, query = q, wkt_filter = bb)
+    # download and filter data ---- filter by st_read() instead of
+    # using vectortranslate_option
+    results <- osmextract::oe_read(link, download_directory = dir_raw,
+        layer = "multipolygons", extra_tags = osmkeys, force_vectortranslate = TRUE,
+        query = q, wkt_filter = bb)
 
 
-    # clean up ---- remove empty geoms, transform back to same crs as 'place', cast to
-    # individual polygons
+    # clean up ---- remove empty geoms, transform back to same crs as
+    # 'place', cast to individual polygons
     suppressWarnings(results <- results %>%
         dplyr::filter(!sf::st_is_empty(.)) %>%
         sf::st_transform(sf::st_crs(place)) %>%
         sf::st_make_valid())
 
     # rm invalid building polygons
-    results <- results[sf::st_is_valid(results),]
-    results <- results[!sf::st_is_empty(results),]
+    results <- results[sf::st_is_valid(results), ]
+    results <- results[!sf::st_is_empty(results), ]
 
     results <- results %>%
         sf::st_cast("MULTIPOLYGON", warn = FALSE) %>%
@@ -121,12 +125,12 @@ get_buildings_osm <- function(place, date = NULL, dir_raw = osmextract::oe_downl
 
 
 
-    # convert building_levels ---- if no info, set as 1; if underground, NA; convert to
-    # numeric, round up
+    # convert building_levels ---- if no info, set as 1; if
+    # underground, NA; convert to numeric, round up
     suppressWarnings(results <- results %>%
         dplyr::mutate(levels = as.numeric(.data$building_levels)) %>%
-        dplyr::mutate(levels = ifelse(is.na(.data$levels) | .data$levels == "", 1, ifelse(.data$levels <=
-            0, NA, .data$levels))) %>%
+        dplyr::mutate(levels = ifelse(is.na(.data$levels) | .data$levels ==
+            "", 1, ifelse(.data$levels <= 0, NA, .data$levels))) %>%
         dplyr::mutate(levels = ceiling(.data$levels)))
 
     # calculate floor area per polygon ----
@@ -137,7 +141,8 @@ get_buildings_osm <- function(place, date = NULL, dir_raw = osmextract::oe_downl
 
     # export ----
     if (!is.null(filename)) {
-        sf::st_write(results, filename, driver = driver, delete_dsn = delete_dsn, append = append)
+        sf::st_write(results, filename, driver = driver, delete_dsn = delete_dsn,
+            append = append)
     }
 
     rm(link, osmkeys, q, bb)

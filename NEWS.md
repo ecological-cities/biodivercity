@@ -1,3 +1,7 @@
 # biodivercity (development version)
 
 * Added a `NEWS.md` file to track changes to the package.
+
+#### Key features
+
+* To add..

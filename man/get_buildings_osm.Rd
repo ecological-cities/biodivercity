@@ -28,7 +28,7 @@ argument \code{download_directory} in \code{osmextract::oe_read()}.}
 \item{filename}{character (optional). File path to export output data.}
 
 \item{driver}{character (optional). Name of driver used to export output data, passed to \code{sf::st_write()}.
-Defaults to "GeoJSON".}
+Defaults to 'GeoJSON'.}
 
 \item{delete_dsn}{logical (optional). Passed to \code{sf::st_write()}.}
 

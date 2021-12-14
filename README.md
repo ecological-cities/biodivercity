@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# biodivercity
+# biodivercity <a href='https://ecological-cities.github.io/biodivercity/'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
 
@@ -40,10 +40,10 @@ library(biodivercity)
 
 To cite `home2park` or acknowledge its use, please cite the following:
 
-*biodivercity: An R package to assess the diversity of animal species in
-urban areas. <https://github.com/ecological-cities/biodivercity>.*
-
-<br>
+*Tan, E. Y. W., Song, X. P., Sim, H. J., Nai, J., Chong, K. Y. (2022).
+biodivercity: An R package to assess the diversity of animal species in
+urban areas. R package version 0.0.1 (unreleased).
+<https://github.com/ecological-cities/biodivercity>.*
 
 To get a BibTex entry, run `citation("biodivercity")`.
 

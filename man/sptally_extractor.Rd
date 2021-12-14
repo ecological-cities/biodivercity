@@ -7,14 +7,14 @@
 sptally_extractor(
   observations,
   survey_ref,
-  specify_town,
-  specify_round,
-  specify_priority,
+  specify_area,
+  specify_period,
+  specify_taxon,
   level,
   survey_id = "survey_id",
-  town = "town",
-  round = "round",
-  priority = "priority",
+  area = "area",
+  period = "period",
+  taxon = "taxon",
   point_id = "point_id",
   species = "species",
   genus = "genus",
@@ -24,30 +24,30 @@ sptally_extractor(
 }
 \arguments{
 \item{observations}{Dataframe of species observations.
-It should include columns for \code{survey_id}, \code{town}, \code{round}, \code{priority}, \code{species} and \code{abundance}.}
+It should include columns for \code{survey_id}, \code{area}, \code{period}, \code{taxon}, \code{species} and \code{abundance}.}
 
 \item{survey_ref}{Dataframe of all surveys conducted. Values in the column
 \code{survey_id} should correspond to those in the \code{observations}.}
 
-\item{specify_town}{Specify the \code{town} (character).}
+\item{specify_area}{Specify the \code{area} (character).}
 
-\item{specify_round}{Specify the survey \code{round} (character).}
+\item{specify_period}{Specify the survey \code{period} (character).}
 
-\item{specify_priority}{Specify the \code{priority} taxon (character).}
+\item{specify_taxon}{Specify the \code{taxon} of interest (character).}
 
-\item{level}{Specify whether to tally by \code{"survey"} or \code{"point"} (character).}
+\item{level}{Specify whether to tally by \code{'survey'} or \code{'point'} (character).}
 
 \item{survey_id}{Column name of the unique identifier for each survey in \code{observations} and
 \code{survey_ref}. Defaults to \code{survey_id}.}
 
-\item{town}{Column name of the town specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{town}.}
+\item{area}{Column name of the area specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{area}.}
 
-\item{round}{Column name of the sampling round specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{round}.}
+\item{period}{Column name of the sampling period specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{period}.}
 
-\item{priority}{Column name of the priority taxon specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{priority}.}
+\item{taxon}{Column name of the taxon of interest specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{taxon}.}
 
 \item{point_id}{Column name of the unique identifier for each sampling point specified in \code{observations} and \code{survey_ref}.
 Defaults to \code{point_id}.}
@@ -68,13 +68,13 @@ Defaults to \code{abundance}.}
 }
 \value{
 A dataframe containing the tally of species per survey/sampling point
-(depends if \verb{level =} \code{"survey"} or \code{"point"}).
+(depends if \verb{level =} \code{'survey'} or \code{'point'}).
 }
 \description{
 Wrapper function to \code{filter_obs()} which filters species observations from biodiversity surveys, based on specified criteria.
 Subsequently tallies the number of species per survey/sampling point (similar to function \code{specnumber()} in package \code{vegan}),
-and extracts output data. If tallied at the level of sampling points (\code{level = "point"}),
-removes taxon group-level (genus/family) if all species within group are observed at the point (& round),
+and extracts output data. If tallied at the level of sampling points (\code{level = 'point'}),
+removes taxon group-level (genus/family) if all species within group are observed at the point (& period),
 using the function \code{check_taxongrps()}. Data on both the biodiversity surveys and their species observations (and respective abundances)
 must be provided.
 }

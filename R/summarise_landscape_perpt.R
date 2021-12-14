@@ -59,6 +59,7 @@
 #'@import sf
 #'@import foreach
 #'@import doParallel
+#'@importFrom glue glue
 #'@importFrom rlang .data
 #'@importFrom graphics hist.default
 #'@importFrom tidyr pivot_longer pivot_wider
