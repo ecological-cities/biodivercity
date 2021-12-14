@@ -132,7 +132,7 @@ normalised_perpt <- normalised_perpt %>%
   mutate(round = as.factor(round))
 ```
 
-![Mean species richness (no. of species) per sampling point and survey, for each town and taxon. The error bars denote two standard deviations of the mean across all iterations. Note that the scale of the y-axis varies between the plots.](./images/sample-stacked-bar-plot.png){#id .class width=80% height=80%}
+![Mean species richness (no. of species) per sampling point and survey, for each town and taxon. The error bars denote two standard deviations of the mean across all iterations. Note that the scale of the y-axis varies between the plots.](sample-stacked-bar-plot.png){#id .class width=80% height=80%}
 
 ```{r sac, eval = FALSE}
 
@@ -175,7 +175,7 @@ plot_sac <- plot_sac %>%
 
 ```
 
-![Species accumulation curves compare total, or ‘gamma’, diversity for the total sampling area, while accounting for differences in sampling effort. The mean species richness (line) and two standard deviations of the mean (shaded region) across all iterations are shown. Note that the scale of the y-axis varies between taxa.](./images/sac-sample-plot.png){#id .class width=80% height=80%}
+![Species accumulation curves compare total, or ‘gamma’, diversity for the total sampling area, while accounting for differences in sampling effort. The mean species richness (line) and two standard deviations of the mean (shaded region) across all iterations are shown. Note that the scale of the y-axis varies between taxa.](sac-sample-plot.png){#id .class width=80% height=80%}
 
 
 ### 3. Process landscape data
@@ -301,7 +301,7 @@ bound_grid <- geom_to_grid(geom = bound,
                            buffer_dist = 126,
                            grid_dim = c(50, 50))
 ```
-![Visualisation of the `geom_to_grid` function.](./images/geom-to-grid.png){#id .class width=60% height=60%}
+![Visualisation of the `geom_to_grid` function.](geom-to-grid.png){#id .class width=60% height=60%}
 
 The `heatmap_raster` function is a combination of multiple functions that result in a final raster of species richness predictions for one taxon. A breakdown of the function is as follows:
 

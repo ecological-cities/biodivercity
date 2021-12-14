@@ -18,7 +18,19 @@ knitr::opts_chunk$set(
 
 ## Overview
 
+Multiple frameworks to assess urban biodiversity have been proposed in both research and practice. Some conceptualise biodiversity to include genetic, phylogenetic and landscape diversity, as well as human-centric dimensions such as food provision, climate regulation and ecosystem functioning. While these frameworks offer a more comprehensive view of ‘total biodiversity’, certain components may have shortcomings in terms of their (1) causal proximity (e.g. indirect effect of landscape diversity such as forest area on diversity of other species); (2) measurability at-scale (e.g. genetic diversity, plant species diversity); and (3) precision (e.g. estimating water or thermal regulation by vegetation). Components that do not directly represent the concept of ‘biodiversity’ can also add complexity in decision-making, and risk contributing to mistrust or ignorance of the overall assessment. 
 
+The package `biodivercity` provides a way to directly assess the _habitat value_ of urban landscapes for a chosen animal group (taxon). The key features include:
+
+- Provide step-by-step protocols for random point sampling of an animal group within areas of interest (for model building and validation). Examples for birds, butterflies, odonates and amphibians are provided.
+- Download and process relevant landscape data for building empirical models (e.g. spatial patterns of land cover from Sentinel-2 satellite imagery; built density from OpenStreetMap).
+- Build predictive models of local (alpha) diversity and community (beta) diversity for an animal group.
+- Use models to make pixel-based spatial predictions across the landscape, at a specified spatial resolution.
+- Validate model predictions with new data.
+- Derive total diversity for the chosen animal group, based on its local and community diversity.
+- Summarise predicted pixel values within custom areas (e.g. within zones used in city planning).
+
+<br>
 
 ## Installation
 
@@ -41,4 +53,18 @@ devtools::load_all() # to knit manually w latest changes (not built/installed ye
 # vignette will be checked in R-CMD check & package build (should use library(home2park))
 ```
 
+
 <br>
+
+## References
+
+Baker, D. J., Maclean, I. M., Goodall, M., & Gaston, K. J. (2021). Species distribution modelling is needed to support ecological impact assessments. _Journal of Applied Ecology_, _58_(1), 21-26.
+
+Soto-Navarro, C. A., Harfoot, M., Hill, S. L. L., Campbell, J., Mora, F., Campos, C., ... & Burgess, N. D. (2021). Towards a multidimensional biodiversity index for national application. _Nature Sustainability_, 1-10.
+
+
+
+
+
+
+

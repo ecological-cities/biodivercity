@@ -77,4 +77,4 @@ sp_rich %>%
           panel.grid.minor.y = element_blank())
 ```
 
-![**Regenerate with sample dataset.** Boxplot of no. of species (species richness) at Punggol in the first Survey Round (2016/17), if similar no. of missed surveys were randomly excluded in Cycle 5 (COVID-19 circuit breaker period in Survey Round 2, 2019/20). The blue cross denotes the counts across full dataset, while the diamond symbol denotes the mean counts across the 100 bootstrapped repetitions of scenarios with excluded data.](./images/exclude-sim-sample-plot.png)
+![**Regenerate with sample dataset.** Boxplot of no. of species (species richness) at Punggol in the first Survey Round (2016/17), if similar no. of missed surveys were randomly excluded in Cycle 5 (COVID-19 circuit breaker period in Survey Round 2, 2019/20). The blue cross denotes the counts across full dataset, while the diamond symbol denotes the mean counts across the 100 bootstrapped repetitions of scenarios with excluded data.](exclude-sim-sample-plot.png)

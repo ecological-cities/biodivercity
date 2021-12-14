@@ -157,7 +157,7 @@ tm <-
   
 ```
 
-```{r leaflet, echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, cache = TRUE}
+```{r leaflet, echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, cache = FALSE}
 # Pipe the tmap object into tmap_leaflet() to create a leaflet widget,
 # so that we can use leaflet::hideGroup().
 tm %>% 
