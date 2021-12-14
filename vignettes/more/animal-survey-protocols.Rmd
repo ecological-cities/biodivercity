@@ -1,10 +1,11 @@
 ---
-title: "Survey methodology"
+title: "Animal Surveys: Protocols"
+subtitle: " "
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Survey methodology}
+  %\VignetteIndexEntry{Animal Surveys: Protocols}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

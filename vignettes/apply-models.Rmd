@@ -1,10 +1,11 @@
 ---
-title: "Alpha diversity heatmap comparisons"
+title: "Apply Models"
+subtitle: "Spatial predictions across the landscape"
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Alpha diversity heatmap comparisons}
+  %\VignetteIndexEntry{Apply Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -156,6 +157,7 @@ tm <-
                 alpha = 0.8) 
   
 ```
+
 
 ```{r leaflet, echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, cache = FALSE}
 # Pipe the tmap object into tmap_leaflet() to create a leaflet widget,

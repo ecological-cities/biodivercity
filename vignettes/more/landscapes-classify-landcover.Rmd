@@ -1,10 +1,11 @@
 ---
-title: "Otsu's thresholding"
+title: "Landscapes: Classify Land Cover"
+subtitle: " "
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Otsu's thresholding}
+  %\VignetteIndexEntry{Landscapes: Classify Land Cover}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

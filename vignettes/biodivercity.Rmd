@@ -23,11 +23,11 @@ Multiple frameworks to assess urban biodiversity have been proposed in both rese
 The package `biodivercity` provides a way to directly assess the _habitat value_ of urban landscapes for a chosen animal group (taxon). The key features include:
 
 - Provide step-by-step protocols for random point sampling of an animal group within areas of interest (for model building and validation). Examples for birds, butterflies, odonates and amphibians are provided.
-- Download and process relevant landscape data for building empirical models (e.g. spatial patterns of land cover from Sentinel-2 satellite imagery; built density from OpenStreetMap).
-- Build predictive models of local (alpha) diversity and community (beta) diversity for an animal group.
+- Download and process relevant landscape data for building empirical models (e.g. spatial patterns of land cover from Sentinel-2 satellite imagery, urban density from OpenStreetMap).
+- Build predictive models of local (alpha) and community (beta) diversity for an animal group.
 - Use models to make pixel-based spatial predictions across the landscape, at a specified spatial resolution.
 - Validate model predictions with new data.
-- Derive total diversity for the chosen animal group, based on its local and community diversity.
+- Derive total (gamma) diversity for the chosen animal group, based on its local and community diversity.
 - Summarise predicted pixel values within custom areas (e.g. within zones used in city planning).
 
 <br>
