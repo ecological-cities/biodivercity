@@ -5,6 +5,8 @@
 ^cran-comments\.md$
 ^\.github$
 ^admin$
+^index\.md$
+^index\.Rmd$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
