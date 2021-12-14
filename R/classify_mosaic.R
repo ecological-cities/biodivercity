@@ -10,7 +10,7 @@
 #'
 #'@return The .tif raster `classified_<index>.tif` in the output folder.
 #'
-#'@import terra
+#'@importFrom terra rast writeRaster tmpFiles
 #'
 #'@export
 classify_mosaic <- function(x, threshold_value = NULL, otsu = FALSE, output){

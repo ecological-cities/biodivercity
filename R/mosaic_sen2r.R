@@ -11,7 +11,7 @@
 #'@return The .tif raster `mosaic.tif` within the subdirectory of included indices.
 #'
 #'@import sen2r
-#'@import terra
+#'@importFrom terra rast mosaic writeRaster
 #'
 #'@export
 mosaic_sen2r <- function(parent_dir, exclude = NULL, rm_outlier = TRUE) {
