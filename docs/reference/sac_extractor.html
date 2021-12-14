@@ -42,7 +42,7 @@
 <meta property="og:title" content="Extract species accumulation curves based on specified criteria — sac_extractor" />
 <meta property="og:description" content="Wrapper function to filter_obs() which filters species observations from biodiversity surveys, based on specified criteria.
 Subsequently forms community matrix, and removes taxon group-level (genus/family)
-if all species within group are observed in the town (&amp;amp; round), using the function check_taxongrps().
+if all species within group are observed in the area (&amp;amp; period), using the function check_taxongrps().
 Finally, runs the function specaccum() in package vegan, and extracts output
 data. Data on both the biodiversity surveys and their species observations (and respective abundances)
 must be provided." />
@@ -146,7 +146,7 @@ must be provided." />
     <div class="ref-description">
     <p>Wrapper function to <code><a href='filter_obs.html'>filter_obs()</a></code> which filters species observations from biodiversity surveys, based on specified criteria.
 Subsequently forms community matrix, and removes taxon group-level (genus/family)
-if all species within group are observed in the town (&amp; round), using the function <code><a href='check_taxongrps.html'>check_taxongrps()</a></code>.
+if all species within group are observed in the area (&amp; period), using the function <code><a href='check_taxongrps.html'>check_taxongrps()</a></code>.
 Finally, runs the function <code>specaccum()</code> in package <code>vegan</code>, and extracts output
 data. Data on both the biodiversity surveys and their species observations (and respective abundances)
 must be provided.</p>
@@ -155,13 +155,13 @@ must be provided.</p>
     <pre class="usage"><span class='fu'>sac_extractor</span><span class='op'>(</span>
   <span class='va'>observations</span>,
   <span class='va'>survey_ref</span>,
-  <span class='va'>specify_town</span>,
-  <span class='va'>specify_round</span>,
-  <span class='va'>specify_priority</span>,
+  <span class='va'>specify_area</span>,
+  <span class='va'>specify_period</span>,
+  <span class='va'>specify_taxon</span>,
   survey_id <span class='op'>=</span> <span class='st'>"survey_id"</span>,
-  town <span class='op'>=</span> <span class='st'>"town"</span>,
-  round <span class='op'>=</span> <span class='st'>"round"</span>,
-  priority <span class='op'>=</span> <span class='st'>"priority"</span>,
+  area <span class='op'>=</span> <span class='st'>"area"</span>,
+  period <span class='op'>=</span> <span class='st'>"period"</span>,
+  taxon <span class='op'>=</span> <span class='st'>"taxon"</span>,
   species <span class='op'>=</span> <span class='st'>"species"</span>,
   genus <span class='op'>=</span> <span class='st'>"genus"</span>,
   family <span class='op'>=</span> <span class='st'>"family"</span>,
@@ -174,7 +174,7 @@ must be provided.</p>
     <tr>
       <th>observations</th>
       <td><p>Dataframe of species observations.
-It should include columns for <code>survey_id</code>, <code>town</code>, <code>round</code>, <code>priority</code>, <code>species</code> and <code>abundance</code>.</p></td>
+It should include columns for <code>survey_id</code>, <code>area</code>, <code>period</code>, <code>taxon</code>, <code>species</code> and <code>abundance</code>.</p></td>
     </tr>
     <tr>
       <th>survey_ref</th>
@@ -182,16 +182,16 @@ It should include columns for <code>survey_id</code>, <code>town</code>, <code>r
 <code>survey_id</code> should correspond to those in the <code>observations</code>.</p></td>
     </tr>
     <tr>
-      <th>specify_town</th>
-      <td><p>Specify the <code>town</code>.</p></td>
+      <th>specify_area</th>
+      <td><p>Specify the <code>area</code>.</p></td>
     </tr>
     <tr>
-      <th>specify_round</th>
-      <td><p>Specify the survey <code>round</code>.</p></td>
+      <th>specify_period</th>
+      <td><p>Specify the survey <code>period</code>.</p></td>
     </tr>
     <tr>
-      <th>specify_priority</th>
-      <td><p>Specify the <code>priority</code> taxon.</p></td>
+      <th>specify_taxon</th>
+      <td><p>Specify the <code>taxon</code> group of interest.</p></td>
     </tr>
     <tr>
       <th>survey_id</th>
@@ -199,19 +199,19 @@ It should include columns for <code>survey_id</code>, <code>town</code>, <code>r
 <code>survey_ref</code>. Defaults to <code>survey_id</code>.</p></td>
     </tr>
     <tr>
-      <th>town</th>
-      <td><p>Column name of the town specified in <code>observations</code> and <code>survey_ref</code>.
-Defaults to <code>town</code>.</p></td>
+      <th>area</th>
+      <td><p>Column name of the area specified in <code>observations</code> and <code>survey_ref</code>.
+Defaults to <code>area</code>.</p></td>
     </tr>
     <tr>
-      <th>round</th>
-      <td><p>Column name of the sampling round specified in <code>observations</code> and <code>survey_ref</code>.
-Defaults to <code>round</code>.</p></td>
+      <th>period</th>
+      <td><p>Column name of the sampling period specified in <code>observations</code> and <code>survey_ref</code>.
+Defaults to <code>period</code>.</p></td>
     </tr>
     <tr>
-      <th>priority</th>
-      <td><p>Column name of the priority taxon specified in <code>observations</code> and <code>survey_ref</code>.
-Defaults to <code>priority</code>.</p></td>
+      <th>taxon</th>
+      <td><p>Column name of the taxon of interest specified in <code>observations</code> and <code>survey_ref</code>.
+Defaults to <code>taxon</code>.</p></td>
     </tr>
     <tr>
       <th>species</th>
@@ -240,7 +240,7 @@ Defaults to <code>abundance</code>.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A dataframe with columns for the <code>sites</code>, species <code>richness</code> and <code>sd</code> (standard deviation)
-of results, as well as the information specified in <code>specify_town</code>, <code>specify_round</code> and <code>specify_priority</code>.</p>
+of results, as well as the information specified in <code>specify_area</code>, <code>specify_period</code> and <code>specify_taxon</code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
