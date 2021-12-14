@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# biodivercity: Biodiversity indices for city landscapes
+# Biodiversity indices for city landscapes
 
 <!-- badges: start -->
 
@@ -38,12 +38,13 @@ library(biodivercity)
 
 ## Citation
 
-To cite `home2park` or acknowledge its use, please cite the following:
+To cite `biodivercity` or acknowledge its use, please cite the
+following:
 
-*biodivercity: An R package to assess the diversity of animal species in
-urban areas. <https://github.com/ecological-cities/biodivercity>.*
-
-<br>
+*Tan, E. Y. W., Song, X. P., Sim, H. J., Nai, J., Chong, K. Y. (2022).
+biodivercity: An R package to assess the diversity of animal species in
+urban areas. R package version 0.0.1 (unreleased).
+<https://github.com/ecological-cities/biodivercity>.*
 
 To get a BibTex entry, run `citation("biodivercity")`.
 

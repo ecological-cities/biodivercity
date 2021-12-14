@@ -2,13 +2,35 @@ Package: biodivercity
 Title: Biodiversity indices for city landscapes
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    c(person(given = "Edwin",
+           family = "Tan",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           email = "dbsetyw@nus.edu.sg",
+           comment = c("Package development, input on geospatial analysis, data collection/curation, methodology")),
+      person(given = "Xiao Ping",
+             family = "Song",
+             role = c("aut"),
+             email = "xp.song@u.nus.edu",
+             comment = c("Project/issue management and data workflow, package development, input on geospatial analysis, methodology",
+                         ORCID = "0000-0002-8825-195X")),
+      person(given = "Hong Jhun",
+             family = "Sim",
+             role = c("aut"),
+             comment = c("Input on community diversity, methodology, data collection")), 
+      person(given = "Justin",
+             family = "Nai",
+             role = c("aut"),
+             comment = c("Data curation of species-level attributes, data collection, methodology")),  
+      person(given = "Kwek Yan",
+             family = "Chong",
+             role = "aut",
+             comment = c("Conceptualisation, funding acquisition, methodology, supervision",
+                         ORCID = "0000-0003-4754-8957"))
+     )
 Description: Assess the diversity of animal species in urban areas.
 License: GPL (>= 3)
+URL: https://github.com/ecological-cities/biodivercity
+BugReports: https://github.com/ecological-cities/biodivercity/issues
 Suggests: 
     testthat (>= 3.0.0),
     roxygen2,
@@ -22,6 +44,7 @@ Suggests:
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
