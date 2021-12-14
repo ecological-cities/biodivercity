@@ -30,7 +30,7 @@ footer:
     left: team
     right: [organisation]
   components:
-    organisation: Part of __ecological-cities__ https://github.com/ecological-cities
+    organisation: _biodivercity_ is a part of [__ecological-cities__](https://github.com/ecological-cities)
     team: Copyright &copy; 2022 [Kwek Yan Chong](https://github.com/kwekiii), [Xiao Ping Song](https://xp-song.github.io), [Justin Nai](https://github.com/JustinNai), [Edwin Tan](https://github.com/edwintyw), [Hong Jhun Sim](https://github.com/hongjhun) and contributors.
 
 sidebar:
@@ -66,15 +66,31 @@ navbar:
         href:
       - text: 4. Apply models
         href: articles/apply-models.html
+      - text: 5. Test models
+        href: articles/test-models.html
+      - text: 6. Scoring and benchmarking
+        href:
     more:
       text: More details
       menu:
-      - text: Animal Surveys - Protocols
-        href: articles/more/animal-survey-protocols.html
-      - text: Animal Surveys - Raw Data Summaries
-        href: articles/more/animal-survey-summarise.html
-      - text: Landscapes - Classify Land Cover
-        href: articles/more/landscapes-classify-landcover.html
+      - text: Animals - Survey Protocols
+        href: articles/more/animals-survey-protocols.html
+      - text: Animals - Data summaries
+        href: articles/more/animals-data-summaries.html
+      - text: Animals - Species-level analyses
+        href: articles/more/animals-species-analyses.html
+      - text: Landscapes - Land cover patterns
+        href: articles/more/landscapes-landcover-patterns.html
+      - text: Landscapes - Urban density
+        href:
+      - text: Landscapes - Monitoring vs. Planning
+        href:
+      - text: Models - Local diversity
+        href: articles/more/models-local-diversity.html
+      - text: Models - Community diversity
+        href:
+      - text: Models - Future updates
+        href:
     reference:
       text: Functions
       href: reference/index.html
@@ -86,23 +102,24 @@ navbar:
       href: https://xp-song.github.io/project/birt/
 
 reference:
-- title: "Fauna: Generate sampling points"
-  desc: "Randomly generate survey points within an area."
+- title: "Data"
+  desc: "**_Example datasets_**"
+- contents:
+  - area
+  - points
+  - fauna
+  - surveys
+- title: "Animal surveys"
+  desc: "**_Get, process and summarise data from animal surveys_**"
 - contents:
   - random_pt_gen
-- title: "Fauna: Build models"
-  desc: "Wrangle data collected from animal surveys."
-- contents:
   - filter_obs
   - sptally_extractor
   - check_taxongrps
   - exclude_simulator
-- title: "Fauna: Summarise data"
-  desc: "Summarise biodiversity within (the boundaries of) specified areal units."
-- contents:
   - sac_extractor
-- title: "Landscape: Build models"
-  desc: "Functions to process and summarise landscape data at survey locations."
+- title: "Landscapes"
+  desc: "**_Get, process and summarise landscape data at survey locations_**"
 - contents:
   - mosaic_sen2r
   - classify_mosaic
@@ -110,9 +127,7 @@ reference:
   - lsm_perpoint
   - get_roads_osm
   - get_buildings_osm
-- title: "Apply models"
-  desc: "Process data and run models to make biodiversity predictions."
+- title: "Models"
+  desc: "**_Predict and validate animal diversity_**"
 - contents:
   - summarise_landscape_perpt
-- title: "Test model predictions"
-  desc: "Validation and accuracy assessments."

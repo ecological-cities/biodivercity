@@ -1,0 +1,18 @@
+---
+title: "Models: Local Diversity"
+subtitle: " "
+author: "Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Models: Local Diversity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+- Show model selection process? Exclude random forest..?
+- Include option to scale results (i.e. predicted - obs / sd(obs)) to present errors in relative terms
+- How spatial predictions work
+- Spatial heat map
+- ...

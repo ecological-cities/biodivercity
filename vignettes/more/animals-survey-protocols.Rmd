@@ -1,13 +1,15 @@
 ---
-title: "Animal Surveys: Protocols"
+title: "Animals: Survey Protocols"
 subtitle: " "
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Animal Surveys: Protocols}
+  %\VignetteIndexEntry{Animals: Survey Protocols}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 To be added.
+
+- Stratified random sampling...

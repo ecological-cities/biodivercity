@@ -1,0 +1,13 @@
+---
+title: "Test Models"
+subtitle: " "
+author: "Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Test Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+- Cross validation with new data - both scaled & unscaled values

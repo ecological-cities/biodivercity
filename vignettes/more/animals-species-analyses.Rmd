@@ -1,0 +1,22 @@
+---
+title: "Animals: Species-level Analyses"
+subtitle: ""
+author: "Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Animals: Species-level Analyses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+- Add spp lists as example data 
+- Most common/abundant species
+- Other interesting info 

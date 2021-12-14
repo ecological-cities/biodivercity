@@ -1,14 +1,19 @@
 ---
-title: "Landscapes: Classify Land Cover"
+title: "Landscapes: Land Cover Patterns"
 subtitle: " "
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Landscapes: Classify Land Cover}
+  %\VignetteIndexEntry{Landscapes: Land Cover Patterns}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+- `sen2r` get data & classify (Otsu's thresholding)
+- Include DTM/DSM processing to convert to turf/shrub/canopy?
+- `landscapemetrics`
+
 
 To make sense of the raster data, the important information (e.g. landscape metrics) has to be isolated from the noise. Otsu's thresholding ([Otsu, 1979](https://cw.fel.cvut.cz/wiki/_media/courses/a6m33bio/otsu.pdf)) is an automated threshold finder that outperforms other techniques in terms of stability of results and processing speed, even with the presence of >2 peaks in the histogram ([Bouhennache et al., 2019](https://www.tandfonline.com/doi/abs/10.1080/10106049.2018.1497094)). The NDVI threshold for vegetation typically ranges from 0.2 to 0.4 ([Wong et al, 2019](https://link.springer.com/article/10.1186/s40562-019-0132-4); [Akbar et al, 2019](https://www.mdpi.com/2072-4292/11/2/105)). Setting a threshold value for each index allows for the assignment of pixels with the absence or presence of the respective land cover type, which facilitates the classification of raster files. 
 

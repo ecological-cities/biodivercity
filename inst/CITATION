@@ -3,7 +3,7 @@ citHeader("To cite biodivercity in publications use:")
 citEntry(
   entry    = "Manual",
   title    = "biodivercity: An R package to assess the diversity of animal species in urban areas",
-  author   = "Edwin YW Tan, Xiao Ping Song, Justin Nai, Hong Jhun Sim, Kwek Yan Chong",
+  author   = "Edwin YW Tan, Xiao Ping Song, Hong Jhun Sim, Justin Nai, Kwek Yan Chong",
   journal  = " ",
   year     = "2022",
   volume   = " ",
