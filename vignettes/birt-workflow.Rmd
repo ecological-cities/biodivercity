@@ -36,11 +36,9 @@ points <- random_pt_gen()
 
 ### Data collection format
 
-```{r sample data table, echo = FALSE, message = FALSE}
-# show sample data in kable
+```{r sample data table, echo = FALSE, message = FALSE, warning = FALSE}
 
-library("knitr")
-library("kableExtra")
+# show sample data in kable
 library("dplyr")
 
 # use either library (having installed package with latest changes) or load_all (package in development)
@@ -50,7 +48,7 @@ devtools::load_all() #knit manually with latest changes to circumvent library("b
 data(fauna)
 
 knitr::kable(head(fauna), caption = "**Sample survey data format**") %>%
-  kable_styling("striped", font_size = 10) %>% scroll_box(width = "100%")
+  kableExtra::kable_styling("striped", font_size = 10) %>% kableExtra::scroll_box(width = "100%")
 ```
 
 ```{r sample info table, echo = FALSE, message = FALSE}
@@ -58,7 +56,7 @@ knitr::kable(head(fauna), caption = "**Sample survey data format**") %>%
 data(surveys)
 
 knitr::kable(head(surveys), caption = "**Sample survey info format**") %>%
-  kable_styling("striped", font_size = 10) %>% scroll_box(width = "100%")
+  kableExtra::kable_styling("striped", font_size = 10) %>% kableExtra::scroll_box(width = "100%")
 ```
 
 ## 2. Process survey data
