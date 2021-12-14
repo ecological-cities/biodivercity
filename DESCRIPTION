@@ -50,4 +50,4 @@ Imports:
 Language: en-GB
 VignetteBuilder: knitr
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0)
