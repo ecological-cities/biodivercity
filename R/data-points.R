@@ -6,7 +6,7 @@
 #'
 #' @usage data(points)
 #'
-#' @format An object of class "list".
+#' @format An object of class 'list'.
 #'
 #' @keywords datasets
 #'
