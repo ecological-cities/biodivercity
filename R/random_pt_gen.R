@@ -15,6 +15,7 @@
 #'@import sf
 #'@import dplyr
 #'@importFrom glue glue
+#'@importFrom rlang .data
 #'@importFrom magrittr '%>%'
 #'
 #'@export
@@ -74,7 +75,7 @@ random_pt_gen <- function(x, area_per_pt, pt_buffer, excess_modifier = 1,
             retain <- sf::st_read(retain) %>%
                 sf::st_as_sf() %>%
                 dplyr::rename(id = 1) %>%
-                dplyr::select(id, geometry) %>%
+                dplyr::select(id, .data$geometry) %>%
                 sf::st_zm(drop = TRUE, what = "ZM")
             retain_NV <- retain[grepl("^WLb", retain$id), ]  #update!
 
@@ -125,7 +126,7 @@ random_pt_gen <- function(x, area_per_pt, pt_buffer, excess_modifier = 1,
             retain <- sf::st_read(retain) %>%
                 sf::st_as_sf() %>%
                 dplyr::rename(id = 1) %>%
-                dplyr::select(id, geometry) %>%
+                dplyr::select(id, .data$geometry) %>%
                 sf::st_zm(drop = TRUE, what = "ZM")
             retain_n <- retain_prop * n
             points <- sf::st_sample(boundaries, ceiling((n - retain_n) *
