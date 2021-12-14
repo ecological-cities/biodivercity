@@ -5,7 +5,7 @@
 \alias{area}
 \title{Survey area boundaries}
 \format{
-An object of class "list".
+An object of class 'list'.
 }
 \source{
 TBC

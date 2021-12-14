@@ -5,7 +5,7 @@
 \alias{fauna}
 \title{Fauna observation data from point surveys across residential towns}
 \format{
-An object of class "list".
+An object of class 'list'.
 }
 \source{
 TBC

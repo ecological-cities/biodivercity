@@ -5,7 +5,7 @@
 \alias{surveys}
 \title{Survey info data to accompany fauna observations}
 \format{
-An object of class "list".
+An object of class 'list'.
 }
 \source{
 TBC

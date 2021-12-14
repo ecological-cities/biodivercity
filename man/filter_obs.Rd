@@ -12,21 +12,21 @@ filter_obs(
   specify_taxon = NULL,
   survey_id = "survey_id",
   point_id = "point_id",
-  area = "town",
-  period = "round",
-  taxon = "priority"
+  area = "area",
+  period = "period",
+  taxon = "taxon"
 )
 }
 \arguments{
 \item{observations}{Dataframe of species observations.
-It should include columns for \code{survey_id}, \code{town}, \code{round}, \code{priority}.}
+It should include columns for \code{survey_id}, \code{area}, \code{period}, \code{taxon}.}
 
 \item{survey_ref}{Dataframe of all surveys conducted. Values in the column
 \code{survey_id} should correspond to those in the \code{observations}.}
 
-\item{specify_area}{Specify the \code{area}(s). Defaults to \code{NULL}, which includes all towns.}
+\item{specify_area}{Specify the \code{area}(s). Defaults to \code{NULL}, which includes all areas.}
 
-\item{specify_period}{Specify the survey \code{period}(s). Defaults to \code{NULL}, which includes all rounds.}
+\item{specify_period}{Specify the survey \code{period}(s). Defaults to \code{NULL}, which includes all periods.}
 
 \item{specify_taxon}{Specify the \code{taxon} taxon/taxa. Defaults to \code{NULL}, which includes all taxa.}
 
@@ -36,14 +36,14 @@ It should include columns for \code{survey_id}, \code{town}, \code{round}, \code
 \item{point_id}{Column name of the unique identifier for each point in \code{observations} and
 \code{survey_ref}. Defaults to \code{point_id}.}
 
-\item{area}{Column name of the town specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{town}.}
+\item{area}{Column name of the area specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{area}.}
 
-\item{period}{Column name of the sampling round specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{round}.}
+\item{period}{Column name of the sampling period specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{period}.}
 
-\item{taxon}{Column name of the priority taxon specified in \code{observations} and \code{survey_ref}.
-Defaults to \code{priority}.}
+\item{taxon}{Column name of the taxon of interest specified in \code{observations} and \code{survey_ref}.
+Defaults to \code{taxon}.}
 }
 \value{
 The dataframe \code{observations} subset according to specified criteria.

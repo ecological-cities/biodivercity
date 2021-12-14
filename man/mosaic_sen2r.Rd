@@ -9,7 +9,7 @@ mosaic_sen2r(parent_dir, exclude = NULL, rm_outlier = TRUE)
 \arguments{
 \item{parent_dir}{File path of parent directory for \code{sen2r} images, as specified in sen2r's \code{path_out} argument.}
 
-\item{exclude}{Character vector of spectral indices to be excluded from the mosaic operation. "CLD", "SCL", "RGB432B", and "BOA" are excluded by default.}
+\item{exclude}{Character vector of spectral indices to be excluded from the mosaic operation. 'CLD', 'SCL', 'RGB432B', and 'BOA' are excluded by default.}
 
 \item{rm_outlier}{TRUE or FALSE to perform outlier removal. Threshold values are specific to spectral indices.}
 }
@@ -19,5 +19,5 @@ The .tif raster \code{mosaic.tif} within the subdirectory of included indices.
 \description{
 Create mosaics of downloaded sen2r images from the parent directory, as specified in sen2r's \code{path_out} argument.
 The images used are those detected in the parent directory as of running the function.
-The list of spectral indices are retrieved from \code{sen2r} and \code{library("terra")} is used to create the mosaics.
+The list of spectral indices are retrieved from \code{sen2r} and \code{library('terra')} is used to create the mosaics.
 }

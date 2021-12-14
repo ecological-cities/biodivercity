@@ -5,7 +5,7 @@
 \alias{points}
 \title{Survey point dataset}
 \format{
-An object of class "list".
+An object of class 'list'.
 }
 \source{
 TBC
