@@ -28,14 +28,22 @@
     <h6 class="dropdown-header" data-toc-skip>2. Process animal data</h6>
     <h6 class="dropdown-header" data-toc-skip>3. Build models</h6>
     <a class="dropdown-item" href="../articles/apply-models.html">4. Apply models</a>
+    <a class="dropdown-item" href="../articles/test-models.html">5. Test models</a>
+    <h6 class="dropdown-header" data-toc-skip>6. Scoring and benchmarking</h6>
   </div>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-more-details">More details</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-more-details">
-    <a class="dropdown-item" href="../articles/more/animal-survey-protocols.html">Animal Surveys - Protocols</a>
-    <a class="dropdown-item" href="../articles/more/animal-survey-summarise.html">Animal Surveys - Raw Data Summaries</a>
-    <a class="dropdown-item" href="../articles/more/landscapes-classify-landcover.html">Landscapes - Classify Land Cover</a>
+    <a class="dropdown-item" href="../articles/more/animals-survey-protocols.html">Animals - Survey Protocols</a>
+    <a class="dropdown-item" href="../articles/more/animals-data-summaries.html">Animals - Data summaries</a>
+    <a class="dropdown-item" href="../articles/more/animals-species-analyses.html">Animals - Species-level analyses</a>
+    <a class="dropdown-item" href="../articles/more/landscapes-landcover-patterns.html">Landscapes - Land cover patterns</a>
+    <h6 class="dropdown-header" data-toc-skip>Landscapes - Urban density</h6>
+    <h6 class="dropdown-header" data-toc-skip>Landscapes - Monitoring vs. Planning</h6>
+    <a class="dropdown-item" href="../articles/more/models-local-diversity.html">Models - Local diversity</a>
+    <h6 class="dropdown-header" data-toc-skip>Models - Community diversity</h6>
+    <h6 class="dropdown-header" data-toc-skip>Models - Future updates</h6>
   </div>
 </li>
 <li class="active nav-item">
@@ -67,9 +75,40 @@
     </div>
 
     <div class="section level2">
-      <h2 id="fauna-generate-sampling-points">Fauna: Generate sampling points<a class="anchor" aria-label="anchor" href="#fauna-generate-sampling-points"></a></h2>
+      <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a></h2>
       
-      <p class="section-desc"></p><p>Randomly generate survey points within an area.</p>
+      <p class="section-desc"></p><p><strong><em>Example datasets</em></strong></p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="area.html">area</a></code> 
+        </dt>
+        <dd>Survey area boundaries</dd>
+      </dl><dl><dt>
+          
+          <code><a href="points.html">points</a></code> 
+        </dt>
+        <dd>Survey point dataset</dd>
+      </dl><dl><dt>
+          
+          <code><a href="fauna.html">fauna</a></code> 
+        </dt>
+        <dd>Fauna observation data from point surveys across residential towns</dd>
+      </dl><dl><dt>
+          
+          <code><a href="surveys.html">surveys</a></code> 
+        </dt>
+        <dd>Survey info data to accompany fauna observations</dd>
+      </dl></div><div class="section level2">
+      <h2 id="animal-surveys">Animal surveys<a class="anchor" aria-label="anchor" href="#animal-surveys"></a></h2>
+      
+      <p class="section-desc"></p><p><strong><em>Get, process and summarise data from animal surveys</em></strong></p>
 
       
     </div><div id="" class="section level2">
@@ -82,18 +121,7 @@
           <code><a href="random_pt_gen.html">random_pt_gen()</a></code> 
         </dt>
         <dd>Randomly generate sampling points within supplied area</dd>
-      </dl></div><div class="section level2">
-      <h2 id="fauna-build-models">Fauna: Build models<a class="anchor" aria-label="anchor" href="#fauna-build-models"></a></h2>
-      
-      <p class="section-desc"></p><p>Wrangle data collected from animal surveys.</p>
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
+      </dl><dl><dt>
           
           <code><a href="filter_obs.html">filter_obs()</a></code> 
         </dt>
@@ -113,26 +141,15 @@
           <code><a href="exclude_simulator.html">exclude_simulator()</a></code> 
         </dt>
         <dd>Simulate multiple scenarios with randomly excluded surveys</dd>
-      </dl></div><div class="section level2">
-      <h2 id="fauna-summarise-data">Fauna: Summarise data<a class="anchor" aria-label="anchor" href="#fauna-summarise-data"></a></h2>
-      
-      <p class="section-desc"></p><p>Summarise biodiversity within (the boundaries of) specified areal units.</p>
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
+      </dl><dl><dt>
           
           <code><a href="sac_extractor.html">sac_extractor()</a></code> 
         </dt>
         <dd>Extract species accumulation curves based on specified criteria</dd>
       </dl></div><div class="section level2">
-      <h2 id="landscape-build-models">Landscape: Build models<a class="anchor" aria-label="anchor" href="#landscape-build-models"></a></h2>
+      <h2 id="landscapes">Landscapes<a class="anchor" aria-label="anchor" href="#landscapes"></a></h2>
       
-      <p class="section-desc"></p><p>Functions to process and summarise landscape data at survey locations.</p>
+      <p class="section-desc"></p><p><strong><em>Get, process and summarise landscape data at survey locations</em></strong></p>
 
       
     </div><div id="" class="section level2">
@@ -171,9 +188,9 @@
         </dt>
         <dd>Get building polygons from OpenStreetMap</dd>
       </dl></div><div class="section level2">
-      <h2 id="apply-models">Apply models<a class="anchor" aria-label="anchor" href="#apply-models"></a></h2>
+      <h2 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a></h2>
       
-      <p class="section-desc"></p><p>Process data and run models to make biodiversity predictions.</p>
+      <p class="section-desc"></p><p><strong><em>Predict and validate animal diversity</em></strong></p>
 
       
     </div><div id="" class="section level2">
@@ -186,13 +203,7 @@
           <code><a href="summarise_landscape_perpt.html">summarise_landscape_perpt()</a></code> 
         </dt>
         <dd>Summarise landscape variables per point based on supplied data</dd>
-      </dl></div><div class="section level2">
-      <h2 id="test-model-predictions">Test model predictions<a class="anchor" aria-label="anchor" href="#test-model-predictions"></a></h2>
-      
-      <p class="section-desc"></p><p>Validation and accuracy assessments.</p>
-
-      
-    </div>
+      </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -202,7 +213,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Part of <strong>ecological-cities</strong> <a href="https://github.com/ecological-cities" class="external-link uri">https://github.com/ecological-cities</a></p>
+  <p></p><p><em>biodivercity</em> is a part of <a href="https://github.com/ecological-cities" class="external-link"><strong>ecological-cities</strong></a></p>
 </div>
 
     </footer></div>
