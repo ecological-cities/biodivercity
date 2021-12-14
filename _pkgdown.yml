@@ -1,10 +1,89 @@
 url: https://ecological-cities.github.io/biodivercity/
 title: biodivercity
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  bslib:
+    link-decoration: none
+    font-size-base: 1rem
+    h2-font-size: $font-size-base * 1.9
+    h3-font-size: $font-size-base * 1.75
+  opengraph:
+    image:
+      src: man/figures/logo.png
+      alt: "Biodiversity Indices for City Landscapes"
+
+authors:
+  Kwek Yan Chong:
+    href: https://github.com/kwekiii
+  Xiao Ping Song:
+    href: https://xp-song.github.io
+  Justin Nai:
+    href: https://github.com/JustinNai
+  Edwin Tan:
+    href: https://github.com/edwintyw
+  Hong Jhun Sim:
+    href: https://github.com/hongjhun
+
+footer:
+  structure:
+    left: team
+    right: [organisation]
+  components:
+    organisation: Part of __ecological-cities__ https://github.com/ecological-cities
+    team: Copyright &copy; 2022 [Kwek Yan Chong](https://github.com/kwekiii), [Xiao Ping Song](https://xp-song.github.io), [Justin Nai](https://github.com/JustinNai), [Edwin Tan](https://github.com/edwintyw), [Hong Jhun Sim](https://github.com/hongjhun) and contributors.
+
+sidebar:
+  roles: [cre, aut]
+
+development:
+  mode: auto
 
 home:
   title: R Package - Biodiversity indices for city landscapes
   description: Assess the diversity of animal species in urban areas.
   links:
+  sidebar:
+    structure: [license, citation, authors, community, links, custom, dev]
+    components:
+      custom:
+        title: Funding
+        text: The Singapore Ministry of National Development Research Fund funded the grant project (2016 to 2022) that contributed to the development of this package. The grant was awarded to the National University of Singapore, in partnership with the Singapore Housing Development Board.
+
+navbar:
+  structure:
+    left:  [intro, articles, more, reference, news]
+    right: [about, github]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: 1. Process landscape data
+        href:
+      - text: 2. Process animal data
+        href:
+      - text: 3. Build models
+        href:
+      - text: 4. Apply models
+        href: articles/apply-models.html
+    more:
+      text: More details
+      menu:
+      - text: Animal Surveys - Protocols
+        href: articles/more/animal-survey-protocols.html
+      - text: Animal Surveys - Raw Data Summaries
+        href: articles/more/animal-survey-summarise.html
+      - text: Landscapes - Classify Land Cover
+        href: articles/more/landscapes-classify-landcover.html
+    reference:
+      text: Functions
+      href: reference/index.html
+    news:
+      text: News
+      href: news/index.html
+    about:
+      text: About
+      href: https://xp-song.github.io/project/birt/
 
 reference:
 - title: "Fauna: Generate sampling points"
@@ -37,25 +116,3 @@ reference:
   - summarise_landscape_perpt
 - title: "Test model predictions"
   desc: "Validation and accuracy assessments."
-
-articles:
-- title: "BIRT Workflow"
-  navbar: ~
-  contents:
-  - birt-workflow
-- title: "Survey methods"
-  navbar: ~
-  contents:
-  - survey-methods
-- title: "Otsu's thresholding"
-  navbar: ~
-  contents:
-  - otsu-thresholding
-- title: "Heatmap resolutions"
-  navbar: ~
-  contents:
-  - heatmap-resolutions
-- title: "Missed surveys during COVID-19"
-  navbar: ~
-  contents:
-  - covid-19_missed-surveys
