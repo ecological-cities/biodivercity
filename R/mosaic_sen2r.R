@@ -10,7 +10,7 @@
 #'
 #'@return The .tif raster `mosaic.tif` within the subdirectory of included indices.
 #'
-#'@import sen2r
+#'@importFrom sen2r list_indices
 #'@importFrom terra rast mosaic writeRaster
 #'
 #'@export

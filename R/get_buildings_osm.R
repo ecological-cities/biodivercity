@@ -30,7 +30,7 @@
 #'
 #'@import sf
 #'@import checkmate
-#'@import osmextract
+#'@importFrom osmextract oe_download_directory oe_match oe_read
 #'@importFrom dplyr filter mutate
 #'@importFrom smoothr fill_holes drop_crumbs
 #'@importFrom rlang .data

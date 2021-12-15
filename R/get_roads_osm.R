@@ -23,12 +23,12 @@
 #'
 #'@import sf
 #'@import checkmate
-#'@import osmextract
+#'@importFrom osmextract oe_download_directory oe_match oe_read
 #'@importFrom dplyr filter
 #'@importFrom rlang .data
 #'
 #'@export
-get_roads_osm <- function(place, date = NULL, dir_raw = oe_download_directory(),
+get_roads_osm <- function(place, date = NULL, dir_raw = osmextract::oe_download_directory(),
     filename = NULL, ...) {
 
     # Error checking ------------------
