@@ -28,6 +28,10 @@
 #'@import dplyr
 #'@importFrom rlang .data
 #'
+#'@examples
+#' data(fauna)
+#' check_taxongrps(observations = fauna, level = area)
+#'
 #'@export
 check_taxongrps <- function(observations, level,
                             species = "species", genus = "genus", family = "family",
