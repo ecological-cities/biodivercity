@@ -1,10 +1,10 @@
 #'Create mosaics of Sentinel-2 images downloaded via the sen2r package
 #'
-#'Create mosaics of downloaded sen2r images from the parent directory, as specified in sen2r's `path_out` argument.
+#'Create mosaics of downloaded sen2r images from the parent directory, as specified in the sen2r `path_out` argument.
 #'The images used are those detected in the parent directory as of running the function.
 #'The list of spectral indices are retrieved from `sen2r` and `library('terra')` is used to create the mosaics.
 #'
-#'@param parent_dir File path of parent directory for `sen2r` images, as specified in sen2r's `path_out` argument.
+#'@param parent_dir File path of parent directory for `sen2r` images, as specified in the sen2r `path_out` argument.
 #'@param exclude Character vector of spectral indices to be excluded from the mosaic operation. 'CLD', 'SCL', 'RGB432B', and 'BOA' are excluded by default.
 #'@param rm_outlier TRUE or FALSE to perform outlier removal. Threshold values are specific to spectral indices.
 #'

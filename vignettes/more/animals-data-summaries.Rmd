@@ -176,7 +176,7 @@ plot_sac <- plot_sac %>%
 
 ```
 
-![Species accumulation curves compare total, or ‘gamma’, diversity for the total sampling area, while accounting for differences in sampling effort. The mean species richness (line) and two standard deviations of the mean (shaded region) across all iterations are shown. Note that the scale of the y-axis varies between taxa.](sac-sample-plot.png){#id .class width=80% height=80%}
+![Species accumulation curves compare total, or 'gamma', diversity for the total sampling area, while accounting for differences in sampling effort. The mean species richness (line) and two standard deviations of the mean (shaded region) across all iterations are shown. Note that the scale of the y-axis varies between taxa.](sac-sample-plot.png){#id .class width=80% height=80%}
 
 
 ### 3. Process landscape data
