@@ -1,23 +1,27 @@
-#'Check taxon group-level records for subsequent removal
+#'Check taxon-group-level records in survey data
 #'
-#'Tally and list all taxon groups where all species within the group are observed,
-#'either at the level of individual towns or points (and survey round).
+#'Show taxon groups where all species within the group are observed,
+#'and tally the number of species within the particular group.
+#'Includes option to tally either different levels (`area`
+#'or `point`; column to be specified by the user).
+#'Output dataframe can used for subsequent data processing
+#'(e.g. filtered away from the input dataset `observations`).
 #'
 #'@param observations Dataframe of species observations.
-#'It should include columns for `species`, `genus`, `family`, `town`, `round`, and `point_id`.
-#'@param level Specify whether to tally by `town` or `point`.
+#'It should include columns for `species`, `genus`, `family`, `area`, `period`, and `point_id`.
+#'@param level Specify whether to tally by `area` or `point`.
 #'@param species Column name of the species name recorded in `observations`.
 #'May include group-level records (`genus` or `family`).
 #'@param genus Column name of the genus name for recorded `observations`.
 #'@param family Column name of the family name for recorded `observations`.
-#'@param town Column name of the town specified in `observations`.
-#'Defaults to `town`.
-#'@param round Column name of the sampling round specified in `observations`.
-#'Defaults to `round`.
+#'@param area Column name of the area of interest specified in `observations`.
+#'Defaults to `area`.
+#'@param period Column name of the sampling period specified in `observations`.
+#'Defaults to `period`.
 #'@param point_id Column name of the unique identifier for each point in `observations`. Defaults to `point_id`.
 #'
 #'@return Dataframe containing the taxon group names where all species within the group are observed.
-#'Includes columns for the `round` and `town`/`point_id` (depending on argument `level`), as well as
+#'Includes columns for the `period` and `area`/`point_id` (depending on argument `level`), as well as
 #'the number (`n`) of species in the particular taxon group.
 #'
 #'@import checkmate
@@ -27,7 +31,7 @@
 #'@export
 check_taxongrps <- function(observations, level,
                             species = "species", genus = "genus", family = "family",
-                            town = "town", round = "round", point_id = "point_id"){
+                            area = "area", period = "period", point_id = "point_id"){
 
   # Error checking ------------------
 
@@ -40,9 +44,12 @@ check_taxongrps <- function(observations, level,
   checkmate::assert_subset(species, choices = colnames(observations), empty.ok = FALSE, add = coll)
   checkmate::assert_subset(genus, choices = colnames(observations), empty.ok = FALSE, add = coll)
   checkmate::assert_subset(family, choices = colnames(observations), empty.ok = FALSE, add = coll)
-  checkmate::assert_subset(town, choices = colnames(observations), empty.ok = FALSE, add = coll)
-  checkmate::assert_subset(round, choices = colnames(observations), empty.ok = FALSE, add = coll)
+  checkmate::assert_subset(area, choices = colnames(observations), empty.ok = FALSE, add = coll)
+  checkmate::assert_subset(period, choices = colnames(observations), empty.ok = FALSE, add = coll)
   checkmate::assert_subset(point_id, choices = colnames(observations), empty.ok = FALSE, add = coll)
+
+  # level
+  checkmate::assert_subset(level, choices = c("area", "point"), empty.ok = FALSE, add = coll)
 
   checkmate::reportAssertions(coll)
 
@@ -54,8 +61,8 @@ check_taxongrps <- function(observations, level,
     dplyr::mutate(species = .data[[species]]) %>%
     dplyr::mutate(genus = .data[[genus]]) %>%
     dplyr::mutate(family = .data[[family]]) %>%
-    dplyr::mutate(town = .data[[town]]) %>%
-    dplyr::mutate(round = .data[[round]]) %>%
+    dplyr::mutate(area = .data[[area]]) %>%
+    dplyr::mutate(period = .data[[period]]) %>%
     dplyr::mutate(point_id = .data[[point_id]])
 
 
@@ -73,30 +80,34 @@ check_taxongrps <- function(observations, level,
     dplyr::summarise(n_total = n())
 
 
-  # town/round level: compare with summary tables, filter sp tt n = n_total
-  if(level == "town"){
+  # area/period level: compare with summary tables, filter sp tt n = n_total
+  if(level == "area"){
 
     genus_remove <- observations %>%
-      dplyr::group_by(town, round, species, genus) %>%
+      dplyr::group_by(area, period, species, genus) %>%
       dplyr::distinct(species, genus) %>%
       dplyr::filter(species != genus & !is.na(genus)) %>% # dont count if species name is genus or NA
-      dplyr::group_by(town, round, genus) %>%
+      dplyr::group_by(area, period, genus) %>%
       dplyr::summarise(n = n()) %>%
-      dplyr::left_join(genus_all) %>%
+      dplyr::left_join(genus_all, by = "genus") %>%
       dplyr::filter(n == .data$n_total) %>%
       dplyr::select(-.data$n_total) %>%
-      dplyr::rename(name = "genus")
+      dplyr::rename(name = "genus") %>%
+      dplyr::rename(!!period := period) %>% # rename back to original colname
+      dplyr::rename(!!area := area)
 
     family_remove <- observations %>%
-      dplyr::group_by(town, round, species, family) %>%
+      dplyr::group_by(area, period, species, family) %>%
       dplyr::distinct(species, family) %>%
       dplyr::filter(species != family & !is.na(family)) %>% # dont count if species name is family or NA
-      dplyr::group_by(town, round, family) %>%
+      dplyr::group_by(area, period, family) %>%
       dplyr::summarise(n = n()) %>%
-      dplyr::left_join(family_all) %>%
+      dplyr::left_join(family_all, by = "family") %>%
       dplyr::filter(n == .data$n_total) %>%
       dplyr::select(-.data$n_total) %>%
-      dplyr::rename(name = "family")
+      dplyr::rename(name = "family") %>%
+      dplyr::rename(!!period := period) %>%
+      dplyr::rename(!!area := area)
 
     all_remove <- bind_rows(genus_remove, family_remove)
 
@@ -105,26 +116,30 @@ check_taxongrps <- function(observations, level,
   }else if(level == "point"){
 
     genus_remove <- observations %>%
-      dplyr::group_by(point_id, round, species, genus) %>%
+      dplyr::group_by(point_id, period, species, genus) %>%
       dplyr::distinct(species, genus) %>%
       dplyr::filter(species != genus & !is.na(genus)) %>% # dont count if species name is genus or NA
-      dplyr::group_by(point_id, round, genus) %>%
+      dplyr::group_by(point_id, period, genus) %>%
       dplyr::summarise(n = n()) %>%
-      dplyr::left_join(genus_all) %>%
+      dplyr::left_join(genus_all, by = "genus") %>%
       dplyr::filter(n == .data$n_total) %>%
       dplyr::select(-.data$n_total) %>%
-      dplyr::rename(name = "genus")
+      dplyr::rename(name = "genus") %>%
+      dplyr::rename(!!period := period) %>% # rename back to original colname
+      dplyr::rename(!!point_id := point_id)
 
     family_remove <- observations %>%
-      dplyr::group_by(point_id, round, species, family) %>%
+      dplyr::group_by(point_id, period, species, family) %>%
       dplyr::distinct(species, family) %>%
       dplyr::filter(species != family & !is.na(family)) %>% # dont count if species name is family or NA
-      dplyr::group_by(point_id, round, family) %>%
+      dplyr::group_by(point_id, period, family) %>%
       dplyr::summarise(n = n()) %>%
-      dplyr::left_join(family_all) %>%
+      dplyr::left_join(family_all, by = "family") %>%
       dplyr::filter(n == .data$n_total) %>%
       dplyr::select(-.data$n_total) %>%
-      dplyr::rename(name = "family")
+      dplyr::rename(name = "family") %>%
+      dplyr::rename(!!period := period) %>%
+      dplyr::rename(!!point_id := point_id)
 
     all_remove <- bind_rows(genus_remove, family_remove)
 
