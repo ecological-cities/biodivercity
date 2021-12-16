@@ -3,9 +3,9 @@
 \docType{data}
 \name{sampling_areas}
 \alias{sampling_areas}
-\title{Survey area boundaries}
+\title{Areas of interest where sampling points were generated within}
 \format{
-An object of class 'list'.
+\code{sf} polygons
 }
 \source{
 TBC
@@ -14,7 +14,8 @@ TBC
 data(sampling_areas)
 }
 \description{
-Desc
+Six residential towns in Singapore: Punggol (PG), Queenstown (QT),
+Tampines (TP), Jurong West (JW), Bishan (BS) and Woodlands (WL).
 }
 \examples{
 head(sampling_areas)
@@ -22,5 +23,10 @@ head(sampling_areas)
 }
 \references{
 TBC
+}
+\seealso{
+\itemize{
+\item \link{sampling_points} where the animal surveys were conducted.
+}
 }
 \keyword{datasets}

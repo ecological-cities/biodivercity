@@ -3,9 +3,9 @@
 \docType{data}
 \name{animal_surveys}
 \alias{animal_surveys}
-\title{Survey info data to accompany fauna observations}
+\title{Animal surveys conducted at sampling points}
 \format{
-An object of class 'list'.
+Dataframe
 }
 \source{
 TBC
@@ -14,16 +14,22 @@ TBC
 data(animal_surveys)
 }
 \description{
-Survey information data of fauna point surveys conducted in six Singapore
-residential towns from 2016 to 2021. Time and weather information of all
-surveys present in the observation data set is recorded here.
+Details about each animal survey conducted (years 2016 to 2022) at sampling points
+within six towns in Singapore: Punggol (PG), Queenstown (QT), Tampines (TP),
+Jurong West (JW), Bishan (BS) and Woodlands (WL). Four types of animal surveys were conducted,
+corresponding to four animal groups (taxa): Birds, butterflies, odonates and amphibians.
 }
 \examples{
-data(animal_surveys)
 head(animal_surveys)
 
 }
 \references{
 TBC
+}
+\seealso{
+\itemize{
+\item \link{sampling_points} where these animal surveys were conducted.
+\item \link{sampling_areas} where the sampling points were generated within.
+}
 }
 \keyword{datasets}

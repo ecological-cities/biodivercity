@@ -1,12 +1,14 @@
-#' Survey point dataset
+#' Sampling points where animal surveys were conducted
 #'
-#' Desc
+#' Point locations where surveys were conducted within the six towns in Singapore:
+#' Punggol (PG), Queenstown (QT), Tampines (TP), Jurong West (JW), Bishan (BS)
+#' and Woodlands (WL).
 #'
 #' @docType data
 #'
 #' @usage data(sampling_points)
 #'
-#' @format An object of class 'list'.
+#' @format `sf` points
 #'
 #' @keywords datasets
 #'
@@ -14,8 +16,11 @@
 #'
 #' @source TBC
 #'
+#' @seealso
+#' * [sampling_areas] where these sampling points were generated within.
+#' * [animal_surveys] containing information about the surveys conducted at these sampling points.
+#'
 #' @examples
-#' data(sampling_points)
 #' head(sampling_points)
 #'
 "sampling_points"

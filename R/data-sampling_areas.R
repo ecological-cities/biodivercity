@@ -1,18 +1,22 @@
-#' Survey area boundaries
+#' Areas of interest where sampling points were generated within
 #'
-#' Desc
+#' Six residential towns in Singapore: Punggol (PG), Queenstown (QT),
+#' Tampines (TP), Jurong West (JW), Bishan (BS) and Woodlands (WL).
 #'
 #' @docType data
 #'
 #' @usage data(sampling_areas)
 #'
-#' @format An object of class 'list'.
+#' @format `sf` polygons
 #'
 #' @keywords datasets
 #'
 #' @references TBC
 #'
 #' @source TBC
+#'
+#' @seealso
+#' * [sampling_points] where the animal surveys were conducted.
 #'
 #' @examples
 #' head(sampling_areas)

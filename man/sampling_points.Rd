@@ -3,9 +3,9 @@
 \docType{data}
 \name{sampling_points}
 \alias{sampling_points}
-\title{Survey point dataset}
+\title{Sampling points where animal surveys were conducted}
 \format{
-An object of class 'list'.
+\code{sf} points
 }
 \source{
 TBC
@@ -14,14 +14,21 @@ TBC
 data(sampling_points)
 }
 \description{
-Desc
+Point locations where surveys were conducted within the six towns in Singapore:
+Punggol (PG), Queenstown (QT), Tampines (TP), Jurong West (JW), Bishan (BS)
+and Woodlands (WL).
 }
 \examples{
-data(sampling_points)
 head(sampling_points)
 
 }
 \references{
 TBC
+}
+\seealso{
+\itemize{
+\item \link{sampling_areas} where these sampling points were generated within.
+\item \link{animal_surveys} containing information about the surveys conducted at these sampling points.
+}
 }
 \keyword{datasets}
