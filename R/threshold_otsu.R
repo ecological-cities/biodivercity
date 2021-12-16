@@ -1,19 +1,23 @@
-#'Calculate pixel value threshold of an image via Otsu's method
+#'Calculate pixel value threshold of an single-band image via Otsu's method
 #'
-#'Calculate Otsu's threshold value that separates a greyscale image into two distinct classes.
+#'Calculate Otsu's threshold value that separates a single-band (e.g. greyscale) image into two distinct classes.
 #'The threshold value is determined by minimizing the combined intra-class variance.
 #'`library(terra)` and `library(stars)` are used to perform out-of-memory operations.
 #'
-#'@param x filename to be imported using `terra::rast()`, or a SpatRaster object.
+#'@param image Single-band raster to be classified (`SpatRaster` object from `library(terra)`),
+#'or a file path to the image to be imported (`terra::rast()` will be used).
 #'@param range Numeric vector (of length 2) specifying the histogram range to be used
 #'for thresholding. Defaults to the minimum and maximum values of the imported raster.
 #'@param levels Number of histogram bins used to calculate the threshold value,
 #'typically based on the bit depth of the image (e.g. 8-bit image has `2^8` = `256` levels).
 #'Defaults to `256`.
-#'@param ... Optional arguments to be passed to `terra::rast()` when importing image.
 #'
 #'@return Otsu's threshold value for the image (a single number), which can subsequently be
-#'used for image classification (e.g. convert greyscale to binary image).
+#'used for image classification (e.g. convert continuous raster to binary raster).
+#'
+#'@seealso
+#' * [classify_image_binary()] to classify single-band image using Otsu's method.
+#' Calls `threshold_otsu()` internally.
 #'
 #'@references Otsu, N. (1979). A threshold selection method from gray-level histograms.
 #'IEEE transactions on systems, man, and cybernetics, 9(1), 62-66.
@@ -24,60 +28,68 @@
 #'
 #'
 #'@import checkmate
-#'@importFrom terra rast
-#'@importFrom terra minmax
-#'@importFrom stars st_as_stars
+#'@importFrom terra rast minmax nlyr values
+#'
+#'@examples
+#' \dontrun{
+#'   ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity")
+#'   terra::plot(ndvi_mosaic) # examine raster data
+#'   threshold_otsu(image = ndvi_mosaic)
+#' }
 #'
 #'@export
-threshold_otsu <- function(x = NULL,
+threshold_otsu <- function(image,
                            range = NULL,
-                           levels = 256, ...){
-
-  # import image
-  if(is.character(x)){
-    raster <- terra::rast(x, ...) # import as terra
-  }else{
-    raster <- x
-  }
-
-
+                           levels = 256){
 
   # Error checking ------------------
+
+  coll <- checkmate::makeAssertCollection()
+
+  # image
+  if(checkmate::test_vector(image)){ # if file path
+    checkmate::assert_character(image, len = 1, any.missing = FALSE, null.ok = FALSE)
+    image <- terra::rast(image) # # import image & overwrite var
+
+  } else if(checkmate::test_true(attributes(image)$class[1] == "SpatRaster")) { # if terra rast object
+    checkmate::assert_true(terra::nlyr(image) == 1, add = coll) # single band
+
+  } else {
+    stop("\'image\' needs to be either a single-band SpatRaster, or file path to the raster to be imported.")
+  }
+
   # range
   if(is.null(range)){
-    range <- c(terra::minmax(raster)) # default to use min/max of raster values
+    range <- c(terra::minmax(image)) # default to use min/max of raster values
   }else{ # do some checks
-    checkmate::assert_numeric(range, len = 2)
+    checkmate::assert_numeric(range, len = 2, add = coll)
   }
 
   # levels
-  checkmate::assert_number(as.integer(levels), na.ok = FALSE, null.ok = FALSE, lower = 1)
+  checkmate::assert_number(as.integer(levels), na.ok = FALSE, null.ok = FALSE, lower = 1, add = coll)
+
+
+  checkmate::reportAssertions(coll)
 
 
   # Calculations ------------------
 
-  raster <- stars::st_as_stars(raster, proxy = FALSE) # convert to stars object
-  # names(NDVI_show) <- NULL
+  breaks <- seq(floor(range[1]*1000)/1000,  # ceiling/floor with decimal places
+                ceiling(range[2]*1000)/1000,
+                length.out = levels + 1)
+  hist_object <- hist.default(terra::values(image),  # just get the array
+                              breaks = breaks, plot = FALSE)
+  counts <- as.double(hist_object$counts)
+  mids <- as.double(hist_object$mids)
 
-  # class(NDVI_show[[1]])
-  # dim(NDVI_show[[1]])
-  raster <- raster[[1]] # just get the array
-
-  breaks = seq(floor(range[1]*1000)/1000,  # ceiling/floor with decimal places
-               ceiling(range[2]*1000)/1000,
-               length.out = levels + 1)
-  hist_object = hist.default(raster, breaks = breaks, plot = FALSE)
-  counts = as.double(hist_object$counts)
-  mids = as.double(hist_object$mids)
-
-  len = length(counts)
-  w1 = cumsum(counts)
-  w2 = w1[len] + counts - w1
-  cm = counts * mids
-  m1 = cumsum(cm)
-  m2 = m1[len] + cm - m1
-  var = w1 * w2 * (m2/w2 - m1/w1)^2
-  maxi = which(var == max(var, na.rm = TRUE))
+  len <- length(counts)
+  w1 <- cumsum(counts)
+  w2 <- w1[len] + counts - w1
+  cm <- counts * mids
+  m1 <- cumsum(cm)
+  m2 <- m1[len] + cm - m1
+  var <- w1 * w2 * (m2/w2 - m1/w1)^2
+  maxi <- which(var == max(var, na.rm = TRUE))
 
   result <- (mids[maxi[1]] + mids[maxi[length(maxi)]])/2
 

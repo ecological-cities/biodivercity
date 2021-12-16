@@ -2,12 +2,13 @@
 % Please edit documentation in R/threshold_otsu.R
 \name{threshold_otsu}
 \alias{threshold_otsu}
-\title{Calculate pixel value threshold of an image via Otsu's method}
+\title{Calculate pixel value threshold of an single-band image via Otsu's method}
 \usage{
-threshold_otsu(x = NULL, range = NULL, levels = 256, ...)
+threshold_otsu(image, range = NULL, levels = 256)
 }
 \arguments{
-\item{x}{filename to be imported using \code{terra::rast()}, or a SpatRaster object.}
+\item{image}{Single-band raster to be classified (\code{SpatRaster} object from \code{library(terra)}),
+or a file path to the image to be imported (\code{terra::rast()} will be used).}
 
 \item{range}{Numeric vector (of length 2) specifying the histogram range to be used
 for thresholding. Defaults to the minimum and maximum values of the imported raster.}
@@ -15,17 +16,23 @@ for thresholding. Defaults to the minimum and maximum values of the imported ras
 \item{levels}{Number of histogram bins used to calculate the threshold value,
 typically based on the bit depth of the image (e.g. 8-bit image has \code{2^8} = \code{256} levels).
 Defaults to \code{256}.}
-
-\item{...}{Optional arguments to be passed to \code{terra::rast()} when importing image.}
 }
 \value{
 Otsu's threshold value for the image (a single number), which can subsequently be
-used for image classification (e.g. convert greyscale to binary image).
+used for image classification (e.g. convert continuous raster to binary raster).
 }
 \description{
-Calculate Otsu's threshold value that separates a greyscale image into two distinct classes.
+Calculate Otsu's threshold value that separates a single-band (e.g. greyscale) image into two distinct classes.
 The threshold value is determined by minimizing the combined intra-class variance.
 \code{library(terra)} and \code{library(stars)} are used to perform out-of-memory operations.
+}
+\examples{
+\dontrun{
+  ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity")
+  terra::plot(ndvi_mosaic) # examine raster data
+  threshold_otsu(image = ndvi_mosaic)
+}
+
 }
 \references{
 Otsu, N. (1979). A threshold selection method from gray-level histograms.
@@ -34,4 +41,10 @@ Pau, G., Fuchs, F., Sklyar, O., Boutros, M., & Huber, W. (2010).
 
 EBImage—an R package for image processing with applications to cellular phenotypes.
 Bioinformatics, 26(7), 979-981.
+}
+\seealso{
+\itemize{
+\item \code{\link[=classify_image_binary]{classify_image_binary()}} to classify single-band image using Otsu's method.
+Calls \code{threshold_otsu()} internally.
+}
 }
