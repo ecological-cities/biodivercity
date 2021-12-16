@@ -55,14 +55,13 @@
 #'
 #'@import checkmate
 #'@import dplyr
-#'@import tibble
-#'@import sf
 #'@import foreach
-#'@import doParallel
+#'@importFrom sf st_geometry_type st_is_longlat st_is_valid st_crs st_buffer st_agr st_intersection st_set_geometry st_area st_length
 #'@importFrom glue glue
 #'@importFrom rlang .data
 #'@importFrom graphics hist.default
 #'@importFrom tidyr pivot_longer pivot_wider
+#'@importFrom doParallel registerDoParallel
 #'
 #'@export
 summarise_landscape_perpt <-
@@ -141,7 +140,7 @@ summarise_landscape_perpt <-
 
     # loop across points
     output <- foreach::foreach(i = 1:nrow(points),
-                               .packages = c("dplyr", "tidyr", "tibble", "sf", "rlang")) %dopar% {
+                               .packages = c("dplyr", "tidyr", "sf", "rlang")) %dopar% {
 
                                  # make results object to append data to
                                  results <- points[i,]

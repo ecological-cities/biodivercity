@@ -23,16 +23,15 @@
 #'
 #'@import checkmate
 #'@import dplyr
-#'@import sf
-#'@import landscapemetrics
-#'@import landscapetools
 #'@import foreach
-#'@import doParallel
+#'@import sf
 #'@importFrom rlang .data
 #'@importFrom methods is
 #'@importFrom tidyr separate pivot_wider
 #'@importFrom tibble deframe tibble
 #'@importFrom raster res nlayers
+#'@importFrom doParallel registerDoParallel
+#'@importFrom landscapemetrics sample_lsm
 #'
 #'@export
 lsm_perpoint <- function(raster, points, buffer_sizes,
@@ -80,7 +79,7 @@ lsm_perpoint <- function(raster, points, buffer_sizes,
   doParallel::registerDoParallel(cl)
 
   circles <- foreach::foreach(i = 1:length(buffer_sizes),
-                              .packages = c("dplyr", "tidyr", "tibble", "raster", "sf", "landscapemetrics", "landscapetools","rlang")) %dopar% {
+                              .packages = c("dplyr", "tidyr", "tibble", "raster", "sf", "landscapemetrics","rlang")) %dopar% {
 
 
                        lsm <- landscapemetrics::sample_lsm(raster, points,
@@ -145,6 +144,8 @@ lsm_perpoint <- function(raster, points, buffer_sizes,
 
   names(circles) <- buffer_sizes
 
+  parallel::stopCluster(cl)
+  rm(cl)
 
   return(circles)
 }

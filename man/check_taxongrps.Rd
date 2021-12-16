@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_taxongrps.R
 \name{check_taxongrps}
 \alias{check_taxongrps}
-\title{Check taxon group-level records for subsequent removal}
+\title{Check taxon-group-level records in survey data}
 \usage{
 check_taxongrps(
   observations,
@@ -10,16 +10,16 @@ check_taxongrps(
   species = "species",
   genus = "genus",
   family = "family",
-  town = "town",
-  round = "round",
+  area = "area",
+  period = "period",
   point_id = "point_id"
 )
 }
 \arguments{
 \item{observations}{Dataframe of species observations.
-It should include columns for \code{species}, \code{genus}, \code{family}, \code{town}, \code{round}, and \code{point_id}.}
+It should include columns for \code{species}, \code{genus}, \code{family}, \code{area}, \code{period}, and \code{point_id}.}
 
-\item{level}{Specify whether to tally by \code{town} or \code{point}.}
+\item{level}{Specify whether to tally by \code{area} or \code{point}.}
 
 \item{species}{Column name of the species name recorded in \code{observations}.
 May include group-level records (\code{genus} or \code{family}).}
@@ -28,20 +28,30 @@ May include group-level records (\code{genus} or \code{family}).}
 
 \item{family}{Column name of the family name for recorded \code{observations}.}
 
-\item{town}{Column name of the town specified in \code{observations}.
-Defaults to \code{town}.}
+\item{area}{Column name of the area of interest specified in \code{observations}.
+Defaults to \code{area}.}
 
-\item{round}{Column name of the sampling round specified in \code{observations}.
-Defaults to \code{round}.}
+\item{period}{Column name of the sampling period specified in \code{observations}.
+Defaults to \code{period}.}
 
 \item{point_id}{Column name of the unique identifier for each point in \code{observations}. Defaults to \code{point_id}.}
 }
 \value{
 Dataframe containing the taxon group names where all species within the group are observed.
-Includes columns for the \code{round} and \code{town}/\code{point_id} (depending on argument \code{level}), as well as
+Includes columns for the \code{period} and \code{area}/\code{point_id} (depending on argument \code{level}), as well as
 the number (\code{n}) of species in the particular taxon group.
 }
 \description{
-Tally and list all taxon groups where all species within the group are observed,
-either at the level of individual towns or points (and survey round).
+Show taxon groups where all species within the group are observed,
+and tally the number of species within the particular group.
+Includes option to tally either different levels (\code{area}
+or \code{point}; column to be specified by the user).
+Output dataframe can used for subsequent data processing
+(e.g. filtered away from the input dataset \code{observations}).
+}
+\examples{
+
+data(animal_observations)
+check_taxongrps(observations = animal_observations, level = "area")
+
 }

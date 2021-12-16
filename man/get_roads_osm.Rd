@@ -7,7 +7,7 @@
 get_roads_osm(
   place,
   date = NULL,
-  dir_raw = oe_download_directory(),
+  dir_raw = osmextract::oe_download_directory(),
   filename = NULL,
   ...
 )

@@ -105,10 +105,10 @@ reference:
 - title: "Data"
   desc: "**_Example datasets_**"
 - contents:
-  - area
-  - points
-  - fauna
-  - surveys
+  - sampling_areas
+  - sampling_points
+  - animal_surveys
+  - animal_observations
 - title: "Animal surveys"
   desc: "**_Get, process and summarise data from animal surveys_**"
 - contents:
@@ -122,7 +122,7 @@ reference:
   desc: "**_Get, process and summarise landscape data at survey locations_**"
 - contents:
   - mosaic_sen2r
-  - classify_mosaic
+  - classify_image_binary
   - threshold_otsu
   - lsm_perpoint
   - get_roads_osm

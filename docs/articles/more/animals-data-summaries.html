@@ -105,7 +105,7 @@
             <h3 data-toc-skip class="subtitle">Comparing local diversity between sampled areas</h3>
                         <h4 data-toc-skip class="author">Author</h4>
             
-            <h4 data-toc-skip class="date">2021-12-15</h4>
+            <h4 data-toc-skip class="date">2021-12-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/more/animals-data-summaries.Rmd" class="external-link"><code>vignettes/more/animals-data-summaries.Rmd</code></a></small>
       <div class="d-none name"><code>animals-data-summaries.Rmd</code></div>
@@ -127,7 +127,7 @@
 </h3>
 <p>To generate random sampling points for the collection of new data, the research area is first randomly sampled at a specified point density. Land cover is stratified into two main classes of <em>natural vegetation</em> and <em>urban</em> land cover. These two land cover types are randomly sampled independently at a point density of one point per 50 hectares of land.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sampling_areas</span><span class="op">)</span>
 
 <span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/random_pt_gen.html">random_pt_gen</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
@@ -143,47 +143,23 @@
 <th style="text-align:left;">
 survey_id
 </th>
-<th style="text-align:right;">
-round
-</th>
 <th style="text-align:left;">
 point_id
+</th>
+<th style="text-align:left;">
+area
+</th>
+<th style="text-align:right;">
+period
 </th>
 <th style="text-align:right;">
 cycle
 </th>
 <th style="text-align:left;">
-priority
-</th>
-<th style="text-align:left;">
-year
-</th>
-<th style="text-align:left;">
-town
-</th>
-<th style="text-align:left;">
 resampled
 </th>
 <th style="text-align:left;">
-landcover
-</th>
-<th style="text-align:left;">
-isWater
-</th>
-<th style="text-align:left;">
-isUGS
-</th>
-<th style="text-align:left;">
-isConey
-</th>
-<th style="text-align:left;">
-date
-</th>
-<th style="text-align:left;">
 start_time
-</th>
-<th style="text-align:left;">
-recorder
 </th>
 <th style="text-align:left;">
 time
@@ -203,59 +179,29 @@ genus
 <th style="text-align:right;">
 abundance
 </th>
-<th style="text-align:right;">
-dist_m
-</th>
-<th style="text-align:left;">
-notes
-</th>
 </tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
 1 QTNa14a_P 1 Odonata
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNa14a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Odonata
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 14:00:00
-</td>
-<td style="text-align:left;">
-Chloe
 </td>
 <td style="text-align:left;">
 2016-08-04 14:01:00
@@ -275,58 +221,28 @@ Rhyothemis spp.
 <td style="text-align:right;">
 3
 </td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-NA
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 1 QTNa14a_P 1 Odonata
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNa14a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Odonata
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 14:00:00
-</td>
-<td style="text-align:left;">
-Chloe
 </td>
 <td style="text-align:left;">
 2016-08-04 14:12:00
@@ -346,58 +262,28 @@ Crocothemis spp.
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-SH4505
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 1 QTNa14a_P 1 Odonata
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNa14a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Odonata
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 14:00:00
-</td>
-<td style="text-align:left;">
-Chloe
 </td>
 <td style="text-align:left;">
 2016-08-04 14:15:00
@@ -417,58 +303,28 @@ Neurothemis spp.
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:left;">
-NA
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 1 QTNa14a_P 1 Odonata
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNa14a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Odonata
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 14:00:00
-</td>
-<td style="text-align:left;">
-Chloe
 </td>
 <td style="text-align:left;">
 2016-08-04 14:23:00
@@ -488,58 +344,28 @@ Crocothemis spp.
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
-18
-</td>
-<td style="text-align:left;">
-CT0017 SH4519
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 1 QTNa14a_P 1 Odonata
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNa14a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Odonata
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 14:00:00
-</td>
-<td style="text-align:left;">
-Chloe
 </td>
 <td style="text-align:left;">
 2016-08-04 14:28:00
@@ -559,58 +385,28 @@ Neurothemis spp.
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:left;">
-NA
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 1 QTNb1a_P 1 Odonata
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNb1a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Odonata
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Nat veg
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 14:44:00
-</td>
-<td style="text-align:left;">
-Chloe
 </td>
 <td style="text-align:left;">
 2016-08-04 14:44:00
@@ -630,12 +426,6 @@ Neurothemis spp.
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-SH4530 CT0027
-</td>
 </tr>
 </tbody>
 </table>
@@ -649,68 +439,23 @@ SH4530 CT0027
 <th style="text-align:left;">
 survey_id
 </th>
-<th style="text-align:right;">
-round
-</th>
 <th style="text-align:left;">
 point_id
+</th>
+<th style="text-align:left;">
+area
+</th>
+<th style="text-align:right;">
+period
 </th>
 <th style="text-align:right;">
 cycle
 </th>
 <th style="text-align:left;">
-priority
-</th>
-<th style="text-align:left;">
-year
-</th>
-<th style="text-align:left;">
-town
-</th>
-<th style="text-align:left;">
 resampled
 </th>
 <th style="text-align:left;">
-landcover
-</th>
-<th style="text-align:left;">
-isWater
-</th>
-<th style="text-align:left;">
-isUGS
-</th>
-<th style="text-align:left;">
-isConey
-</th>
-<th style="text-align:left;">
-date
-</th>
-<th style="text-align:left;">
 start_time
-</th>
-<th style="text-align:left;">
-surveyors
-</th>
-<th style="text-align:left;">
-weather
-</th>
-<th style="text-align:left;">
-weather_station
-</th>
-<th style="text-align:right;">
-rain_lastdate
-</th>
-<th style="text-align:right;">
-rain_dailytotal_mm
-</th>
-<th style="text-align:right;">
-rain_highest30min_mm
-</th>
-<th style="text-align:right;">
-rain_highest60min_mm
-</th>
-<th style="text-align:right;">
-rain_highest120min_mm
 </th>
 <th style="text-align:left;">
 notes
@@ -721,68 +466,23 @@ notes
 <td style="text-align:left;">
 1 QTNa14a_P 1 Odonata
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNa14a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Odonata
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 14:00:00
-</td>
-<td style="text-align:left;">
-Chloe, Sherry
-</td>
-<td style="text-align:left;">
-Fair
-</td>
-<td style="text-align:left;">
-Queenstown
-</td>
-<td style="text-align:right;">
-20160803
-</td>
-<td style="text-align:right;">
-9.6
-</td>
-<td style="text-align:right;">
-6.2
-</td>
-<td style="text-align:right;">
-8.6
-</td>
-<td style="text-align:right;">
-9.0
 </td>
 <td style="text-align:left;">
 NA
@@ -792,68 +492,23 @@ NA
 <td style="text-align:left;">
 1 QTNb1a_P 1 Odonata
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNb1a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Odonata
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Nat veg
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 14:44:00
-</td>
-<td style="text-align:left;">
-Chloe, Sherry
-</td>
-<td style="text-align:left;">
-Fair
-</td>
-<td style="text-align:left;">
-Queenstown
-</td>
-<td style="text-align:right;">
-20160803
-</td>
-<td style="text-align:right;">
-9.6
-</td>
-<td style="text-align:right;">
-6.2
-</td>
-<td style="text-align:right;">
-8.6
-</td>
-<td style="text-align:right;">
-9.0
 </td>
 <td style="text-align:left;">
 NA
@@ -863,68 +518,23 @@ NA
 <td style="text-align:left;">
 1 QTNa14a_P 1 Amphibia
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNa14a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Amphibia
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 19:55:00
-</td>
-<td style="text-align:left;">
-Chloe, Sherry, Marcus, Jacqueline
-</td>
-<td style="text-align:left;">
-Fair
-</td>
-<td style="text-align:left;">
-Queenstown
-</td>
-<td style="text-align:right;">
-20160803
-</td>
-<td style="text-align:right;">
-9.6
-</td>
-<td style="text-align:right;">
-6.2
-</td>
-<td style="text-align:right;">
-8.6
-</td>
-<td style="text-align:right;">
-9.0
 </td>
 <td style="text-align:left;">
 NA
@@ -934,68 +544,23 @@ NA
 <td style="text-align:left;">
 1 QTNb1a_P 1 Amphibia
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 QTNb1a_P
 </td>
+<td style="text-align:left;">
+QT
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Amphibia
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-QT
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Nat veg
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-04
-</td>
-<td style="text-align:left;">
 2016-08-04 20:40:00
-</td>
-<td style="text-align:left;">
-Chloe, Sherry, Marcus, Jacqueline
-</td>
-<td style="text-align:left;">
-Fair
-</td>
-<td style="text-align:left;">
-Queenstown
-</td>
-<td style="text-align:right;">
-20160803
-</td>
-<td style="text-align:right;">
-9.6
-</td>
-<td style="text-align:right;">
-6.2
-</td>
-<td style="text-align:right;">
-8.6
-</td>
-<td style="text-align:right;">
-9.0
 </td>
 <td style="text-align:left;">
 NA
@@ -1005,68 +570,23 @@ NA
 <td style="text-align:left;">
 1 PGT15 1 Aves
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 PGT15
 </td>
+<td style="text-align:left;">
+PG
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Aves
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-PG
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-08
-</td>
-<td style="text-align:left;">
 2016-08-08 07:00:00
-</td>
-<td style="text-align:left;">
-Chloe, Sherry
-</td>
-<td style="text-align:left;">
-Partly cloudy
-</td>
-<td style="text-align:left;">
-Punggol
-</td>
-<td style="text-align:right;">
-20160807
-</td>
-<td style="text-align:right;">
-0.2
-</td>
-<td style="text-align:right;">
-0.2
-</td>
-<td style="text-align:right;">
-0.2
-</td>
-<td style="text-align:right;">
-0.2
 </td>
 <td style="text-align:left;">
 NA
@@ -1076,68 +596,23 @@ NA
 <td style="text-align:left;">
 1 PGT14 1 Aves
 </td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 PGT14
 </td>
+<td style="text-align:left;">
+PG
+</td>
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
-Aves
-</td>
-<td style="text-align:left;">
-2016/17
-</td>
-<td style="text-align:left;">
-PG
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Urban
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-2016-08-08
-</td>
-<td style="text-align:left;">
 2016-08-08 07:33:00
-</td>
-<td style="text-align:left;">
-Chloe, Sherry
-</td>
-<td style="text-align:left;">
-Partly cloudy
-</td>
-<td style="text-align:left;">
-Punggol
-</td>
-<td style="text-align:right;">
-20160807
-</td>
-<td style="text-align:right;">
-0.2
-</td>
-<td style="text-align:right;">
-0.2
-</td>
-<td style="text-align:right;">
-0.2
-</td>
-<td style="text-align:right;">
-0.2
 </td>
 <td style="text-align:left;">
 NA
@@ -1153,10 +628,10 @@ NA
 </h2>
 <p>Collected fauna survey data in the format detailed in the previous section can be easily subset with respect to <code>town</code>, <code>round</code> and/or <code>priority</code> with the <code>filter_obs</code> function. For example, a specific set of surveys (i.e. butterfly surveys in Tampines from 2020-2021) can be filtered as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">fauna</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">surveys</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_observations</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_surveys</span><span class="op">)</span>
 
-<span class="va">butterflies_tampines_round_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/filter_obs.html">filter_obs</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna</span>, survey_ref <span class="op">=</span> <span class="va">surveys</span>,
+<span class="va">butterflies_tampines_round_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/filter_obs.html">filter_obs</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">animal_observations</span>, survey_ref <span class="op">=</span> <span class="va">animal_surveys</span>,
                    specify_taxon <span class="op">=</span> <span class="st">"Lepidoptera"</span>,
                    specify_area <span class="op">=</span> <span class="st">"TP"</span>,
                    specify_period <span class="op">=</span> <span class="st">"2"</span><span class="op">)</span></code></pre></div>
@@ -1219,18 +694,18 @@ NA
 <span class="co"># loop across all bootstrapped iterations</span>
 
 <span class="va">plot_sac</span> <span class="op">&lt;-</span> 
-  <span class="fu">foreach</span><span class="op">(</span>i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">fauna</span><span class="op">)</span>, 
+  <span class="fu">foreach</span><span class="op">(</span>i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">animal_observations</span><span class="op">)</span>, 
           .packages <span class="op">=</span> <span class="st">"tidyverse"</span><span class="op">)</span> <span class="op">%dopar%</span> <span class="op">{</span>
   
-  <span class="va">unique</span> <span class="op">&lt;-</span> <span class="va">surveys</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+  <span class="va">unique</span> <span class="op">&lt;-</span> <span class="va">animal_surveys</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
     <span class="fu">distinct</span><span class="op">(</span><span class="va">town</span>, <span class="va">round</span>, <span class="va">priority</span><span class="op">)</span>
             
   <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>
   
   <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">unique</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
     
-    <span class="va">sac_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/sac_extractor.html">sac_extractor</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, 
-                              survey_ref <span class="op">=</span> <span class="va">surveys</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>,
+    <span class="va">sac_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/sac_extractor.html">sac_extractor</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">animal_observations</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, 
+                              survey_ref <span class="op">=</span> <span class="va">animal_surveys</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>,
                               specify_town <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">town</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, 
                               specify_round <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">round</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, 
                               specify_priority <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">priority</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span>
@@ -1291,7 +766,7 @@ NA
               rm_outlier <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>We then classify the resulting mosaics according to their respective indices. We use Otsu’s thresholding (see article) to define threshold values where any value above the threshold is regarded as a presence of the landscape type measured by an index.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../../reference/classify_mosaic.html">classify_mosaic</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"out_dir/index/mosaic.tif"</span>,
+<code class="sourceCode R"><span class="fu">classify_mosaic</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"out_dir/index/mosaic.tif"</span>,
                 otsu <span class="op">=</span> <span class="cn">TRUE</span>,
                 output <span class="op">=</span> <span class="st">"out_dir/classified/"</span><span class="op">)</span></code></pre></div>
 <p>With the classified mosaics, we can isolate landscape metrics at a defined buffer distance around fauna sampling points. The sample datasets <code>data(points)</code>, <code>data(NDVI)</code> and <code>data(NDWI2)</code> contains the survey points and the classified mosaics for NDVI and NDWI2.</p>
