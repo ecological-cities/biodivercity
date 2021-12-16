@@ -21,8 +21,8 @@
 #'
 #'@return The processed road lines (`sf` object).
 #'
-#'@import sf
 #'@import checkmate
+#'@importFrom sf st_transform st_as_sf st_make_valid st_as_text st_geometry st_crs st_is_empty st_write
 #'@importFrom osmextract oe_download_directory oe_match oe_read
 #'@importFrom dplyr filter
 #'@importFrom rlang .data

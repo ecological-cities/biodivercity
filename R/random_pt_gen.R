@@ -12,8 +12,8 @@
 #'
 #'@return The sf object `sampling_points` containing the coordinates of generated points.
 #'
-#'@import sf
 #'@import dplyr
+#'@importFrom sf st_read st_cast st_buffer st_difference st_area st_sample st_as_sf st_intersection st_combine st_zm
 #'@importFrom glue glue
 #'@importFrom rlang .data
 #'@importFrom magrittr '%>%'

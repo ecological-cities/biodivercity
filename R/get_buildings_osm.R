@@ -28,8 +28,8 @@
 #'
 #'@return The processed building polygons (`sf` object).
 #'
-#'@import sf
 #'@import checkmate
+#'@importFrom sf st_transform st_as_sf st_union st_make_valid st_is_valid st_as_text st_geometry st_crs st_is_empty st_cast st_area st_write
 #'@importFrom osmextract oe_download_directory oe_match oe_read
 #'@importFrom dplyr filter mutate
 #'@importFrom smoothr fill_holes drop_crumbs
