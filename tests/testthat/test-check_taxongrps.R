@@ -2,7 +2,7 @@ test_that("Test check_taxongrps()", {
 
   # CHECK INPUTS
   expect_error(check_taxongrps(observations = fauna)) # level not defined
-  expect_error(check_taxongrps(observations = fauna, level = area)) # level shld be character string 'area' or 'point', not a var
+  expect_error(check_taxongrps(observations = fauna, level = area)) # level shld be character 'area' or 'point', not a var
 
 
   # CHECK OUTPUTS

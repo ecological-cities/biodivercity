@@ -29,6 +29,7 @@
 #'@importFrom rlang .data
 #'
 #'@examples
+#'
 #' data(fauna)
 #' check_taxongrps(observations = fauna, level = "area")
 #'
