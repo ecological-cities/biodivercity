@@ -14,10 +14,20 @@ TBC
 data(animal_surveys)
 }
 \description{
-Details about each animal survey conducted (years 2016 to 2022) at sampling points
-within six towns in Singapore: Punggol (PG), Queenstown (QT), Tampines (TP),
-Jurong West (JW), Bishan (BS) and Woodlands (WL). Four types of animal surveys were conducted,
-corresponding to four animal groups (taxa): Birds, butterflies, odonates and amphibians.
+Details about each animal survey conducted at sampling points
+within six towns (areas) in Singapore: Punggol (PG), Queenstown (QT), Tampines (TP),
+Jurong West (JW), Bishan (BS) and Woodlands (WL).
+}
+\details{
+The sampling points (\code{point_id}) were randomly generated within each town (\code{area}).
+Four types of animal surveys were conducted at sampling points,
+corresponding to four animal groups (taxa names in column \code{survey_id}): Birds (Aves), Butterflies (Lepidoptera),
+Odonates (Odonata) and Amphibians (Amphibia).
+
+Each sampling \code{period} stretched across a year-long duration, where sampling points
+were sampled once every two months (\code{cycle} adds up to 6 per \code{period}).
+Some points were sampled again in the second period (column \code{resampled} is \code{TRUE}).
+All surveys took place between the years 2016 to 2022.
 }
 \examples{
 head(animal_surveys)

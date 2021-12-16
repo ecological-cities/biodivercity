@@ -1,14 +1,20 @@
 #' Sampling points where animal surveys were conducted
 #'
-#' Point locations where surveys were conducted within the six towns in Singapore:
-#' Punggol (PG), Queenstown (QT), Tampines (TP), Jurong West (JW), Bishan (BS)
+#' Point locations where animal surveys were conducted within the six towns (areas) in Singapore,
+#' during two sampling periods. The six towns were Punggol (PG), Queenstown (QT), Tampines (TP), Jurong West (JW), Bishan (BS)
 #' and Woodlands (WL).
 #'
 #' @docType data
 #'
 #' @usage data(sampling_points)
 #'
-#' @format `sf` points
+#' @format Tabular [`sf`](https://r-spatial.github.io/sf/index.html) object.
+#' Each row has a geometry of type `POINT`.
+#'
+#' @details Points were randomly generated within each town (`area`),
+#' stratified by `landcover` type (either `Urban` or `Forest`).
+#' Each sampling `period` stretched across a year-long duration;
+#' some points were sampled in both periods.
 #'
 #' @keywords datasets
 #'

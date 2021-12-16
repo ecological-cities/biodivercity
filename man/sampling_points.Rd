@@ -5,7 +5,8 @@
 \alias{sampling_points}
 \title{Sampling points where animal surveys were conducted}
 \format{
-\code{sf} points
+Tabular \href{https://r-spatial.github.io/sf/index.html}{\code{sf}} object.
+Each row has a geometry of type \code{POINT}.
 }
 \source{
 TBC
@@ -14,9 +15,15 @@ TBC
 data(sampling_points)
 }
 \description{
-Point locations where surveys were conducted within the six towns in Singapore:
-Punggol (PG), Queenstown (QT), Tampines (TP), Jurong West (JW), Bishan (BS)
+Point locations where animal surveys were conducted within the six towns (areas) in Singapore,
+during two sampling periods. The six towns were Punggol (PG), Queenstown (QT), Tampines (TP), Jurong West (JW), Bishan (BS)
 and Woodlands (WL).
+}
+\details{
+Points were randomly generated within each town (\code{area}),
+stratified by \code{landcover} type (either \code{Urban} or \code{Forest}).
+Each sampling \code{period} stretched across a year-long duration;
+some points were sampled in both periods.
 }
 \examples{
 head(sampling_points)

@@ -1,13 +1,14 @@
-#' Areas of interest where sampling points were generated within
+#' Areas of interest where sampling points were generated
 #'
-#' Six residential towns in Singapore: Punggol (PG), Queenstown (QT),
+#' Six towns (areas) in Singapore: Punggol (PG), Queenstown (QT),
 #' Tampines (TP), Jurong West (JW), Bishan (BS) and Woodlands (WL).
 #'
 #' @docType data
 #'
 #' @usage data(sampling_areas)
 #'
-#' @format `sf` polygons
+#' @format Tabular [`sf`](https://r-spatial.github.io/sf/index.html) object.
+#' Each row has a geometry of type `POLYGON`.
 #'
 #' @keywords datasets
 #'

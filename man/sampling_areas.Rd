@@ -3,9 +3,10 @@
 \docType{data}
 \name{sampling_areas}
 \alias{sampling_areas}
-\title{Areas of interest where sampling points were generated within}
+\title{Areas of interest where sampling points were generated}
 \format{
-\code{sf} polygons
+Tabular \href{https://r-spatial.github.io/sf/index.html}{\code{sf}} object.
+Each row has a geometry of type \code{POLYGON}.
 }
 \source{
 TBC
@@ -14,7 +15,7 @@ TBC
 data(sampling_areas)
 }
 \description{
-Six residential towns in Singapore: Punggol (PG), Queenstown (QT),
+Six towns (areas) in Singapore: Punggol (PG), Queenstown (QT),
 Tampines (TP), Jurong West (JW), Bishan (BS) and Woodlands (WL).
 }
 \examples{

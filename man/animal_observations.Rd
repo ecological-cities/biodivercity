@@ -14,12 +14,22 @@ TBC
 data(animal_observations)
 }
 \description{
-Time-based point observations of animals (years 2016 to 2022)
-at sampling point locations within six towns in Singapore:
-Punggol (PG), Queenstown (QT), Tampines (TP), Jurong West (JW),
-Bishan (BS) and Woodlands (WL). Species abundance and occurrence
-were recorded for four types of animal surveys, corresponding to four
-animal groups (taxa): Birds, butterflies, odonates and amphibians.
+Time-based point observations of species abundance at sampling points
+within six towns (areas) in Singapore: Punggol (PG), Queenstown (QT),
+Tampines (TP), Jurong West (JW), Bishan (BS) and Woodlands (WL).
+}
+\details{
+The sampling points (\code{point_id}) were randomly generated within each town (\code{area}).
+Four types of animal surveys were conducted at sampling points,
+corresponding to four animal groups (column \code{taxon}): Birds (Aves), Butterflies (Lepidoptera),
+Odonates (Odonata) and Amphibians (Amphibia). In addition to the name of the \code{species} and
+\code{abundance} (number observed) at the particular time point, the names of the \code{family} and \code{genus}
+are also made available.
+
+Each sampling \code{period} stretched across a year-long duration, where sampling points
+were sampled once every two months (\code{cycle} adds up to 6 per \code{period}).
+Some points were sampled again in the second period (column \code{resampled} is \code{TRUE}).
+All surveys took place between the years 2016 to 2022.
 }
 \examples{
 head(animal_observations)
