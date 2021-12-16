@@ -1,8 +1,8 @@
-#'Calculate pixel value threshold of an single-band image via Otsu's method
+#'Calculate pixel value threshold of a single-band image via Otsu's method
 #'
 #'Calculate Otsu's threshold value that separates a single-band (e.g. greyscale) image into two distinct classes.
 #'The threshold value is determined by minimizing the combined intra-class variance.
-#'`library(terra)` and `library(stars)` are used to perform out-of-memory operations.
+#'`library(terra)` is used to perform out-of-memory operations.
 #'
 #'@param image Single-band raster to be classified (`SpatRaster` object from `library(terra)`),
 #'or a file path to the image to be imported (`terra::rast()` will be used).
@@ -32,7 +32,8 @@
 #'
 #'@examples
 #' \dontrun{
-#'   ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity")
+#'   ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif",
+#'                               package="biodivercity")
 #'   terra::plot(ndvi_mosaic) # examine raster data
 #'   threshold_otsu(image = ndvi_mosaic)
 #' }

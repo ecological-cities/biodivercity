@@ -17,9 +17,8 @@ classify_image_binary(
 \item{image}{Single band raster to be classified (\code{SpatRaster} object from \code{library(terra)}),
 or a file path to the image to be imported (\code{terra::rast()} will be used).}
 
-\item{threshold}{Either a numeric value for a manually-specified threshold
-indicating absence/presence, or \code{"otsu"} to calculate the threshold via Otsu's method.
-Defaults to \code{"otsu"}.}
+\item{threshold}{Either a numeric value for a manually-specified threshold,
+or \code{"otsu"} to calculate the threshold via Otsu's method. Defaults to \code{"otsu"}.}
 
 \item{range}{Numeric vector (of length 2) specifying the histogram range to be used
 for Otsu's thresholding (only relevant if \code{threshold = "otsu"}). Defaults to the minimum and maximum values of the imported raster.}
@@ -28,7 +27,7 @@ for Otsu's thresholding (only relevant if \code{threshold = "otsu"}). Defaults t
 Typically based on the bit depth of the image (e.g. 8-bit image has \code{2^8} = \code{256} levels).
 Defaults to \code{256}.}
 
-\item{file}{File path to export output raster. Defaults to \code{NULL}.}
+\item{file}{File path to export output raster (optional). Defaults to \code{NULL}.}
 
 \item{...}{Other arguments that may be supplied to \code{terra::writeRaster()}.}
 }
@@ -41,7 +40,8 @@ If a threshold value is not specified, the Otsu's threshold can be calculated an
 }
 \examples{
 \dontrun{
-  ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity")
+  ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif",
+                              package="biodivercity")
   terra::plot(ndvi_mosaic) # examine continuous raster
   ndvi_classified <- classify_image_binary(image = ndvi_mosaic)
   terra::plot(ndvi) # examine classified raster

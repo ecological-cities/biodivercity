@@ -2,7 +2,7 @@
 % Please edit documentation in R/threshold_otsu.R
 \name{threshold_otsu}
 \alias{threshold_otsu}
-\title{Calculate pixel value threshold of an single-band image via Otsu's method}
+\title{Calculate pixel value threshold of a single-band image via Otsu's method}
 \usage{
 threshold_otsu(image, range = NULL, levels = 256)
 }
@@ -24,11 +24,12 @@ used for image classification (e.g. convert continuous raster to binary raster).
 \description{
 Calculate Otsu's threshold value that separates a single-band (e.g. greyscale) image into two distinct classes.
 The threshold value is determined by minimizing the combined intra-class variance.
-\code{library(terra)} and \code{library(stars)} are used to perform out-of-memory operations.
+\code{library(terra)} is used to perform out-of-memory operations.
 }
 \examples{
 \dontrun{
-  ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity")
+  ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif",
+                              package="biodivercity")
   terra::plot(ndvi_mosaic) # examine raster data
   threshold_otsu(image = ndvi_mosaic)
 }

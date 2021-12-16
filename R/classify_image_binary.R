@@ -5,15 +5,14 @@
 #'
 #'@param image Single band raster to be classified (`SpatRaster` object from `library(terra)`),
 #'or a file path to the image to be imported (`terra::rast()` will be used).
-#'@param threshold Either a numeric value for a manually-specified threshold
-#'indicating absence/presence, or `"otsu"` to calculate the threshold via Otsu's method.
-#'Defaults to `"otsu"`.
+#'@param threshold Either a numeric value for a manually-specified threshold,
+#'or `"otsu"` to calculate the threshold via Otsu's method. Defaults to `"otsu"`.
 #'@param range Numeric vector (of length 2) specifying the histogram range to be used
 #'for Otsu's thresholding (only relevant if `threshold = "otsu"`). Defaults to the minimum and maximum values of the imported raster.
 #'@param levels Number of histogram bins used to calculate the threshold value (only relevant if `threshold = "otsu"`).
 #'Typically based on the bit depth of the image (e.g. 8-bit image has `2^8` = `256` levels).
 #'Defaults to `256`.
-#'@param file File path to export output raster. Defaults to `NULL`.
+#'@param file File path to export output raster (optional). Defaults to `NULL`.
 #'@param ... Other arguments that may be supplied to `terra::writeRaster()`.
 #'
 #'@return The classified raster (`SpatRaster` object).
@@ -26,7 +25,8 @@
 #'
 #'@examples
 #' \dontrun{
-#'   ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity")
+#'   ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif",
+#'                               package="biodivercity")
 #'   terra::plot(ndvi_mosaic) # examine continuous raster
 #'   ndvi_classified <- classify_image_binary(image = ndvi_mosaic)
 #'   terra::plot(ndvi) # examine classified raster
