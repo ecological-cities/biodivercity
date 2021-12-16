@@ -25,12 +25,6 @@
     <loc>https://ecological-cities.github.io/biodivercity/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/articles/more/animal-survey-protocols.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/articles/more/animal-survey-summarise.html</loc>
-  </url>
-  <url>
     <loc>https://ecological-cities.github.io/biodivercity/articles/more/animals-data-summaries.html</loc>
   </url>
   <url>
@@ -40,19 +34,10 @@
     <loc>https://ecological-cities.github.io/biodivercity/articles/more/animals-survey-protocols.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/articles/more/classify-landcover.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/articles/more/landscapes-classify-landcover.html</loc>
-  </url>
-  <url>
     <loc>https://ecological-cities.github.io/biodivercity/articles/more/landscapes-landcover-patterns.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/articles/more/models-local-diversity.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/articles/more/summarise-animal-surveys.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/articles/test-models.html</loc>
@@ -67,19 +52,19 @@
     <loc>https://ecological-cities.github.io/biodivercity/news/index.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/area.html</loc>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/animal_observations.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/animal_surveys.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/check_taxongrps.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/classify_mosaic.html</loc>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/classify_image_binary.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/exclude_simulator.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/fauna.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/filter_obs.html</loc>
@@ -103,22 +88,22 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/pipe.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/points.html</loc>
-  </url>
-  <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/random_pt_gen.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/sac_extractor.html</loc>
   </url>
   <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/sampling_areas.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/sampling_points.html</loc>
+  </url>
+  <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/sptally_extractor.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/summarise_landscape_perpt.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/surveys.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/threshold_otsu.html</loc>
