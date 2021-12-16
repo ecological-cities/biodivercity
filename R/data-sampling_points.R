@@ -4,7 +4,7 @@
 #'
 #' @docType data
 #'
-#' @usage data(points)
+#' @usage data(sampling_points)
 #'
 #' @format An object of class 'list'.
 #'
@@ -15,7 +15,7 @@
 #' @source TBC
 #'
 #' @examples
-#' data(points)
+#' data(sampling_points)
+#' head(sampling_points)
 #'
-#'
-"points"
+"sampling_points"

@@ -6,7 +6,7 @@
 #'
 #' @docType data
 #'
-#' @usage data(surveys)
+#' @usage data(animal_surveys)
 #'
 #' @format An object of class 'list'.
 #'
@@ -17,7 +17,7 @@
 #' @source TBC
 #'
 #' @examples
-#' data(surveys)
+#' data(animal_surveys)
+#' head(animal_surveys)
 #'
-#'
-"surveys"
+"animal_surveys"

@@ -4,7 +4,7 @@
 #'
 #' @docType data
 #'
-#' @usage data(area)
+#' @usage data(sampling_areas)
 #'
 #' @format An object of class 'list'.
 #'
@@ -15,7 +15,6 @@
 #' @source TBC
 #'
 #' @examples
-#' data(area)
+#' head(sampling_areas)
 #'
-#'
-"area"
+"sampling_areas"

@@ -6,7 +6,7 @@
 #'
 #' @docType data
 #'
-#' @usage data(fauna)
+#' @usage data(animal_observations)
 #'
 #' @format An object of class 'list'.
 #'
@@ -17,7 +17,7 @@
 #' @source TBC
 #'
 #' @examples
-#' data(fauna)
+#' data(animal_observations)
+#' head(animal_observations)
 #'
-#'
-"fauna"
+"animal_observations"

@@ -50,7 +50,8 @@ Output dataframe can used for subsequent data processing
 (e.g. filtered away from the input dataset \code{observations}).
 }
 \examples{
-data(fauna)
-check_taxongrps(observations = fauna, level = "area")
+
+data(animal_observations)
+check_taxongrps(observations = animal_observations, level = "area")
 
 }

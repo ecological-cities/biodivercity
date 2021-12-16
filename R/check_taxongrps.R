@@ -30,8 +30,8 @@
 #'
 #'@examples
 #'
-#' data(fauna)
-#' check_taxongrps(observations = fauna, level = "area")
+#' data(animal_observations)
+#' check_taxongrps(observations = animal_observations, level = "area")
 #'
 #'@export
 check_taxongrps <- function(observations, level,
