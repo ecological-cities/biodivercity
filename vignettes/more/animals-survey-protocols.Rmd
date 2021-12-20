@@ -33,17 +33,17 @@ library("dplyr")
 # library("biodivercity")
 devtools::load_all() #knit manually with latest changes to circumvent library("biodivercity") (use in final version)
 
-data(fauna)
+data(animal_observations)
 
-knitr::kable(head(fauna), caption = "**Sample survey data format**") %>%
+knitr::kable(head(animal_observations), caption = "**Sample survey data format**") %>%
   kableExtra::kable_styling("striped", font_size = 10) %>% kableExtra::scroll_box(width = "100%")
 ```
 
 ```{r sample info table, echo = FALSE, message = FALSE}
 # show sample info in kable
-data(surveys)
+data(animal_surveys)
 
-knitr::kable(head(surveys), caption = "**Sample survey info format**") %>%
+knitr::kable(head(animal_surveys), caption = "**Sample survey info format**") %>%
   kableExtra::kable_styling("striped", font_size = 10) %>% kableExtra::scroll_box(width = "100%")
 ```
 
