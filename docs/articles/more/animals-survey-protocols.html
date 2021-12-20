@@ -98,13 +98,13 @@
     
   </div>
 </nav><div class="container template-article">
-
+<script src="animals-survey-protocols_files/kePrint-0.0.1/kePrint.js"></script><link href="animals-survey-protocols_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../../logo.png" class="logo" alt=""><h1>Animals: Survey Protocols</h1>
                         <h4 data-toc-skip class="author">Author</h4>
             
-            <h4 data-toc-skip class="date">2021-12-16</h4>
+            <h4 data-toc-skip class="date">2021-12-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/more/animals-survey-protocols.Rmd" class="external-link"><code>vignettes/more/animals-survey-protocols.Rmd</code></a></small>
       <div class="d-none name"><code>animals-survey-protocols.Rmd</code></div>
@@ -112,10 +112,512 @@
 
     
     
-<p>To be added.</p>
-<ul>
-<li>Stratified random sampling…</li>
-</ul></main>
+<div class="section level2">
+<h2 id="pre-survey-preparations">Pre-survey preparations<a class="anchor" aria-label="anchor" href="#pre-survey-preparations"></a>
+</h2>
+<div class="section level3">
+<h3 id="sampling-point-generation">Sampling point generation<a class="anchor" aria-label="anchor" href="#sampling-point-generation"></a>
+</h3>
+<p>To generate random sampling points for the collection of new data, the research area is first randomly sampled at a specified point density. Land cover is stratified into two main classes of <em>natural vegetation</em> and <em>urban</em> land cover. These two land cover types are randomly sampled independently at a point density of one point per 50 hectares of land.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
+
+<span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/random_pt_gen.html">random_pt_gen</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="data-collection-format">Data collection format<a class="anchor" aria-label="anchor" href="#data-collection-format"></a>
+</h3>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
+<table class="table table table-striped" style="font-size: 10px; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">
+<strong>Sample survey data format</strong>
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+survey_id
+</th>
+<th style="text-align:left;">
+point_id
+</th>
+<th style="text-align:left;">
+area
+</th>
+<th style="text-align:right;">
+period
+</th>
+<th style="text-align:right;">
+cycle
+</th>
+<th style="text-align:left;">
+resampled
+</th>
+<th style="text-align:left;">
+start_time
+</th>
+<th style="text-align:left;">
+time
+</th>
+<th style="text-align:left;">
+taxon
+</th>
+<th style="text-align:left;">
+species
+</th>
+<th style="text-align:left;">
+family
+</th>
+<th style="text-align:left;">
+genus
+</th>
+<th style="text-align:right;">
+abundance
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1 QTNa14a_P 1 Odonata
+</td>
+<td style="text-align:left;">
+QTNa14a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 14:00:00
+</td>
+<td style="text-align:left;">
+2016-08-04 14:01:00
+</td>
+<td style="text-align:left;">
+Odonata
+</td>
+<td style="text-align:left;">
+Rhyothemis phyllis
+</td>
+<td style="text-align:left;">
+Libellulidae
+</td>
+<td style="text-align:left;">
+Rhyothemis spp.
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 QTNa14a_P 1 Odonata
+</td>
+<td style="text-align:left;">
+QTNa14a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 14:00:00
+</td>
+<td style="text-align:left;">
+2016-08-04 14:12:00
+</td>
+<td style="text-align:left;">
+Odonata
+</td>
+<td style="text-align:left;">
+Crocothemis servilia
+</td>
+<td style="text-align:left;">
+Libellulidae
+</td>
+<td style="text-align:left;">
+Crocothemis spp.
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 QTNa14a_P 1 Odonata
+</td>
+<td style="text-align:left;">
+QTNa14a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 14:00:00
+</td>
+<td style="text-align:left;">
+2016-08-04 14:15:00
+</td>
+<td style="text-align:left;">
+Odonata
+</td>
+<td style="text-align:left;">
+Neurothemis fluctuans
+</td>
+<td style="text-align:left;">
+Libellulidae
+</td>
+<td style="text-align:left;">
+Neurothemis spp.
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 QTNa14a_P 1 Odonata
+</td>
+<td style="text-align:left;">
+QTNa14a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 14:00:00
+</td>
+<td style="text-align:left;">
+2016-08-04 14:23:00
+</td>
+<td style="text-align:left;">
+Odonata
+</td>
+<td style="text-align:left;">
+Crocothemis servilia
+</td>
+<td style="text-align:left;">
+Libellulidae
+</td>
+<td style="text-align:left;">
+Crocothemis spp.
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 QTNa14a_P 1 Odonata
+</td>
+<td style="text-align:left;">
+QTNa14a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 14:00:00
+</td>
+<td style="text-align:left;">
+2016-08-04 14:28:00
+</td>
+<td style="text-align:left;">
+Odonata
+</td>
+<td style="text-align:left;">
+Neurothemis fluctuans
+</td>
+<td style="text-align:left;">
+Libellulidae
+</td>
+<td style="text-align:left;">
+Neurothemis spp.
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 QTNb1a_P 1 Odonata
+</td>
+<td style="text-align:left;">
+QTNb1a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 14:44:00
+</td>
+<td style="text-align:left;">
+2016-08-04 14:44:00
+</td>
+<td style="text-align:left;">
+Odonata
+</td>
+<td style="text-align:left;">
+Neurothemis fluctuans
+</td>
+<td style="text-align:left;">
+Libellulidae
+</td>
+<td style="text-align:left;">
+Neurothemis spp.
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
+<table class="table table table-striped" style="font-size: 10px; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">
+<strong>Sample survey info format</strong>
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+survey_id
+</th>
+<th style="text-align:left;">
+point_id
+</th>
+<th style="text-align:left;">
+area
+</th>
+<th style="text-align:right;">
+period
+</th>
+<th style="text-align:right;">
+cycle
+</th>
+<th style="text-align:left;">
+resampled
+</th>
+<th style="text-align:left;">
+start_time
+</th>
+<th style="text-align:left;">
+notes
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1 QTNa14a_P 1 Odonata
+</td>
+<td style="text-align:left;">
+QTNa14a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 14:00:00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 QTNb1a_P 1 Odonata
+</td>
+<td style="text-align:left;">
+QTNb1a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 14:44:00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 QTNa14a_P 1 Amphibia
+</td>
+<td style="text-align:left;">
+QTNa14a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 19:55:00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 QTNb1a_P 1 Amphibia
+</td>
+<td style="text-align:left;">
+QTNb1a_P
+</td>
+<td style="text-align:left;">
+QT
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-04 20:40:00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 PGT15 1 Aves
+</td>
+<td style="text-align:left;">
+PGT15
+</td>
+<td style="text-align:left;">
+PG
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-08 07:00:00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 PGT14 1 Aves
+</td>
+<td style="text-align:left;">
+PGT14
+</td>
+<td style="text-align:left;">
+PG
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2016-08-08 07:33:00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
