@@ -10,6 +10,43 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+## Spatial predictions
+
+`geom_to_grid` overlays a grid over a target area where species richness predictions are desired. This function is a wrapper for the `st_make_grid` function with `what == "centers"`, from the package `sf`. The output is an object of class `sfc` that comprise of points at which landscape metrics are extracted from their respective distance buffers. Grid dimensions are variable and can be specified with `grid_dim`. `buffer_dist` is an optional argument for situations where landscape data is limited to the target area or smaller. The distance value for this argument should correspond to the largest buffer present in the variables, so as to not include areas with no landscape data.
+
+```{r create grid for each UGS town, eval = FALSE}
+# subset to regions where predictions can be made: >126m inwards from boundaries
+bound_grid <- geom_to_grid(geom = bound,
+                           buffer_dist = 126,
+                           grid_dim = c(50, 50))
+```
+![Visualisation of the `geom_to_grid` function.](geom-to-grid.png){#id .class width=60% height=60%}
+
+The `heatmap_raster` function is a combination of multiple functions that result in a final raster of species richness predictions for one taxon. A breakdown of the function is as follows:
+
+1. Species richness is predicted at each point provided in the `geom` argument with the objects specified in `mods`, `env_df` and `landscape`.
+2. A second grid is created using `st_make_grid` with `what == "polygons"` as a template for the final raster.
+3. The grid template and prediction values are combined with `rasterize` from the `terra` package.
+
+**Note**: Variables used in `landscape` should match variables in `env_df`.
+
+```{r heatmap_raster, eval = FALSE}
+# Minor edits to the env_df had to be made
+# bird_env <- birds %>% 
+#   dplyr::select(where(is.numeric) & !sprich) %>% 
+#   dplyr::select(!r50m_man_GnPR) # non-GnPR dataset
+
+bird_hm <- heatmap_raster(env_df = bird_env,
+                          mods = birdmods,
+                          landscape = grid_landscape,
+                          geom = bound,
+                          buffer_dist = 126,
+                          grid_dim = c(50, 50),
+                          name = "bird_hm") # optional
+```
+
+## Visualisation
+
 ```{r load data, include = FALSE}
 
 library("tmap")

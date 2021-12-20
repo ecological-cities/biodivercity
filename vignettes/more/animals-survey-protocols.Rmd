@@ -10,6 +10,40 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-To be added.
+## Pre-survey preparations
 
-- Stratified random sampling...
+### Sampling point generation
+To generate random sampling points for the collection of new data, the research area is first randomly sampled at a specified point density. Land cover is stratified into two main classes of *natural vegetation* and *urban* land cover. These two land cover types are randomly sampled independently at a point density of one point per 50 hectares of land. 
+
+```{r random point generation, eval = FALSE}
+data(area)
+
+points <- random_pt_gen()
+```
+
+
+### Data collection format
+
+```{r sample data table, echo = FALSE, message = FALSE, warning = FALSE}
+
+# show sample data in kable
+library("dplyr")
+
+# use either library (having installed package with latest changes) or load_all (package in development)
+# library("biodivercity")
+devtools::load_all() #knit manually with latest changes to circumvent library("biodivercity") (use in final version)
+
+data(fauna)
+
+knitr::kable(head(fauna), caption = "**Sample survey data format**") %>%
+  kableExtra::kable_styling("striped", font_size = 10) %>% kableExtra::scroll_box(width = "100%")
+```
+
+```{r sample info table, echo = FALSE, message = FALSE}
+# show sample info in kable
+data(surveys)
+
+knitr::kable(head(surveys), caption = "**Sample survey info format**") %>%
+  kableExtra::kable_styling("striped", font_size = 10) %>% kableExtra::scroll_box(width = "100%")
+```
+
