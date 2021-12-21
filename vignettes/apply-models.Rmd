@@ -52,23 +52,11 @@ bird_hm <- heatmap_raster(env_df = bird_env,
 library("tmap")
 library("leaflet")
 
-# data(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m,
-#      butt_heatmap_100m, butt_heatmap_20m, butt_heatmap_50m,
-#      drag_heatmap_100m, drag_heatmap_20m, drag_heatmap_50m,
-#      frog_heatmap_100m, frog_heatmap_20m, frog_heatmap_50m)
+# data(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m)
 
 bird_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_100m.tif")
 bird_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_50m.tif")
 bird_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_20m.tif")
-butt_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/butt_heatmap_100m.tif")
-butt_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/butt_heatmap_20m.tif")
-butt_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/butt_heatmap_50m.tif")
-drag_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/drag_heatmap_100m.tif")
-drag_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/drag_heatmap_50m.tif")
-drag_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/drag_heatmap_20m.tif")
-frog_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/frog_heatmap_100m.tif")
-frog_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/frog_heatmap_50m.tif")
-frog_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/frog_heatmap_20m.tif")
 ```
 
 ```{r plotting maps, include = FALSE}
@@ -82,7 +70,7 @@ tmap_options(check.and.fix = TRUE, #turf, natveg and shrubs layers contain inval
 tm <- 
   tm_basemap(c("CartoDB.Positron", "CartoDB.DarkMatter", "OpenStreetMap")) +
 
-  #100m heatmaps
+  #100m heatmap
   tm_shape(bird_heatmap_100m, raster.downsample = FALSE) +
     tm_raster(title = "Bird SR",
                 group = paste0("Bird Heatmap Raster ", 100, "m"),
@@ -92,34 +80,7 @@ tm <-
               #legend.show = FALSE,
                 alpha = 0.8) +
   
-  tm_shape(butt_heatmap_100m, raster.downsample = FALSE) +
-    tm_raster(title = "Butt SR",
-                group = paste0("Butterfly Heatmap Raster ", 100, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(drag_heatmap_100m, raster.downsample = FALSE) +
-    tm_raster(title = "Odonate SR",
-                group = paste0("Odonate Heatmap Raster ", 100, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(frog_heatmap_100m, raster.downsample = FALSE) +
-    tm_raster(title = "Amphibian SR",
-                group = paste0("Amphibian Heatmap Raster ", 100, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  #50m heatmaps
+  #50m heatmap
   tm_shape(bird_heatmap_50m, raster.downsample = FALSE) +
     tm_raster(title = "Bird SR",
                 group = paste0("Bird Heatmap Raster ", 50, "m"),
@@ -129,34 +90,7 @@ tm <-
               #legend.show = FALSE,
                 alpha = 0.8) +
   
-  tm_shape(butt_heatmap_50m, raster.downsample = FALSE) +
-    tm_raster(title = "Butt SR",
-                group = paste0("Butterfly Heatmap Raster ", 50, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(drag_heatmap_50m, raster.downsample = FALSE) +
-    tm_raster(title = "Odonate SR",
-                group = paste0("Odonate Heatmap Raster ", 50, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(frog_heatmap_50m, raster.downsample = FALSE) +
-    tm_raster(title = "Amphibian SR",
-                group = paste0("Amphibian Heatmap Raster ", 50, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  #20m heatmaps
+  #20m heatmap
   tm_shape(bird_heatmap_20m, raster.downsample = FALSE) +
     tm_raster(title = "Bird SR",
                 group = paste0("Bird Heatmap Raster ", 20, "m"),
@@ -164,34 +98,7 @@ tm <-
                 palette = "YlOrRd",
                 # labels = c(" "),
               #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(butt_heatmap_20m, raster.downsample = FALSE) +
-    tm_raster(title = "Butt SR",
-                group = paste0("Butterfly Heatmap Raster ", 20, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(drag_heatmap_20m, raster.downsample = FALSE) +
-    tm_raster(title = "Odonate SR",
-                group = paste0("Odonate Heatmap Raster ", 20, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(frog_heatmap_20m, raster.downsample = FALSE) +
-    tm_raster(title = "Amphibian SR",
-                group = paste0("Amphibian Heatmap Raster ", 20, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) 
+                alpha = 0.8)
   
 ```
 
@@ -202,23 +109,12 @@ tm <-
 tm %>% 
   tmap_leaflet() %>%
   
-  leaflet::hideGroup("Butterfly Heatmap Raster 100m") %>%
-  leaflet::hideGroup("Butterfly Heatmap Raster 50m") %>% 
-  leaflet::hideGroup("Butterfly Heatmap Raster 20m") %>% 
-  leaflet::hideGroup("Odonate Heatmap Raster 100m") %>% 
-  leaflet::hideGroup("Odonate Heatmap Raster 50m") %>% 
-  leaflet::hideGroup("Odonate Heatmap Raster 20m") %>% 
-  leaflet::hideGroup("Amphibian Heatmap Raster 100m") %>% 
-  leaflet::hideGroup("Amphibian Heatmap Raster 50m") %>% 
-  leaflet::hideGroup("Amphibian Heatmap Raster 20m")
-  
+  leaflet::hideGroup("Bird Heatmap Raster 50m") %>% 
+  leaflet::hideGroup("Bird Heatmap Raster 20m")
   
 ```
 
 ```{r rm obj, include = FALSE}
-rm(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m,
-   butt_heatmap_100m, butt_heatmap_20m, butt_heatmap_50m,
-   drag_heatmap_100m, drag_heatmap_20m, drag_heatmap_50m,
-   frog_heatmap_100m, frog_heatmap_20m, frog_heatmap_50m)
+rm(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m)
 ```
 
