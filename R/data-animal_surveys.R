@@ -12,7 +12,7 @@
 #'
 #' @details The sampling points (`point_id`) were randomly generated within each town (`area`).
 #' Four types of animal surveys were conducted at sampling points,
-#' corresponding to four animal groups (taxa names in column `survey_id`): Birds (Aves), Butterflies (Lepidoptera),
+#' corresponding to four animal groups (column `taxon`): Birds (Aves), Butterflies (Lepidoptera),
 #' Odonates (Odonata) and Amphibians (Amphibia).
 #'
 #' Each sampling `period` stretched across a year-long duration, where sampling points
