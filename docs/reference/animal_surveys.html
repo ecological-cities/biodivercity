@@ -42,6 +42,7 @@ Jurong West (JW), Bishan (BS) and Woodlands (WL)."><meta property="og:image" con
     <a class="dropdown-item" href="../articles/more/animals-survey-protocols.html">Animals - Survey Protocols</a>
     <a class="dropdown-item" href="../articles/more/animals-data-summaries.html">Animals - Data summaries</a>
     <a class="dropdown-item" href="../articles/more/animals-species-analyses.html">Animals - Species-level analyses</a>
+    <a class="dropdown-item" href="../articles/more/animals-simulate-missing-surveys.html">Animals - Simulate missing surveys</a>
     <a class="dropdown-item" href="../articles/more/landscapes-landcover-patterns.html">Landscapes - Land cover patterns</a>
     <h6 class="dropdown-header" data-toc-skip>Landscapes - Urban density</h6>
     <h6 class="dropdown-header" data-toc-skip>Landscapes - Monitoring vs. Planning</h6>
@@ -103,7 +104,7 @@ Jurong West (JW), Bishan (BS) and Woodlands (WL).</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The sampling points (<code>point_id</code>) were randomly generated within each town (<code>area</code>).
 Four types of animal surveys were conducted at sampling points,
-corresponding to four animal groups (taxa names in column <code>survey_id</code>): Birds (Aves), Butterflies (Lepidoptera),
+corresponding to four animal groups (column <code>taxon</code>): Birds (Aves), Butterflies (Lepidoptera),
 Odonates (Odonata) and Amphibians (Amphibia).</p>
 <p>Each sampling <code>period</code> stretched across a year-long duration, where sampling points
 were sampled once every two months (<code>cycle</code> adds up to 6 per <code>period</code>).
@@ -125,15 +126,16 @@ All surveys took place between the years 2016 to 2022.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">animal_surveys</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   survey_id      point_id area  period cycle resampled start_time          notes</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1 QTNa14a_P 1… QTNa14a… QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span> <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 1 QTNb1a_P 1 … QTNb1a_P QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:44:00</span> <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 1 QTNa14a_P 1… QTNa14a… QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">19:55:00</span> <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 1 QTNb1a_P 1 … QTNb1a_P QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">20:40:00</span> <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 1 PGT15 1 Aves PGT15    PG         1     1 <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:00:00</span> <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> 1 PGT14 1 Aves PGT14    PG         1     1 <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:33:00</span> <span style="color: #BB0000;">NA</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   survey_id     point_id  area  period cycle taxon resampled start_time         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1 QTNa14a_P … QTNa14a_P QT         1     1 Odon… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 1 QTNb1a_P 1… QTNb1a_P  QT         1     1 Odon… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:44:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 1 QTNa14a_P … QTNa14a_P QT         1     1 Amph… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">19:55:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 1 QTNb1a_P 1… QTNb1a_P  QT         1     1 Amph… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">20:40:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 1 PGT15 1 Av… PGT15     PG         1     1 Aves  <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:00:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> 1 PGT14 1 Av… PGT14     PG         1     1 Aves  <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:33:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 1 more variable: notes &lt;chr&gt;</span></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

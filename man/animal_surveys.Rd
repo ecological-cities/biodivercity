@@ -21,7 +21,7 @@ Jurong West (JW), Bishan (BS) and Woodlands (WL).
 \details{
 The sampling points (\code{point_id}) were randomly generated within each town (\code{area}).
 Four types of animal surveys were conducted at sampling points,
-corresponding to four animal groups (taxa names in column \code{survey_id}): Birds (Aves), Butterflies (Lepidoptera),
+corresponding to four animal groups (column \code{taxon}): Birds (Aves), Butterflies (Lepidoptera),
 Odonates (Odonata) and Amphibians (Amphibia).
 
 Each sampling \code{period} stretched across a year-long duration, where sampling points
