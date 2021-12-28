@@ -102,9 +102,9 @@ knitr::kable(head(animal_surveys), caption = "**Sample survey info format**") %>
 
 ## Animal survey methods
 
-General animal survey protocol for the BIRT project consisted of 30 minute surveys in the designated buffer radius around the generated points once every two months for a year (6 cycles per Survey Round). Surveyors can move within the area to identify and count any species belonging to the priority taxon of each survey. 
+General animal survey protocol for the BIRT project consisted of **30 minute** surveys in the designated buffer radius around the generated points once every two months for a year (6 cycles per Survey Round). Surveyors can move within the area to identify and count any species belonging to the priority taxon of each survey. 
 
-![**Figure**: Diagram of animal surveys within the respective buffer radii. Data recorded for each species observation is shown here as well.](survey-diagram.png)
+![**Figure**: Diagram of animal surveys within the respective buffer radii. Data recorded for each species observation is also shown here.](survey-diagram.png)
 
 Survey time windows and buffer radii varied for each priority taxon and were chosen based on previous research. The four priority animal taxa surveyed and included in the example data are shown in the table below with their specific survey details. 
 
@@ -129,7 +129,7 @@ For ephemeral water points, odonate and amphibian surveys were conducted within 
 
 Plant surveys were split into two types according to the `Urban` or `Forest` land-cover where the plants are located. 
 
-`Urban` plant surveys were conducted within the same 50m radius of the animal survey points. Cultivated trees, palms, shrubs and turf were mapped manually on-site and identified to the species-level. For digitising in geographic information system (GIS) software, trees and palms were drawn as Point layers while shrubs and turfs were drawn as Polygon layers.
+`Urban` plant surveys were conducted within the same 50m radius of the animal survey points. Cultivated trees, palms, shrubs and turf were mapped manually on-site and identified to the species-level. For digitising in geographic information system (GIS) software, trees and palms were drawn as `Point` layers while shrubs and turfs were drawn as `Polygon` layers.
 
 ![**Figure**: Original satellite imagery of the point (left) and manually-mapped vegetation digitised in QGIS (right).](mapping-diagram.png)
 
