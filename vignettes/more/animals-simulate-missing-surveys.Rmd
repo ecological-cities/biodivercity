@@ -17,9 +17,14 @@ Simulations can be performed to observe the loss in species richness (number of 
 
 First, load the necessary packages to run the analysis:
 
-```{r load required libraries, message = FALSE, warning = FALSE}
+```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
 library("biodivercity")
 library("ggplot2") # for visualisation
+```
+
+```{r load biodivercity while in dev, include = FALSE}
+devtools::load_all()
+library("ggplot2")
 ```
 
 <br>

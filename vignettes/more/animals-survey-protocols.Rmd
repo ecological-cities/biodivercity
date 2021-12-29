@@ -1,7 +1,7 @@
 ---
 title: "Animals: Survey Protocols"
 subtitle: " "
-author: "Author"
+author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -11,6 +11,20 @@ vignette: >
 ---
 
 This article describes how surveys are carried out for the BIRT project, and how the data is recorded.
+
+First, load main libraries for this analysis.
+
+```{r load required libraries, eval = FALSE}
+library("biodivercity")
+library("dplyr")
+```
+
+```{r load libraries while in dev, include = FALSE}
+library("dplyr")
+
+# use either library (having installed package with latest changes) or load_all (package in development)
+devtools::load_all() #knit manually with latest changes to circumvent library("biodivercity") (use in final version)
+```
 
 ## Pre-survey preparations
 
@@ -77,13 +91,6 @@ To conduct new surveys or to build models on existing data, the format in which 
 
 ```{r sample data table, echo = FALSE, message = FALSE, warning = FALSE}
 
-# show sample data in kable
-library("dplyr")
-
-# use either library (having installed package with latest changes) or load_all (package in development)
-# library("biodivercity")
-devtools::load_all() #knit manually with latest changes to circumvent library("biodivercity") (use in final version)
-
 data(animal_observations)
 
 knitr::kable(head(animal_observations), caption = "**Sample survey data format**") %>%
@@ -91,7 +98,6 @@ knitr::kable(head(animal_observations), caption = "**Sample survey data format**
 ```
 
 ```{r sample info table, echo = FALSE, message = FALSE}
-# show sample info in kable
 data(animal_surveys)
 
 knitr::kable(head(animal_surveys), caption = "**Sample survey info format**") %>%
@@ -108,7 +114,7 @@ General animal survey protocol for the BIRT project consisted of **30 minute** s
 
 Survey time windows and buffer radii varied for each priority taxon and were chosen based on previous research. The four priority animal taxa surveyed and included in the example data are shown in the table below with their specific survey details. 
 
-```{r survey type table, echo = FALSE}
+```{r survey type table, echo = FALSE, fig.align='center'}
 
 Taxon <- c("Birds", "Butterflies", "Odonates", "Amphibians")
 Time <- c("0700–0930", "0930–1200", "1400–1600", "2000–2200")

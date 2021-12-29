@@ -10,6 +10,19 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r load required libraries, eval = FALSE}
+library("biodivercity")
+library("tmap")
+library("leaflet")
+```
+
+```{r load libraries while in dev, include = FALSE}
+devtools::load_all() 
+
+library("tmap")
+library("leaflet")
+```
+
 ## Spatial predictions
 
 `geom_to_grid` overlays a grid over a target area where species richness predictions are desired. This function is a wrapper for the `st_make_grid` function with `what == "centers"`, from the package `sf`. The output is an object of class `sfc` that comprise of points at which landscape metrics are extracted from their respective distance buffers. Grid dimensions are variable and can be specified with `grid_dim`. `buffer_dist` is an optional argument for situations where landscape data is limited to the target area or smaller. The distance value for this argument should correspond to the largest buffer present in the variables, so as to not include areas with no landscape data.
@@ -48,15 +61,19 @@ bird_hm <- heatmap_raster(env_df = bird_env,
 ## Visualisation
 
 ```{r load data, include = FALSE}
-
-library("tmap")
-library("leaflet")
-
 # data(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m)
 
-bird_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_100m.tif")
-bird_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_50m.tif")
-bird_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_20m.tif")
+bird_heatmap_100m <- system.file("extdata", "bird_heatmap_100m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
+
+bird_heatmap_50m <- system.file("extdata", "bird_heatmap_50m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
+
+bird_heatmap_20m <- system.file("extdata", "bird_heatmap_20m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
 ```
 
 ```{r plotting maps, include = FALSE}
