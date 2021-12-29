@@ -88,7 +88,7 @@
   <span class="va">area_per_pt</span>,
   <span class="va">pt_buffer</span>,
   excess_modifier <span class="op">=</span> <span class="fl">1</span>,
-  natveg <span class="op">=</span> <span class="cn">NULL</span>,
+  forest <span class="op">=</span> <span class="cn">NULL</span>,
   retain <span class="op">=</span> <span class="cn">NULL</span>,
   retain_prop <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
@@ -99,15 +99,15 @@
     <dl><dt>x</dt>
 <dd><p>Shapefile (polygon or multipolygon) of site boundaries for sampling.</p></dd>
 <dt>area_per_pt</dt>
-<dd><p>Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000)</p></dd>
+<dd><p>Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000).</p></dd>
 <dt>pt_buffer</dt>
-<dd><p>Buffer radius of point surveys in meters so as to not survey outside area of interest.</p></dd>
+<dd><p>Buffer radius of survey points in meters. Points will be generated at this distance away from the boundary so as to not survey outside area of interest.</p></dd>
 <dt>excess_modifier</dt>
 <dd><p>Numeric value of a multiplicative modifier for excess points to be generated (i.e. a value of 1.5 = 1.5 times the expected number of points will be generated). The default value is '1'.</p></dd>
-<dt>natveg</dt>
-<dd><p>Shapefile (polygon or multipolygon) of natural vegetation area for separate point generation.</p></dd>
+<dt>forest</dt>
+<dd><p>Shapefile (polygon or multipolygon) of forest area for separate point generation.</p></dd>
 <dt>retain</dt>
-<dd><p>Shapefile (point) of previous round of surveys to retain in the new set of survey points.</p></dd>
+<dd><p>Shapefile (point) of previous round of surveys to retain in the new set of survey points. There must exist a column <code>landcover</code> with either <code>Urban</code> or <code>Forest</code> as values.</p></dd>
 <dt>retain_prop</dt>
 <dd><p>Value of 0 to 1 for proportion of points to retain from previous round of surveys.</p></dd>
 </dl></div>

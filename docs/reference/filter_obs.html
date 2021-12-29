@@ -100,17 +100,17 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>observations</dt>
-<dd><p>Dataframe of animal pecies observations.
+<dd><p>Dataframe of species observations.
 It should include columns for <code>survey_id</code>, <code>area</code>, <code>period</code>, <code>taxon</code>.</p></dd>
 <dt>survey_ref</dt>
 <dd><p>Dataframe of all surveys conducted. Values in the column
 <code>survey_id</code> should correspond to those in the <code>observations</code>.</p></dd>
 <dt>specify_area</dt>
-<dd><p>Specify the area(s) of interest as a character string (can be a vector of multiple areas). Defaults to <code>NULL</code>, which includes all areas.</p></dd>
+<dd><p>Specify the <code>area</code>(s). Defaults to <code>NULL</code>, which includes all areas.</p></dd>
 <dt>specify_period</dt>
-<dd><p>Specify the survey period(s) of interest as a character string (can be a vector of multiple periods). Defaults to <code>NULL</code>, which includes all periods.</p></dd>
+<dd><p>Specify the survey <code>period</code>(s). Defaults to <code>NULL</code>, which includes all periods.</p></dd>
 <dt>specify_taxon</dt>
-<dd><p>Specify the <code>taxon</code> of interest as a character string (can be a vector of multiple taxa). Defaults to <code>NULL</code>, which includes all taxa.</p></dd>
+<dd><p>Specify the <code>taxon</code> taxon/taxa. Defaults to <code>NULL</code>, which includes all taxa.</p></dd>
 <dt>survey_id</dt>
 <dd><p>Column name of the unique identifier for each survey in <code>observations</code> and
 <code>survey_ref</code>. Defaults to <code>survey_id</code>.</p></dd>
@@ -118,18 +118,18 @@ It should include columns for <code>survey_id</code>, <code>area</code>, <code>p
 <dd><p>Column name of the unique identifier for each point in <code>observations</code> and
 <code>survey_ref</code>. Defaults to <code>point_id</code>.</p></dd>
 <dt>area</dt>
-<dd><p>Column name for the areas specified in <code>observations</code> and <code>survey_ref</code>.
+<dd><p>Column name of the area specified in <code>observations</code> and <code>survey_ref</code>.
 Defaults to <code>area</code>.</p></dd>
 <dt>period</dt>
-<dd><p>Column name for the sampling periods specified in <code>observations</code> and <code>survey_ref</code>.
+<dd><p>Column name of the sampling period specified in <code>observations</code> and <code>survey_ref</code>.
 Defaults to <code>period</code>.</p></dd>
 <dt>taxon</dt>
-<dd><p>Column name for the taxa specified in <code>observations</code> and <code>survey_ref</code>.
+<dd><p>Column name of the taxon of interest specified in <code>observations</code> and <code>survey_ref</code>.
 Defaults to <code>taxon</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The dataframe <code>observations</code> subset according to the specified criteria.</p>
+    <p>The dataframe <code>observations</code> subset according to specified criteria.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
