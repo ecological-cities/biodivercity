@@ -10,7 +10,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This article describes how surveys are carried out for the BIRT project, and how the data is recorded.
+This article describes how surveys were carried out for the example data in this package, as well as how the data was recorded.
+
+## Pre-survey preparations
+
+### Sampling point generation
+
+Before surveys can begin, survey points are randomly generated to best represent the area of interest and its variables. If new data in previous or new areas of interest is to be collected, more points can be randomly generated with respect to the two land cover types: `Urban` and `Forest`. 
+
+The following example covers how the residential town of Queenstown is randomly sampled at a point density of one point per 50 hectares, with a survey radius of 50 m for each point. An excess modifier of `1.5` is set to generate `1.5` times more points than is required for the specified point density, in case points were determined to be inaccessible later in the Survey Period.
 
 First, load main libraries for this analysis.
 
@@ -26,15 +34,7 @@ library("dplyr")
 devtools::load_all() #knit manually with latest changes to circumvent library("biodivercity") (use in final version)
 ```
 
-## Pre-survey preparations
-
-### Sampling point generation
-
-Before surveys can begin, survey points are randomly generated to best represent the area of interest and its variables. If new data in previous or new areas of interest is to be collected, more points can be randomly generated with respect to the two land cover types: `Urban` and `Forest`. 
-
-The following example covers how the residential town of Queenstown is randomly sampled at a point density of one point per 50 hectares, with a survey radius of 50 m for each point. An excess modifier of `1.5` is set to generate `1.5` times more points than is required for the specified point density, in case points were determined to be inaccessible later in the Survey Period.
-
-First, load and process the example dataset to retrieve the Queenstown data only. 
+Then, load and process the example dataset to retrieve the Queenstown data only. 
 
 ```{r process example data, eval = FALSE}
 data("sampling_areas")
@@ -57,7 +57,8 @@ ggplot(data = queenstown) +
   geom_sf(fill = NA) +
   theme_void() +
   geom_sf(data = queenstown_forest, fill = "darkgreen") +
-  geom_sf(data = points, col = ifelse(points$class == "Urban", "blue", "yellow"), show.legend = "point")
+  geom_sf(data = points, col = ifelse(points$class == "Urban", "blue", "yellow"), 
+          show.legend = "point")
 ```
 
 ![](sample-point-plot.png)
@@ -65,7 +66,7 @@ ggplot(data = queenstown) +
 <br>
 
 
-If there is a need to retain survey points from a previous period, the example below shows how new points can be generated without overlap. Here, within the same area of Queenstown, load example points to simulate points in Survey Period 1 for re-surveying in Survey Period 2. If only half of the previous points are to be retained, `survey_prop` can be set to "0.5".  
+If there is a need to retain survey points from a previous period, the example below shows how new points can be generated without overlap. Here, the file path to a shapefile with the previous survey points is given to the argument `retain`. Load example points within the same area of Queenstown and from period `1` to simulate point selection for re-surveying in Survey Period 2. If only half of the previous points are to be retained, the proportion `retain_prop` can be set to `"0.5"`.  
 
 ```{r random point generation with retain, eval = FALSE}
 data("sampling_points")
@@ -108,7 +109,7 @@ knitr::kable(head(animal_surveys), caption = "**Sample survey info format**") %>
 
 ## Animal survey methods
 
-General animal survey protocol for the BIRT project consisted of **30 minute** surveys in the designated buffer radius around the generated points once every two months for a year (6 cycles per Survey Round). Surveyors can move within the area to identify and count any species belonging to the priority taxon of each survey. 
+The general animal survey protocol consisted of **30 minute** surveys in the designated buffer radius around the generated points once every two months for a year (6 cycles per Survey Round). Surveyors can move within the area to identify and count any species belonging to the priority taxon of each survey. 
 
 ![**Figure**: Diagram of animal surveys within the respective buffer radii. Data recorded for each species observation is also shown here.](survey-diagram.png)
 
@@ -118,13 +119,13 @@ Survey time windows and buffer radii varied for each priority taxon and were cho
 
 Taxon <- c("Birds", "Butterflies", "Odonates", "Amphibians")
 Time <- c("0700–0930", "0930–1200", "1400–1600", "2000–2200")
-Radius <- c("50m", "20m", "20m", "20m")
+Radius <- c("50", "20", "20", "20")
 
-survey_types <- data.frame(Taxon, Time, Radius)
+survey_types <- data.frame(Taxon, Time, Radius) %>% 
+  rename("Radius (m)" = Radius)
 
-knitr::kable(survey_types, caption = "**Animal survey types**") %>%
-  kableExtra::kable_styling("striped", font_size = 10) %>%
-  kableExtra::kable_styling(position = "center")
+knitr::kable(survey_types, caption = "**Animal survey types**", align = "lcr", position = "center") %>%
+  kableExtra::kable_styling("striped", font_size = 10)
 ```
 
 For ephemeral water points, odonate and amphibian surveys were conducted within 24 hours after a rain event at the sampling point. The rain event had to be of at least a light–moderate intensity with reference to the [Meteorological Service Singapore's live map of Rain Areas](http://www.weather.gov.sg/weather-rain-area-50km/).
