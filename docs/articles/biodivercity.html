@@ -103,9 +103,9 @@
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Get started with biodivercity</h1>
-                        <h4 data-toc-skip class="author">Author</h4>
+                        <h4 data-toc-skip class="author">Song, Xiao Ping</h4>
             
-            <h4 data-toc-skip class="date">2021-12-29</h4>
+            <h4 data-toc-skip class="date">2022-01-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/biodivercity.Rmd" class="external-link"><code>vignettes/biodivercity.Rmd</code></a></small>
       <div class="d-none name"><code>biodivercity.Rmd</code></div>
@@ -116,32 +116,40 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Multiple frameworks to assess urban biodiversity have been proposed in both research and practice. Some conceptualise biodiversity to include genetic, phylogenetic and landscape diversity, as well as human-centric dimensions such as food provision, climate regulation and ecosystem functioning. While these frameworks offer a more comprehensive view of ‘total biodiversity’, certain components may have shortcomings in terms of their (1) causal proximity (e.g. indirect effect of landscape diversity such as forest area on diversity of other species); (2) measurability at-scale (e.g. genetic diversity, plant species diversity); and (3) precision (e.g. estimating water or thermal regulation by vegetation). Components that do not directly represent the concept of ‘biodiversity’ can also add complexity in decision-making, and risk contributing to mistrust or ignorance of the overall assessment.</p>
-<p>The package <code>biodivercity</code> provides a way to directly assess the <em>habitat value</em> of urban landscapes for a chosen animal group (taxon). The key features include:</p>
+<p>Multiple frameworks to assess urban biodiversity have been proposed in both research and practice. Some conceptualise ‘biodiversity’ to include genetic variation, landscape structure and other human-centric dimensions such as climate regulation and ecosystem functioning. While these offer a more comprehensive view of ‘total biodiversity’, certain components may have shortcomings in terms of their (1) causal proximity (e.g. indirect effect of the landscape on the diversity of other species); (2) measurability at-scale (e.g. genetic diversity, plant species diversity); and (3) precision (e.g. estimating water or thermal regulation by vegetation). In decision-making, unnecessary complexity may also risk contributing to mistrust or ignorance of the overall assessment.</p>
+<p><code>biodivercity</code> is an R package for assessing the diversity of animal species in urban areas. It provides a way to directly assess the <em>habitat value</em> of urban landscapes, based on their empirical effect on chosen animal groups (taxa). Examples for birds, butterflies, odonates and amphibians are provided. The key features include:</p>
 <ul>
-<li>Provide step-by-step protocols for random point sampling of an animal group within areas of interest (for model building and validation). Examples for birds, butterflies, odonates and amphibians are provided.</li>
-<li>Download and process relevant landscape data for building empirical models (e.g. spatial patterns of land cover from Sentinel-2 satellite imagery, urban density from OpenStreetMap).</li>
-<li>Build predictive models of local (alpha) and community (beta) diversity for an animal group.</li>
-<li>Use models to make pixel-based spatial predictions across the landscape, at a specified spatial resolution.</li>
-<li>Validate model predictions with new data.</li>
-<li>Derive total (gamma) diversity for the chosen animal group, based on its local and community diversity.</li>
-<li>Summarise predicted pixel values within custom areas (e.g. within zones used in city planning).</li>
+<li>Step-by-step protocols for random point sampling of an animal group within areas of interest.</li>
+<li>Generate data summaries of the animals surveyed at multiple levels (e.g. areas, periods, animal groups, species).</li>
+<li>Download and process landscape predictors within areas of interest (e.g. satellite imagery, OpenStreetMap data).</li>
+<li>Build and validate predictive models to assess local (alpha), community (beta) and total (gamma) diversity for an animal group.</li>
+<li>Convert vector data generated from future design scenarios into formats suitable for model predictions.</li>
+<li>Use models to make pixel-based spatial predictions across new areas, for both monitoring and future scenario planning purposes.</li>
+<li>Summarise predictions for city-wide scoring and benchmarking (i.e. allow comparisons to be made between zones used in city planning).</li>
 </ul>
 <p><br></p>
+<div class="figure" style="text-align: center">
+<img src="framework.jpeg" alt="**Figure: Broad overview of the data workflow for an animal group**" width="70%"><p class="caption">
+<strong>Figure: Broad overview of the data workflow for an animal group</strong>
+</p>
 </div>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<p>Install the development version of <code>biodivercity</code> from GitHub:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ecological-cities/biodivercity"</span>, ref <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span></code></pre></div>
+<p><br></p>
 </div>
 <div class="section level2">
 <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h2>
+<p>Install the development version of <code>biodivercity</code> from GitHub:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ecological-cities/biodivercity"</span>, ref <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span></code></pre></div>
 <p>Load the package:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">biodivercity</a></span><span class="op">)</span></code></pre></div>
+<p><br></p>
+</div>
+<div class="section level2">
+<h2 id="data-sources">Data sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
+</h2>
+<p>Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys. 14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant, $1,286,979.79. Awarded to the National University of Singapore (host institution) and the Singapore Housing Development Board.</p>
 <p><br></p>
 </div>
 <div class="section level2">
