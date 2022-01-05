@@ -9,7 +9,9 @@ Tabular \href{https://r-spatial.github.io/sf/index.html}{\code{sf}} object.
 Each row has a geometry of type \code{POINT}.
 }
 \source{
-TBC
+Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys.
+14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant, $1,286,979.79.
+Awarded to the National University of Singapore (host institution) and the Singapore Housing Development Board.
 }
 \usage{
 data(sampling_points)
@@ -28,9 +30,6 @@ some points were sampled in both periods.
 \examples{
 head(sampling_points)
 
-}
-\references{
-TBC
 }
 \seealso{
 \itemize{
