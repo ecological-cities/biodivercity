@@ -53,9 +53,9 @@
 #'data(animal_surveys)
 #'
 #'# filter animal observations to taxon of interest
-#'birds <- filter_obs(observations = animal_observations,
-#'                    survey_ref = animal_surveys,
-#'                    specify_taxon = "Aves")
+#'birds <- filter_observations(observations = animal_observations,
+#'                             survey_ref = animal_surveys,
+#'                             specify_taxon = "Aves")
 #'
 #'# convert animal observations to community matrix
 #'birds <- as.data.frame.matrix(xtabs(abundance ~ survey_id + species, data = birds))

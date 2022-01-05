@@ -37,11 +37,11 @@ data("animal_observations")
 data("animal_surveys")
 
 # filter animal observations to taxon of interest
-birds <- filter_obs(observations = animal_observations,
-                    survey_ref = animal_surveys,
-                    specify_taxon = "Aves", # birds
-                    specify_area = "PG", # punggol
-                    specify_period = "1") # survey period 1
+birds <- filter_observations(observations = animal_observations,
+                             survey_ref = animal_surveys,
+                             specify_taxon = "Aves", # birds
+                             specify_area = "PG", # punggol
+                             specify_period = "1") # survey period 1
 
 # convert animal observations to community matrix
 birds <- as.data.frame.matrix(xtabs(abundance ~ survey_id + species, data = birds))
@@ -75,14 +75,10 @@ spp_richness <- spp_richness %>%
   dplyr::mutate(area = "Punggol")
 
 spp_richness %>%
-
   ggplot(aes(x = area, y = n)) +
-    
-    
     geom_boxplot() +
     geom_point(aes(y = full), shape=4, color = "blue") +
     stat_summary(fun = mean, geom = "point", shape = 5) + 
-  
     xlab("") + ylab("No. of species") + 
     theme_bw()
 
@@ -108,11 +104,9 @@ species_order <- plot_bird_spp %>%
 plot_bird_spp %>%
   dplyr::left_join(species_order) %>% 
   ggplot(aes(x = reorder(species, order), y = n)) +
-  
     geom_boxplot() +
     geom_point(aes(y = full), shape = 4, color = "blue") +
     stat_summary(fun = mean, geom = "point", shape = 5) + 
-  
     xlab("") + ylab("No. of sampling points") + 
     theme_bw() +
     coord_flip() 

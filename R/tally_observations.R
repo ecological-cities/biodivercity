@@ -1,6 +1,6 @@
-#'Tally number of species based on specified criteria
+#'Tally number of species observations based on specified criteria
 #'
-#'Wrapper function to `filter_obs()` which filters species observations from biodiversity surveys, based on specified criteria.
+#'Wrapper function to `filter_observations()` which filters species observations from biodiversity surveys, based on specified criteria.
 #'Subsequently tallies the number of species per survey/sampling point (similar to function `specnumber()` in package `vegan`),
 #'and extracts output data. If tallied at the level of sampling points (`level = 'point'`),
 #'removes taxon group-level (genus/family) if all species within group are observed at the point (& period),
@@ -45,7 +45,7 @@
 #'@importFrom rlang .data
 #'
 #'@export
-sptally_extractor <- function(observations, survey_ref, specify_area, specify_period,
+tally_observations <- function(observations, survey_ref, specify_area, specify_period,
     specify_taxon, level, survey_id = "survey_id", area = "area", period = "period",
     taxon = "taxon", point_id = "point_id", species = "species",
     genus = "genus", family = "family", abundance = "abundance") {
@@ -75,7 +75,7 @@ sptally_extractor <- function(observations, survey_ref, specify_area, specify_pe
     # Calculations ------------------
 
     # subset
-    obs_subset <- filter_obs(observations, survey_ref, specify_area = specify_area,
+    obs_subset <- filter_observations(observations, survey_ref, specify_area = specify_area,
         specify_period = specify_period, specify_taxon = specify_taxon,
         survey_id = survey_id, area = area, period = period, taxon = taxon)
 
