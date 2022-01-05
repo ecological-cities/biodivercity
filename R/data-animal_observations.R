@@ -25,9 +25,9 @@
 #'
 #' @keywords datasets
 #'
-#' @references TBC
-#'
-#' @source TBC
+#' @source Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys.
+#' 14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant, $1,286,979.79.
+#' Awarded to the National University of Singapore (host institution) and the Singapore Housing Development Board.
 #'
 #' @seealso
 #' * [animal_surveys] containing information about the surveys conducted.
