@@ -1,0 +1,21 @@
+pandoc: 2.11.4
+pkgdown: 2.0.1
+pkgdown_sha: ~
+articles:
+  apply-models: apply-models.html
+  biodivercity: biodivercity.html
+  build-models: build-models.html
+  animals-data-summaries: more/animals-data-summaries.html
+  animals-simulate-missing-surveys: more/animals-simulate-missing-surveys.html
+  animals-species-analyses: more/animals-species-analyses.html
+  animals-survey-protocols: more/animals-survey-protocols.html
+  landscapes-landcover-patterns: more/landscapes-landcover-patterns.html
+  models-local-diversity: more/models-local-diversity.html
+  process-animal: process-animal.html
+  process-landscape: process-landscape.html
+  test-models: test-models.html
+last_built: 2022-01-07T06:39Z
+urls:
+  reference: https://ecological-cities.github.io/biodivercity/reference
+  article: https://ecological-cities.github.io/biodivercity/articles
+
