@@ -1,4 +1,4 @@
-pandoc: 2.14.0.3
+pandoc: 2.11.4
 pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
@@ -14,11 +14,7 @@ articles:
   process-animal: process-animal.html
   process-landscape: process-landscape.html
   test-models: test-models.html
-<<<<<<< HEAD
-last_built: 2022-01-05T06:21Z
-=======
-last_built: 2022-01-03T02:51Z
->>>>>>> 6b090ae (regenerated website)
+last_built: 2022-01-03T05:54Z
 urls:
   reference: https://ecological-cities.github.io/biodivercity/reference
   article: https://ecological-cities.github.io/biodivercity/articles

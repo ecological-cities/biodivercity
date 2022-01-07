@@ -124,12 +124,13 @@
 <div class="section level3">
 <h3 id="sampling-point-generation">Sampling point generation<a class="anchor" aria-label="anchor" href="#sampling-point-generation"></a>
 </h3>
-<p>Before surveys can begin, survey points are randomly generated to best represent the area of interest and its variables. If new data in previous or new areas of interest is to be collected, more points can be randomly generated with respect to the two land cover types: <code>Urban</code> and <code>Forest</code>.</p>
-<p>The following example covers how the residential town of Queenstown is randomly sampled at a point density of one point per 50 hectares, with a survey radius of 50 m for each point. An excess modifier of <code>1.5</code> is set to generate <code>1.5</code> times more points than is required for the specified point density, in case points were determined to be inaccessible later in the Survey Period.</p>
+<p>Before surveys can begin, survey points are randomly generated to best represent the area of interest. If new data is to be collected, survey points can be randomly generated with respect to the two land cover types: <code>Urban</code> and <code>Forest</code>.</p>
+<p>The following example covers how the residential town of Queenstown can be randomly sampled at a point density of one point per 50 hectares, with a survey radius of 50 m for each point. An excess modifier of <code>1.5</code> can be set to generate <code>1.5</code> times the points that are required for the specified point density, in case any of the points were determined to be inaccessible later in the Survey Period.</p>
 <p>First, load main libraries for this analysis.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">"biodivercity"</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></code></pre></div>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></code></pre></div>
 <p>Then, load and process the example dataset to retrieve the Queenstown data only.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"sampling_areas"</span><span class="op">)</span>
@@ -152,7 +153,7 @@
           show.legend <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span></code></pre></div>
 <p><img src="sample-point-plot.png"></p>
 <p><br></p>
-<p>If there is a need to retain survey points from a previous period, the example below shows how new points can be generated without overlap. Here, the file path to a shapefile with the previous survey points is given to the argument <code>retain</code>. Load example points within the same area of Queenstown and from period <code>1</code> to simulate point selection for re-surveying in Survey Period 2. If only half of the previous points are to be retained, the proportion <code>retain_prop</code> can be set to <code>"0.5"</code>.</p>
+<p>If there is a need to retain survey points from a previous Survey Period, the example below shows how new points can be generated without overlap. Here, the file path to a shapefile with the previous survey points is given to the argument <code>retain</code>. Load the example points within the same area of Queenstown from period <code>1</code> to simulate point selection for re-surveying in a subsequent Survey Period 2. If only half of the previous points are to be retained, the proportion <code>retain_prop</code> can be set to <code>"0.5"</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"sampling_points"</span><span class="op">)</span>
 
@@ -165,13 +166,13 @@
                         retain <span class="op">=</span> <span class="va">queenstown_retain</span>,
                         retain_prop <span class="op">=</span> <span class="fl">0.5</span>,
                         excess_modifier <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></code></pre></div>
-<p>After obtaining the generated points, surveyors are to then assess the points and the surrounding areas up to the above buffer radius for potential on-site disturbances to wild animals. Approved points are then selected according to the order in which they were generated (i.e. the point <code>id</code>) to maintain randomness.</p>
+<p>After obtaining the generated points, surveyors are to then assess the points and the surrounding areas up to the above buffer radius (50 m) for potential on-site disturbances to wild animals. Approved points are then selected according to the order in which they were generated (i.e. the point <code>id</code>) to maintain randomness.</p>
 <hr>
 </div>
 <div class="section level3">
 <h3 id="animal-data-collection-format">Animal data collection format<a class="anchor" aria-label="anchor" href="#animal-data-collection-format"></a>
 </h3>
-<p>To conduct new surveys or to build models on existing data, the format in which the data is organised is shown below. Animal data is separated into the survey data and survey info datasets, where the former includes the individual observation records and the latter contains meta information on each 30 minutes survey.</p>
+<p>To conduct new surveys or to build models on collected data, the format in which the data is organised for analysis is shown below. Animal data is separated into the survey data and survey info datasets, where the former includes the individual observation records and the latter contains meta information on each 30 minutes survey.</p>
 <div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
 <table class="table table table-striped" style="font-size: 10px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -684,11 +685,11 @@ NA
 <div class="section level2">
 <h2 id="animal-survey-methods">Animal survey methods<a class="anchor" aria-label="anchor" href="#animal-survey-methods"></a>
 </h2>
-<p>The general animal survey protocol consisted of <strong>30 minute</strong> surveys in the designated buffer radius around the generated points once every two months for a year (6 cycles per Survey Round). Surveyors can move within the area to identify and count any species belonging to the priority taxon of each survey.</p>
+<p>The general animal survey protocol consisted of <strong>30 minute</strong> surveys in the designated buffer radius around the generated points once every two months for a year (6 cycles per Survey Period). Surveyors can move within the area to identify and count any species belonging to the priority taxon of each survey. Each encounter is recorded according to the species, with further details on the time, abundance and distance from center point.</p>
 <div class="figure">
 <img src="survey-diagram.png" alt=""><p class="caption"><strong>Figure</strong>: Diagram of animal surveys within the respective buffer radii. Data recorded for each species observation is also shown here.</p>
 </div>
-<p>Survey time windows and buffer radii varied for each priority taxon and were chosen based on previous research. The four priority animal taxa surveyed and included in the example data are shown in the table below with their specific survey details.</p>
+<p>Survey time windows and buffer radii varies for each priority taxon and they were chosen based on previous research. The four priority animal taxa surveyed and included in the example data are shown in the table below with their specific survey details.</p>
 <table class="table table table-striped" style="font-size: 10px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 <strong>Animal survey types</strong>
