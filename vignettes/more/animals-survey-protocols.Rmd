@@ -48,8 +48,10 @@ queenstown_forest <- queenstown[queenstown$landcover == "Forest",]
 
 Run `random_pt_gen()` with the above parameters and plot to visualise the generated points. 
 
+**Take note**: `random_pt_gen` uses `st_read`, throwing an error when example data is used as it's meant to read shapefiles from local directories.
+
 ```{r random point generation, eval = FALSE}
-points <- random_pt_gen(x = queenstown, #function uses st_read, gives error here since sample is alr an sf obj
+points <- random_pt_gen(x = queenstown,
                         area_per_pt = 500000,
                         pt_buffer = 50,
                         forest = queenstown_forest,
@@ -136,11 +138,15 @@ For ephemeral water points, odonate and amphibian surveys were conducted within 
 
 ## Plant survey methods
 
+**Take note**: If species lists are not generated with this package, `Forest` plant survey methodology should be removed.
+
 Plant surveys were split into two types according to the `Urban` or `Forest` land-cover where the plants are located. 
 
 `Urban` plant surveys were conducted within the same 50m radius of the animal survey points. Cultivated trees, palms, shrubs and turf were mapped manually on-site and identified to the species-level. For digitising in geographic information system (GIS) software, trees and palms were drawn as `Point` layers while shrubs and turfs were drawn as `Polygon` layers.
 
 ![**Figure**: Original satellite imagery of the point (left) and manually-mapped vegetation digitised in QGIS (right).](mapping-diagram.png)
+
+---
 
 `Forest` plant surveys were dependent on existing forest patches in the sampling areas. Available maps and satellite images were first checked for natural vegetation cover that were unmanaged within the sampling area boundaries. After locating such patches, surveys were then carried out to identify all unique vascular plant species present. Surveyors would also trace the existing outlines of these forest patches by walking the perimeter with a Global Positioning System (GPS) device. Plant specimens were collected if they were not identifiable on-site and photographs were taken of plants that were out-of-reach. 
 

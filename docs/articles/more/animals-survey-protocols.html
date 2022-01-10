@@ -105,7 +105,7 @@
       <img src="../../logo.png" class="logo" alt=""><h1>Animals: Survey Protocols</h1>
                         <h4 data-toc-skip class="author">Edwin Tan</h4>
             
-            <h4 data-toc-skip class="date">2022-01-07</h4>
+            <h4 data-toc-skip class="date">2022-01-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/more/animals-survey-protocols.Rmd" class="external-link"><code>vignettes/more/animals-survey-protocols.Rmd</code></a></small>
       <div class="d-none name"><code>animals-survey-protocols.Rmd</code></div>
@@ -134,8 +134,9 @@
 <span class="va">queenstown</span> <span class="op">&lt;-</span> <span class="va">sampling_areas</span><span class="op">[</span><span class="va">sampling_areas</span><span class="op">$</span><span class="va">area</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">"QT"</span>, <span class="op">]</span>
 <span class="va">queenstown_forest</span> <span class="op">&lt;-</span> <span class="va">queenstown</span><span class="op">[</span><span class="va">queenstown</span><span class="op">$</span><span class="va">landcover</span> <span class="op">==</span> <span class="st">"Forest"</span>,<span class="op">]</span></code></pre></div>
 <p>Run <code><a href="../../reference/random_pt_gen.html">random_pt_gen()</a></code> with the above parameters and plot to visualise the generated points.</p>
+<p><strong>Take note</strong>: <code>random_pt_gen</code> uses <code>st_read</code>, throwing an error when example data is used as it’s meant to read shapefiles from local directories.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/random_pt_gen.html">random_pt_gen</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">queenstown</span>, <span class="co">#function uses st_read, gives error here since sample is alr an sf obj</span>
+<code class="sourceCode R"><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/random_pt_gen.html">random_pt_gen</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">queenstown</span>,
                         area_per_pt <span class="op">=</span> <span class="fl">500000</span>,
                         pt_buffer <span class="op">=</span> <span class="fl">50</span>,
                         forest <span class="op">=</span> <span class="va">queenstown_forest</span>,
@@ -754,11 +755,13 @@ Amphibians
 <div class="section level2">
 <h2 id="plant-survey-methods">Plant survey methods<a class="anchor" aria-label="anchor" href="#plant-survey-methods"></a>
 </h2>
+<p><strong>Take note</strong>: If species lists are not generated with this package, <code>Forest</code> plant survey methodology should be removed.</p>
 <p>Plant surveys were split into two types according to the <code>Urban</code> or <code>Forest</code> land-cover where the plants are located.</p>
 <p><code>Urban</code> plant surveys were conducted within the same 50m radius of the animal survey points. Cultivated trees, palms, shrubs and turf were mapped manually on-site and identified to the species-level. For digitising in geographic information system (GIS) software, trees and palms were drawn as <code>Point</code> layers while shrubs and turfs were drawn as <code>Polygon</code> layers.</p>
 <div class="figure">
 <img src="mapping-diagram.png" alt=""><p class="caption"><strong>Figure</strong>: Original satellite imagery of the point (left) and manually-mapped vegetation digitised in QGIS (right).</p>
 </div>
+<hr>
 <p><code>Forest</code> plant surveys were dependent on existing forest patches in the sampling areas. Available maps and satellite images were first checked for natural vegetation cover that were unmanaged within the sampling area boundaries. After locating such patches, surveys were then carried out to identify all unique vascular plant species present. Surveyors would also trace the existing outlines of these forest patches by walking the perimeter with a Global Positioning System (GPS) device. Plant specimens were collected if they were not identifiable on-site and photographs were taken of plants that were out-of-reach.</p>
 <p>Locations of any ‘rare’ plant species identified were recorded with the GPS. These include species that were not locally cultivated, and ‘critically endangered’ or ‘extinct’ according to the Singapore Red Data Book, 2nd Edition (Davison et al., 2008).</p>
 </div>
