@@ -1,7 +1,7 @@
 ---
 title: "Process Landscape Data"
 subtitle: "Process remotely-sensed images"
-author: "Author"
+author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -10,9 +10,48 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Process landscape data
+## Download open-source landscape data
 
-Landscape information is retrieved from the publicly available Sentinel-2 database using the `sen2r` package. As this is an external package unrelated to `biodivercity`, please also refer to the official repository for updated instructions. 
+### OpenStreetMap 
+
+Urban landscape elements can be retrieved from the freely-available OpenStreetMap (OSM) database. Building polygons and road lines are extracted from a set geographical boundary with the functions `get_buildings_osm` and `get_roads_osm`. 
+
+```{r download urban elements w parallel loops, eval = FALSE}
+osm_boundaries <- data(boundaries) %>% 
+  # st_union() %>% # merge all subzones
+  st_as_sf() %>%
+  st_make_valid()
+
+foreach(i = seq_along(params$osm_download_dates), 
+                   .packages = c("home2park",
+                                 "tidyverse", "sf", "osmextract")) %dopar% { 
+  
+  # buildings                   
+  get_buildings_osm(osm_boundaries, 
+                    date = params$osm_download_dates[i],
+                    dir_raw = params$osm_dir_rawdata,
+                    filename = paste0(dir_dataoutput, "/landscape/osm/buildings_osm-polygons_", params$osm_download_dates[i], ".geojson"))
+              
+  # roads
+  get_roads_osm(osm_boundaries, 
+                date = params$osm_download_dates[i],
+                dir_raw = params$osm_dir_rawdata,
+                filename = paste0(dir_dataoutput, "/landscape/osm/roads_osm-lines_", params$osm_download_dates[i], ".geojson"))       
+                     
+  rm(i)                   
+}
+```
+
+### Sentinel-2 satellite images
+
+```{r get sen2r version, include = FALSE}
+library(sen2r)
+sen2r_version <- packageVersion("sen2R")
+```
+
+```{r intro para, results = 'asis', echo = FALSE}
+cat(paste0("Landscape information is retrieved from the publicly available Sentinel-2 database using the `sen2r` package. As this is an external package unrelated to `biodivercity`, please also refer to the official repository for updated instructions. The package version used to generate this article is `sen2r_", sen2r_version, "`."))
+```
 
 To model for fauna species richness across the six towns from 2016 to 2019, the spatio-temporal selections can be set accordingly to download all available Sentinel-2 images with the `sen2r()` GUI interface. 
 
@@ -42,7 +81,11 @@ out_paths <- sen2r(
   )
 ```
 
-After downloading the raster files within their specific index directories, we have to mosaic the individual images to account for data deficiencies from cloud cover. 
+---
+
+## Mosaic rasters
+
+Raster files downloaded across multiple dates can be combined to create mosaics to account for cloud cover. This can be done with the file directories created by `sen2r()` in the `mosaic_sen2r()` function.
 
 ```{r mosaic generation, eval = FALSE}
  mosaic_sen2r(parent_dir = out_dir,
@@ -50,34 +93,35 @@ After downloading the raster files within their specific index directories, we h
               rm_outlier = TRUE)
 ```
 
-We then classify the resulting mosaics according to their respective indices. We use Otsu's thresholding (see article) to define threshold values where any value above the threshold is regarded as a presence of the landscape type measured by an index.
+Downloaded rasters and the resulting mosaics contain raw information for the specified indices. To account for noise and classify pixel values, Otsu's thresholding (see article) can be used to define threshold values, where values above the threshold are regarded as a presence of the landscape type measured by an index.
 
 ```{r mosaic classification, eval = FALSE}
-classify_mosaic(x = "out_dir/index/mosaic.tif",
-                otsu = TRUE,
-                output = "out_dir/classified/")
+classify_image_binary(image = "out_dir/index/mosaic.tif",
+                      threshold = "otsu")
 ```
 
-With the classified mosaics, we can isolate landscape metrics at a defined buffer distance around fauna sampling points. The sample datasets `data(points)`, `data(NDVI)` and `data(NDWI2)` contains the survey points and the classified mosaics for NDVI and NDWI2. 
+With the classified mosaics, landscape metrics can then be extracted at the defined buffer distances around fauna sampling points. The sample datasets `data(points)`, `data(NDVI)` and `data(NDWI2)` contains the survey points and the classified mosaics for NDVI and NDWI2. 
 
 ```{r lsm_perpoint, eval = FALSE}
 data(points)
 veg_classified <- data(NDVI)
 water_classified <- data(NDWI2)
 
-circles <- lsm_perpoint(raster = veg_classified, points = points, 
+circles <- lsm_perpoint(raster = veg_classified, 
+                        points = points, 
                         buffer_sizes = c(50, 100, 126, 200, 400, 600, 800, 1000),
                         class_names = c("veg"),
                         class_values = c(1),
                         landscape_name = "veg",
                         level = c("class")) 
 
-circles2 <- lsm_perpoint(raster = water_classified, points = points, 
-                        buffer_sizes = c(50, 100, 126, 200, 400, 600, 800, 1000),
-                        class_names = c("water"),
-                        class_values = c(1),
-                        landscape_name = "water",
-                        level = c("class")) 
+circles2 <- lsm_perpoint(raster = water_classified, 
+                         points = points,
+                         buffer_sizes = c(50, 100, 126, 200, 400, 600, 800, 1000),
+                         class_names = c("water"),
+                         class_values = c(1),
+                         landscape_name = "water",
+                         level = c("class")) 
 
 for(i in 1:length(circles)){ # append to circles2 info to circles
   circles[[i]] <- circles[[i]] %>%
@@ -89,32 +133,4 @@ for(i in 1:length(circles)){ # append to circles2 info to circles
 }
 ```
 
-Next, urban landscape elements are retrieved from the freely-available OpenStreetMap (OSM) database. In the Sentinel-2 images, buildings would be represented by their building footprint as opposed to three-dimensional structures. We can download the number of above-ground levels as a proxy for building height, especially in residential buildings where the floor-to-floor height is standardised (Building height data may also be supplied by government databases if available (e.g. [HDB Property Information from data.gov.sg](https://data.gov.sg/dataset/hdb-property-information)).). Building polygons and road lines are extracted from a set geographical boundary with the functions `get_buildings_osm` and `get_roads_osm`. `home2park`, a GitHub package, and `osmextract` are required dependencies for these functions and this package. 
-
-```{r download urban elements w parallel loops, eval = FALSE}
-osm_boundaries <- data(boundaries) %>% 
-  # st_union() %>% # merge all subzones
-  st_as_sf() %>%
-  st_make_valid()
-
-# get_roads_osm is not in home2park package. Need to load dependency libraries
-
-foreach(i = seq_along(params$osm_download_dates), 
-                   .packages = c("home2park",
-                                 "tidyverse", "sf", "osmextract")) %dopar% { 
-  
-  # buildings                   
-  get_buildings_osm(osm_boundaries, 
-                    date = params$osm_download_dates[i],
-                    dir_raw = params$osm_dir_rawdata,
-                    filename = paste0(dir_dataoutput, "/landscape/osm/buildings_osm-polygons_", params$osm_download_dates[i], ".geojson"))
-              
-  # roads
-  get_roads_osm(osm_boundaries, 
-                date = params$osm_download_dates[i],
-                dir_raw = params$osm_dir_rawdata,
-                filename = paste0(dir_dataoutput, "/landscape/osm/roads_osm-lines_", params$osm_download_dates[i], ".geojson"))       
-                     
-  rm(i)                   
-}
-```
+---

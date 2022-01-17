@@ -1,7 +1,7 @@
 ---
 title: "Process Animal Data"
 subtitle: "Process animal survey data for model building"
-author: "Author"
+author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -10,7 +10,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Process survey data
+## Dealing with data
 
 Collected fauna survey data in the format detailed in the previous section can be easily subset with respect to `town`, `round` and/or `priority` with the `filter_observations()` function. For example, a specific set of surveys (i.e. butterfly surveys in Tampines from 2020-2021) can be filtered as follows:
 
@@ -30,3 +30,9 @@ Checks are then performed to remove uncertain fauna identifications to prevent o
 ```{r check taxon groups, eval = FALSE}
 
 ```
+
+## Filtering survey points
+
+Create a function for normalising survey points respective to area?
+
+
