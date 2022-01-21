@@ -12,7 +12,7 @@ lsm_perpoint(
   class_values,
   landscape_name,
   point_id = "point_id",
-  round = "round",
+  period = "period",
   what = NULL,
   level = NULL,
   ...
@@ -20,9 +20,9 @@ lsm_perpoint(
 }
 \arguments{
 \item{raster}{Classified land cover raster object to be analysed.
-The number of layers should correspond to the number of survey rounds present in \code{points}.}
+The number of layers should correspond to the number of survey periods present in \code{points}.}
 
-\item{points}{Sampling points (sf objects) for the calculation of landscape metrics.}
+\item{points}{Sampling points (sf object) for the calculation of landscape metrics.}
 
 \item{buffer_sizes}{Radius of circles for sampling points (in mapunits);
 landscape metrics will be calculated within the buffer area.}
@@ -35,7 +35,7 @@ landscape metrics will be calculated within the buffer area.}
 
 \item{point_id}{Column name of the sampling point id within the \code{points} sf.}
 
-\item{round}{Column name of the survey round within the \code{points} sf.
+\item{period}{Column name of the survey period within the \code{points} sf.
 The column should contain integers that correspond to the number of layers in \code{raster}.}
 
 \item{what}{Argument passed to \code{landscapemetrics::calculate_lsm()}.
@@ -48,7 +48,7 @@ Currently only supports class- and landscape-level metrics.}
 }
 \value{
 A list containing the landscape metrics across the input \code{buffer_sizes}.
-Each element in the list contains results for each \code{point_id} and \code{round}, for a particular buffer size.
+Each element in the list contains results for each \code{point_id} and \code{period}, for a particular buffer size.
 }
 \description{
 Calculate landscape metrics at sampling points

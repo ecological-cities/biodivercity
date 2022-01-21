@@ -68,7 +68,10 @@ Imports:
     glue (>= 1.4.2),
     units (>= 0.7.2),
     smoothr (>= 0.2.2),
-    sen2r (>= 1.5.0)
+    sen2r (>= 1.5.0),
+    purrr (>= 0.3.4),
+    stringr (>= 1.4.0),
+    tidyselect (>= 1.1.1)
 Language: en-GB
 VignetteBuilder: knitr
 Depends: 
