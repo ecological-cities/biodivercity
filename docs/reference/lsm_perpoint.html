@@ -91,7 +91,7 @@
   <span class="va">class_values</span>,
   <span class="va">landscape_name</span>,
   point_id <span class="op">=</span> <span class="st">"point_id"</span>,
-  round <span class="op">=</span> <span class="st">"round"</span>,
+  period <span class="op">=</span> <span class="st">"period"</span>,
   what <span class="op">=</span> <span class="cn">NULL</span>,
   level <span class="op">=</span> <span class="cn">NULL</span>,
   <span class="va">...</span>
@@ -102,9 +102,9 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>raster</dt>
 <dd><p>Classified land cover raster object to be analysed.
-The number of layers should correspond to the number of survey rounds present in <code>points</code>.</p></dd>
+The number of layers should correspond to the number of survey periods present in <code>points</code>.</p></dd>
 <dt>points</dt>
-<dd><p>Sampling points (sf objects) for the calculation of landscape metrics.</p></dd>
+<dd><p>Sampling points (sf object) for the calculation of landscape metrics.</p></dd>
 <dt>buffer_sizes</dt>
 <dd><p>Radius of circles for sampling points (in mapunits);
 landscape metrics will be calculated within the buffer area.</p></dd>
@@ -116,8 +116,8 @@ landscape metrics will be calculated within the buffer area.</p></dd>
 <dd><p>Character string for name of landscape. Used to label landscape-level metrics.</p></dd>
 <dt>point_id</dt>
 <dd><p>Column name of the sampling point id within the <code>points</code> sf.</p></dd>
-<dt>round</dt>
-<dd><p>Column name of the survey round within the <code>points</code> sf.
+<dt>period</dt>
+<dd><p>Column name of the survey period within the <code>points</code> sf.
 The column should contain integers that correspond to the number of layers in <code>raster</code>.</p></dd>
 <dt>what</dt>
 <dd><p>Argument passed to <code><a href="https://r-spatialecology.github.io/landscapemetrics/reference/calculate_lsm.html" class="external-link">landscapemetrics::calculate_lsm()</a></code>.
@@ -131,7 +131,7 @@ Currently only supports class- and landscape-level metrics.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list containing the landscape metrics across the input <code>buffer_sizes</code>.
-Each element in the list contains results for each <code>point_id</code> and <code>round</code>, for a particular buffer size.</p>
+Each element in the list contains results for each <code>point_id</code> and <code>period</code>, for a particular buffer size.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

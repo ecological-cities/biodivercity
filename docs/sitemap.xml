@@ -4,6 +4,15 @@
     <loc>https://ecological-cities.github.io/biodivercity/404.html</loc>
   </url>
   <url>
+    <loc>https://ecological-cities.github.io/biodivercity/CONTRIBUTING.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/SUPPORT.html</loc>
+  </url>
+  <url>
     <loc>https://ecological-cities.github.io/biodivercity/articles/apply-models.html</loc>
   </url>
   <url>
@@ -46,13 +55,7 @@
     <loc>https://ecological-cities.github.io/biodivercity/authors.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/CONTRIBUTING.html</loc>
-  </url>
-  <url>
     <loc>https://ecological-cities.github.io/biodivercity/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/LICENSE.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/news/index.html</loc>
@@ -91,7 +94,13 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/lsm_perpoint.html</loc>
   </url>
   <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/lsm_perpoint_specified.html</loc>
+  </url>
+  <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/mosaic_sen2r.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/osm_perpoint_specified.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/pipe.html</loc>
@@ -116,8 +125,5 @@
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/tidyeval.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/SUPPORT.html</loc>
   </url>
 </urlset>

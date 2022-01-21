@@ -115,20 +115,22 @@ reference:
   desc: "**_Get, process and summarise data from animal surveys_**"
 - contents:
   - random_pt_gen
-  - filter_obs
-  - sptally_extractor
+  - filter_observations
+  - tally_observations
   - check_taxongrps
+  - calculate_sac
   - exclude_simulator
-  - sac_extractor
 - title: "Landscapes"
   desc: "**_Get, process and summarise landscape data at survey locations_**"
 - contents:
   - mosaic_sen2r
   - classify_image_binary
   - threshold_otsu
-  - lsm_perpoint
   - get_roads_osm
   - get_buildings_osm
+  - lsm_perpoint
+  - lsm_perpoint_specified
+  - osm_perpoint_specified
 - title: "Models"
   desc: "**_Predict and validate animal diversity_**"
 - contents:
