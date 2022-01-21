@@ -76,7 +76,7 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
 
       # subset to areas within sampling points for relevant round
       vector_sub <- vector_list[[i]] %>%
-        df::st_make_valid() %>%
+        sf::st_make_valid() %>%
         sf::st_intersection(results %>% # for relevant buffer radius
                               sf::st_buffer(dist = as.numeric(input$radius[j])))
       row.names(vector_sub) <- NULL # reset row names for later indexing
@@ -99,7 +99,7 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
 
           buildings_summarised <- vector_sub %>%
             dplyr::group_by(.data[[period]], .data[[point_id]]) %>%
-            dplyr::summarise("{input$radius[j]}m_osm_buildingVol_m3" :=
+            dplyr::summarise("r{input$radius[j]}m_osm_buildingVol_m3" :=
                                sum(units::set_units(area_m2, value = NULL) * .data[[building_height]],
                                    na.rm = TRUE)) %>%
             dplyr::mutate(dplyr::across(.cols = tidyselect::everything(),
@@ -110,7 +110,7 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
           results <- results %>%
             dplyr::left_join(buildings_summarised,
                              by = c(.data[[point_id]], .data[[period]])) %>%
-            dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0(input$radius[j], "m_osm_buildingVol_m3")), # points with no buildings have a value of 0
+            dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("r", input$radius[j], "m_osm_buildingVol_m3")), # points with no buildings have a value of 0
                           .fns = ~tidyr::replace_na(., 0)))
           rm(buildings_summarised)
 
@@ -120,8 +120,8 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
                   is.null(vector_sub[[building_height]])){
 
           warning(paste0("Column '", building_height, "' not present in element ", i," of vector_list for calculation of ",
-                         paste0(input$radius[j], "m_osm_", input$metric[j]), ". Returning NAs.\n"))
-          results[[paste0(input$radius[j], "m_osm_", input$metric[j])]] <- NA
+                         paste0("r", input$radius[j], "m_osm_", input$metric[j]), ". Returning NAs.\n"))
+          results[[paste0("r", input$radius[j], "m_osm_", input$metric[j])]] <- NA
 
 
         # building-height metrics: use ndsm data to process
@@ -145,7 +145,7 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
 
           buildings_summarised <- vector_sub %>%
             dplyr::group_by(.data[[period]], .data[[point_id]]) %>%
-            dplyr::summarise("{input$radius[j]}m_osm_buildingVol_m3" :=
+            dplyr::summarise("r{input$radius[j]}m_osm_buildingVol_m3" :=
                                sum(units::set_units(area_m2, value = NULL) * .data$height,
                                    na.rm = TRUE)) %>%
             dplyr::mutate(dplyr::across(.cols = tidyselect::everything(),
@@ -156,7 +156,7 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
           results <- results %>%
             dplyr::left_join(buildings_summarised,
                              by = c(.data[[point_id]], .data[[period]])) %>%
-            dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0(input$radius[j], "m_osm_buildingVol_m3")), # points with no buildings have a value of 0
+            dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("r", input$radius[j], "m_osm_buildingVol_m3")), # points with no buildings have a value of 0
                           .fns = ~tidyr::replace_na(., 0)))
           rm(buildings_summarised)
 
@@ -165,7 +165,7 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
         } else if(!is.null(building_ndsm) & i > length(building_ndsm)){
 
           warning(paste0("List lengths of vector_list and building_ndsm are different! List elements matched by sequence. Returning NAs for data in survey period ",i ,".\n"))
-          results[[paste0(input$radius[j], "m_osm_", input$metric[j])]] <- NA
+          results[[paste0("r", input$radius[j], "m_osm_", input$metric[j])]] <- NA
 
         }
 
@@ -181,19 +181,19 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
             # summarise
             dplyr::group_by(.data[[period]], .data[[point_id]]) %>%
 
-            dplyr::summarise("{input$radius[j]}m_osm_buildingArea_m2" := sum(area_m2, na.rm = TRUE),
-                      "{input$radius[j]}m_osm_buildingGFA_m2" := sum(GFA_m2, na.rm = TRUE)) %>%
+            dplyr::summarise("r{input$radius[j]}m_osm_buildingArea_m2" := sum(area_m2, na.rm = TRUE),
+                      "r{input$radius[j]}m_osm_buildingGFA_m2" := sum(GFA_m2, na.rm = TRUE)) %>%
             sf::st_set_geometry(NULL) %>%
 
-            dplyr::mutate("{input$radius[j]}m_osm_buildingAvgLvl" := .data[[paste0(input$radius[j], "m_osm_buildingGFA_m2")]] / .data[[paste0(input$radius[j], "m_osm_buildingArea_m2")]]) %>%
-            dplyr::mutate("{input$radius[j]}m_osm_buildingFA_ratio" := .data[[paste0(input$radius[j], "m_osm_buildingGFA_m2")]] / (pi * as.numeric(input$radius[j]) ^ 2)) %>%
+            dplyr::mutate("r{input$radius[j]}m_osm_buildingAvgLvl" := .data[[paste0("r", input$radius[j], "m_osm_buildingGFA_m2")]] / .data[[paste0("r", input$radius[j], "m_osm_buildingArea_m2")]]) %>%
+            dplyr::mutate("r{input$radius[j]}m_osm_buildingFA_ratio" := .data[[paste0("r", input$radius[j], "m_osm_buildingGFA_m2")]] / (pi * as.numeric("r", input$radius[j]) ^ 2)) %>%
             dplyr::mutate(dplyr::across(.cols = tidyselect::everything(),
                           .fns = ~tidyr::replace_na(., 0))) %>%
             dplyr::select(c(.data[[point_id]], .data[[period]], matches(paste0("_osm_", input$metric[j])))) # only select metric of interest
 
           results <- results %>%
             left_join(to_append) %>%
-            dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0(input$radius[j], "m_osm_", c("buildingArea_m2", "buildingGFA_m2", "buildingAvgLvl", "buildingFA_ratio"))),
+            dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("r", input$radius[j], "m_osm_", c("buildingArea_m2", "buildingGFA_m2", "buildingAvgLvl", "buildingFA_ratio"))),
                           .fns = ~tidyr::replace_na(., 0)))
           rm(to_append)
         }
@@ -212,14 +212,14 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
 
         to_append <- vector_sub %>%
           dplyr::group_by(.data[[period]], .data[[point_id]]) %>%
-          dplyr::summarise("{input$radius[j]}m_osm_laneLength_m" := sum(lanelength_m),
-                    "{input$radius[j]}m_osm_laneDensity" := sum(lanelength_m) / (pi * as.numeric(input$radius[j]) ^ 2)) %>% # radius depends on circles
+          dplyr::summarise("r{input$radius[j]}m_osm_laneLength_m" := sum(lanelength_m),
+                    "r{input$radius[j]}m_osm_laneDensity" := sum(lanelength_m) / (pi * as.numeric(input$radius[j]) ^ 2)) %>% # radius depends on circles
           sf::st_set_geometry(NULL) %>% # remove geometry
           dplyr::select(c(.data[[point_id]], .data[[period]], matches(paste0("_osm_", input$metric[j])))) # only select metric of interest
 
         results <- results %>%
           dplyr::left_join(to_append) %>%
-          dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0(input$radius[j], "m_osm_", c("laneLength_m", "laneDensity"))),
+          dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("r", input$radius[j], "m_osm_", c("laneLength_m", "laneDensity"))),
                         .fns = ~tidyr::replace_na(., 0)))
         rm(to_append)
 
