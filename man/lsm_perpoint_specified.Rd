@@ -30,7 +30,7 @@ Refer to \code{landscapemetrics::list_lsm()} for the full list of metrics.}
 
 \item{point_id}{Column name of the sampling point id within the \code{points} sf. Defaults to \code{"point_id"}.}
 
-\item{period}{Column name of the survey period within the \code{points} sf. Defaults to \code{"period"}.
+\item{period}{Column name of the survey period (integers) within the \code{points} sf. Defaults to \code{"period"}.
 The column should contain integers that correspond to the number of elements in \code{raster_list}.}
 }
 \value{
@@ -40,7 +40,7 @@ Each element of the list contains results for a survey \code{period} (represente
 \description{
 Summarise specified landscape metrics at sampling points, for classified raster object(s).
 Multiple (list of) rasters may be classified, each corresponding
-to a survey period in the dataset \code{points}. Calls the function \code{lsm_perpoint()} internally.
+to a survey period (integer values) in the dataset \code{points}. Calls the function \code{lsm_perpoint()} internally.
 The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 Refer to \code{landscapemetrics::list_lsm()} for the full list of metric names and abbreviations.
 }
