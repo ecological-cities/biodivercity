@@ -186,7 +186,7 @@ osm_perpoint_specified <- function(vector_list, predictors_osm,
             sf::st_set_geometry(NULL) %>%
 
             dplyr::mutate("r{input$radius[j]}m_osm_buildingAvgLvl" := .data[[paste0("r", input$radius[j], "m_osm_buildingGFA_m2")]] / .data[[paste0("r", input$radius[j], "m_osm_buildingArea_m2")]]) %>%
-            dplyr::mutate("r{input$radius[j]}m_osm_buildingFA_ratio" := .data[[paste0("r", input$radius[j], "m_osm_buildingGFA_m2")]] / (pi * as.numeric("r", input$radius[j]) ^ 2)) %>%
+            dplyr::mutate("r{input$radius[j]}m_osm_buildingFA_ratio" := .data[[paste0("r", input$radius[j], "m_osm_buildingGFA_m2")]] / (pi * as.numeric(input$radius[j]) ^ 2)) %>%
             dplyr::mutate(dplyr::across(.cols = tidyselect::everything(),
                           .fns = ~tidyr::replace_na(., 0))) %>%
             dplyr::select(c(.data[[point_id]], .data[[period]], matches(paste0("_osm_", input$metric[j])))) # only select metric of interest
