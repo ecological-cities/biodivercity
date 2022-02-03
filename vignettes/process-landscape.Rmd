@@ -16,30 +16,21 @@ vignette: >
 
 Urban landscape elements can be retrieved from the freely-available OpenStreetMap (OSM) database. Building polygons and road lines are extracted from a set geographical boundary with the functions `get_buildings_osm` and `get_roads_osm`. 
 
-```{r download urban elements w parallel loops, eval = FALSE}
+```{r download urban elements, eval = FALSE}
 osm_boundaries <- data(boundaries) %>% 
   # st_union() %>% # merge all subzones
   st_as_sf() %>%
   st_make_valid()
 
-foreach(i = seq_along(params$osm_download_dates), 
-                   .packages = c("home2park",
-                                 "tidyverse", "sf", "osmextract")) %dopar% { 
-  
-  # buildings                   
-  get_buildings_osm(osm_boundaries, 
-                    date = params$osm_download_dates[i],
-                    dir_raw = params$osm_dir_rawdata,
-                    filename = paste0(dir_dataoutput, "/landscape/osm/buildings_osm-polygons_", params$osm_download_dates[i], ".geojson"))
+get_buildings_osm(osm_boundaries,
+                  date = params$osm_download_dates[i],
+                  dir_raw = params$osm_dir_rawdata,
+                  filename = paste0(dir_dataoutput, "/landscape/osm/buildings_osm-polygons_", params$osm_download_dates[i], ".geojson"))
               
-  # roads
-  get_roads_osm(osm_boundaries, 
-                date = params$osm_download_dates[i],
-                dir_raw = params$osm_dir_rawdata,
-                filename = paste0(dir_dataoutput, "/landscape/osm/roads_osm-lines_", params$osm_download_dates[i], ".geojson"))       
-                     
-  rm(i)                   
-}
+get_roads_osm(osm_boundaries,
+              date = params$osm_download_dates[i],
+              dir_raw = params$osm_dir_rawdata,
+              filename = paste0(dir_dataoutput, "/landscape/osm/roads_osm-lines_", params$osm_download_dates[i], ".geojson"))
 ```
 
 ### Sentinel-2 satellite images
@@ -53,7 +44,7 @@ sen2r_version <- packageVersion("sen2R")
 cat(paste0("Landscape information is retrieved from the publicly available Sentinel-2 database using the `sen2r` package. As this is an external package unrelated to `biodivercity`, please also refer to the official repository for updated instructions. The package version used to generate this article is `sen2r_", sen2r_version, "`."))
 ```
 
-To model for fauna species richness across the six towns from 2016 to 2019, the spatio-temporal selections can be set accordingly to download all available Sentinel-2 images with the `sen2r()` GUI interface. 
+To model for fauna species richness across the six towns from 2016 to 2019, the spatio-temporal selections can be set accordingly to download all available Sentinel-2 images with the `sen2r()` function. The same parameters can be customised with a GUI interface by running `sen2r()` with no arguments, if preferred.  
 
 ```{r sen2r setup, eval = FALSE}
 # http://sen2r.ranghetti.info/articles/installation.html
@@ -85,7 +76,7 @@ out_paths <- sen2r(
 
 ## Mosaic rasters
 
-Raster files downloaded across multiple dates can be combined to create mosaics to account for cloud cover. This can be done with the file directories created by `sen2r()` in the `mosaic_sen2r()` function.
+Raster files downloaded across multiple dates can be combined to create mosaics to account for cloud cover. Using the `mosaic_sen2r()` function, this can be easily done with the file directory created by `sen2r()`, as specified in the `path_out` argument.
 
 ```{r mosaic generation, eval = FALSE}
  mosaic_sen2r(parent_dir = out_dir,
@@ -93,7 +84,7 @@ Raster files downloaded across multiple dates can be combined to create mosaics 
               rm_outlier = TRUE)
 ```
 
-Downloaded rasters and the resulting mosaics contain raw information for the specified indices. To account for noise and classify pixel values, Otsu's thresholding (see article) can be used to define threshold values, where values above the threshold are regarded as a presence of the landscape type measured by an index.
+Downloaded rasters and the resulting mosaics contain raw information for specified indices. To account for noise and classify pixel values, Otsu's thresholding (see article) can be used to define threshold values, where values above the threshold are regarded as a presence of the landscape type measured by an index.
 
 ```{r mosaic classification, eval = FALSE}
 classify_image_binary(image = "out_dir/index/mosaic.tif",
@@ -131,6 +122,22 @@ for(i in 1:length(circles)){ # append to circles2 info to circles
                 dplyr::select(-percentage_inside), 
               by = c("point_id", "round"))
 }
+```
+
+The same can be repeated for the downloaded OSM dataset.
+
+```{r osm_perpoint, eval = FALSE}
+osm_perpoint_specified(
+  vector_list,
+  predictors_osm,
+  building_ndsm = NULL,
+  building_height = "height",
+  building_levels = "levels",
+  road_lanes = "lanes",
+  points,
+  point_id = "point_id",
+  period = "period"
+)
 ```
 
 ---

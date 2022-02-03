@@ -25,14 +25,28 @@ butterflies_tampines_round_2 <-
                       specify_period = "2")
 ```
 
-Checks are then performed to remove uncertain fauna identifications to prevent over-counting. 
+Checks can be performed to remove uncertain fauna identifications to prevent over-counting. 
 
 ```{r check taxon groups, eval = FALSE}
 
+# full fauna data
+rmspp_town <- check_taxongrps(fauna, level = "town")
+rmspp_point <- check_taxongrps(fauna, level = "point")
+rmspp <- list(town = rmspp_town, point = rmspp_point) # combine to list
+rm(rmspp_town, rmspp_point)
+
+
+# normalised fauna data - list of lists
+rmspp_normalised <- 
+  foreach(i = seq_along(fauna_normalised), 
+          .packages = "tidyverse") %dopar% {
+            
+  rmspp_town <- check_taxongrps(fauna_normalised[[i]], level = "town")
+  rmspp_point <- check_taxongrps(fauna_normalised[[i]], level = "point")
+  rmspp_normalised <- list(town = rmspp_town, point = rmspp_point) # combine to list
+  
+  rmspp_normalised
+          }
+
 ```
-
-## Filtering survey points
-
-Create a function for normalising survey points respective to area?
-
 
