@@ -22,16 +22,18 @@ osm_boundaries <- data(boundaries) %>%
   st_as_sf() %>%
   st_make_valid()
 
-get_buildings_osm(osm_boundaries,
-                  date = params$osm_download_dates[i],
-                  dir_raw = params$osm_dir_rawdata,
-                  filename = paste0(dir_dataoutput, "/landscape/osm/buildings_osm-polygons_", params$osm_download_dates[i], ".geojson"))
+buildings <- get_buildings_osm(osm_boundaries,
+                               date = as.Date(c("2019-07-01", "2021-06-30")),
+                               dir_raw = your_dir_raw,
+                               filename = "osm_buildings.geojson"))
               
-get_roads_osm(osm_boundaries,
-              date = params$osm_download_dates[i],
-              dir_raw = params$osm_dir_rawdata,
-              filename = paste0(dir_dataoutput, "/landscape/osm/roads_osm-lines_", params$osm_download_dates[i], ".geojson"))
+roads <- get_roads_osm(osm_boundaries,
+                       date = as.Date(c("2019-07-01", "2021-06-30")),
+                       dir_raw = your_dir_raw,
+                       filename = "osm_roads.geojson"
 ```
+
+---
 
 ### Sentinel-2 satellite images
 
@@ -49,13 +51,7 @@ To model for fauna species richness across the six towns from 2016 to 2019, the 
 ```{r sen2r setup, eval = FALSE}
 # http://sen2r.ranghetti.info/articles/installation.html
 install.packages("sen2r")
-
-# install Sen2Cor software (atmospheric correction for Level-1C products)
 library(sen2r)
-check_sen2r_deps() # check dependencies
-install_sen2cor(force = TRUE) # install via command instead of GUI
-
-out_dir  <- glue::glue("{dir_dataoutput}/spatial/satellite-images/sen2r/sen2r_", {as.character(params$sen2r_date_range[1])}, "-to-", {as.character(params$sen2r_date_range[2])})
 
 # run this after every successful download if there are still files in LTA not yet online, then subsequently check with provided safe_is_online() and sen2r():
 out_paths <- sen2r(
@@ -63,8 +59,8 @@ out_paths <- sen2r(
   timewindow = c(as.Date(params$sen2r_date_range[1]), as.Date(params$sen2r_date_range[2])),
   path_l2a = params$sen2r_dir_rawdata, # level-2A SAFE products
   path_l1c = params$sen2r_dir_rawdata, # level-1C SAFE products
-  path_out = out_dir,
-  path_indices = out_dir,
+  path_out = your_out_dir,
+  path_indices = your_out_dir,
   extent_as_mask = TRUE,
   list_rgb = "RGB432B" # output RGB image
   # max_mask = 15,
@@ -124,20 +120,48 @@ for(i in 1:length(circles)){ # append to circles2 info to circles
 }
 ```
 
-The same can be repeated for the downloaded OSM dataset.
+Alternatively, certain desired landscape metrics can be specified for calculation via the `lsm_perpoint_specified` function instead of summarising the full suite of metrics. For example, to calculate the `pland` metric for the classified vegetation raster at multiple buffer distances:
+
+```{r lsm_perpoint_specified, eval = FALSE}
+predictors_lsm <- vector()
+dist <- c(50, 100, 126, 200, 400, 600, 800, 1000)
+
+for(i in seq_along(dist)){
+  predictors_lsm[i] <- paste0("r", dist[i], "m_lsm_pland")
+}
+
+rm(i, dist)
+
+pland <- lsm_perpoint_specified(raster_list = veg_classified,
+                                predictors_lsm = predictors_lsm,
+                                class_names = c("veg"),
+                                class_values =  c(1),
+                                points = points,
+                                point_id = "point_id",
+                                period = "period"
+                                )
+```
+
+The same can be also be performed for the downloaded OSM dataset.
 
 ```{r osm_perpoint, eval = FALSE}
-osm_perpoint_specified(
-  vector_list,
-  predictors_osm,
-  building_ndsm = NULL,
-  building_height = "height",
-  building_levels = "levels",
-  road_lanes = "lanes",
-  points,
-  point_id = "point_id",
-  period = "period"
-)
+predictors_osm <- vector()
+dist <- c(50, 100, 126, 200, 400, 600, 800, 1000)
+
+for(i in seq_along(dist)){
+  predictors_osm[i] <- paste0("r", dist[i], "m_osm_buildingFA_ratio")
+}
+
+buildingFA_ratio <- osm_perpoint_specified(buildings,
+                                           predictors_osm,
+                                           building_ndsm = NULL,
+                                           building_height = "height",
+                                           building_levels = "levels",
+                                           road_lanes = "lanes",
+                                           points,
+                                           point_id = "point_id",
+                                           period = "period"
+                                           )
 ```
 
 ---

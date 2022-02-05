@@ -29,24 +29,148 @@ Checks can be performed to remove uncertain fauna identifications to prevent ove
 
 ```{r check taxon groups, eval = FALSE}
 
-# full fauna data
 rmspp_town <- check_taxongrps(fauna, level = "town")
 rmspp_point <- check_taxongrps(fauna, level = "point")
 rmspp <- list(town = rmspp_town, point = rmspp_point) # combine to list
 rm(rmspp_town, rmspp_point)
 
-
-# normalised fauna data - list of lists
-rmspp_normalised <- 
-  foreach(i = seq_along(fauna_normalised), 
-          .packages = "tidyverse") %dopar% {
-            
-  rmspp_town <- check_taxongrps(fauna_normalised[[i]], level = "town")
-  rmspp_point <- check_taxongrps(fauna_normalised[[i]], level = "point")
-  rmspp_normalised <- list(town = rmspp_town, point = rmspp_point) # combine to list
-  
-  rmspp_normalised
-          }
-
 ```
 
+## Sampling points (normalised)
+
+Owing to the limited number of points with the full set of six survey cycles, those with at least three survey cycles were retained (per taxon and round). (individual surveys removed in the next section).
+
+```{r include = FALSE}
+points_tally <- surveys  %>%
+  group_by(point_id, priority, town, round, landcover, isUGS, isConey, isWater, subcategory, type_combined) %>%
+  summarise(survey_cycles = n())
+
+points_tally3 <- points_tally %>% 
+  dplyr::filter(survey_cycles >= 3)
+```
+
+Sampling points were then randomly removed from sampling zones that had higher point densities than `r params$filter_fauna_pointdens` points/km<sup>2</sup> for Aves/Lepidoptera, and `r params$filter_fauna_waterpointdens` points/km<sup>2</sup> for Odonata/Amphibia. The number of remaining points were rounded up if the target point density was not a whole number. Random removal was weighted; sampling points within zones with a point density much higher than the target (i.e. larger difference between the actual and target number of points) were more likely to be removed. The entire process was repeated ``r params$filter_normalise_bootstrap`` times to obtain bootstrapped results in the following sections.
+
+```{r filter sampling points to make them more representative, include = FALSE}
+
+# sampling_refer: append actual data
+sampling_refer <- sampling_refer %>%
+  left_join(points_tally3 %>% 
+              group_by(priority, town, round, type_combined) %>%
+              summarise(actual_n = n())) %>%
+  mutate(actual_n = ifelse(is.na(actual_n), 0, actual_n)) %>%
+  
+  # get targets from rmarkdown params
+  mutate(target_n = ifelse(priority == "Odonata" | priority == "Amphibia",
+                           (zone_m2 * 1e-6) * params$filter_fauna_waterpointdens,
+                           ifelse(priority == "Aves" | priority == "Lepidoptera", (zone_m2 * 1e-6) * params$filter_fauna_pointdens, NA))) %>%
+  mutate(diff_n = target_n - actual_n)
+
+
+# summarise based on aggregated sampling zones (type_combined2)
+sampling_aggregated <- sampling_refer %>%
+  group_by(town, round, priority, type_combined2, town_m2) %>%
+  summarise(zone_m2 = sum(zone_m2),
+            actual_n = sum(actual_n),
+            target_n = sum(target_n)) %>%
+  mutate(diff_n = target_n - actual_n) %>% 
+  mutate(diffrounded_n = ceiling(diff_n))
+
+
+# append diff_n info to points_tally3 (for weighted random sampling later)
+points_tallynorm <- points_tally3 %>%
+  left_join(sampling_refer)
+
+
+
+# parallel loop 
+# bootstrapped random removal - multiple scenarios
+points_normalisedboot <- 
+  foreach(i = 1:params$filter_normalise_bootstrap,
+          .packages = "tidyverse") %dopar% {
+                            
+  set.seed(123 * i)
+                            
+  toremove <- points_tallynorm[0,] # create empty df
+  
+  # loop to randomly exclude excess points (with specific criteria)
+  for(j in 1:nrow(sampling_aggregated)){
+    
+    diff <- sampling_aggregated$diffrounded_n[j]
+    
+    ## ONLY SAMPLE IF THERE IS EXCESS ##
+    if(diff < 0 & !(is.na(diff))){ 
+      
+      # GET SUITABLE POINTS TO SAMPLE FROM 
+      tosample <- points_tallynorm %>%
+        filter(town == sampling_aggregated$town[j]) %>% # relevant town
+        filter(round == sampling_aggregated$round[j]) %>% # relevant round
+        filter(priority == sampling_aggregated$priority[j]) %>%
+        filter(type_combined2 == sampling_aggregated$type_combined2[j]) %>%
+        filter(diff_n < 0) %>% # only sample those exceeding target
+        mutate(diff_flipped = -diff_n)
+      
+      toremove <- toremove %>%
+                    bind_rows(
+                      tosample %>%
+                        ungroup() %>%
+                        # prefer to sample higher value for diff_flipped
+                        slice_sample(n = -diff, weight_by = diff_flipped) %>%
+                        dplyr::select(-diff_flipped)
+                      ) 
+      
+      rm(tosample)
+    }
+    
+    rm(diff, j)
+  }
+  
+  toremove
+}
+  
+
+# remove points from points_tallynorm
+points_normalisedboot <- # overwrite var
+  foreach(i = seq_along(points_normalisedboot),
+          .packages = "tidyverse") %dopar% {
+            
+  results <- points_tallynorm %>%
+  anti_join(points_normalisedboot[[i]], 
+            by = c("point_id", "round", "priority"))
+  results          
+}
+
+
+rm(points_tally3, points_tallynorm)
+
+
+# make vars for printing
+points_tallynorm_eg <- points_normalisedboot[[1]] # just use 1st scenario as eg (all the same in terms of summarised numbers)
+
+npoints_removed <- points_tally %>% 
+  anti_join(points_tallynorm_eg,  
+            by = c("point_id", "priority", "round")) %>%
+  nrow()
+
+nbird_removed <- points_tally %>% 
+   anti_join(points_tallynorm_eg, 
+             by = c("point_id", "priority", "round")) %>% 
+   filter(priority == "Aves") %>% 
+   nrow()
+nbutt_removed <- points_tally %>% 
+   anti_join(points_tallynorm_eg, 
+             by = c("point_id", "priority", "round")) %>% 
+   filter(priority == "Lepidoptera") %>% 
+   nrow()
+ndragon_removed <- points_tally %>% 
+   anti_join(points_tallynorm_eg, 
+             by = c("point_id", "priority", "round")) %>% 
+   filter(priority == "Odonata") %>% 
+   nrow()
+nfrog_removed <- points_tally %>% 
+   anti_join(points_tallynorm_eg, 
+             by = c("point_id", "priority", "round")) %>% 
+   filter(priority == "Amphibia") %>% 
+   nrow()
+
+```
