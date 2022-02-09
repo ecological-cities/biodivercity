@@ -38,20 +38,18 @@ devtools::load_all() #knit manually with latest changes to circumvent library("b
 
 Then, load and process the example dataset to retrieve the Queenstown data only. 
 
-```{r process example data, eval = FALSE}
-data("sampling_areas")
+```{r process example data, message = FALSE, warning = FALSE}
+data(sampling_areas)
+data(sampling_forest)
 
 queenstown <- sampling_areas[sampling_areas$area %in% "QT", ]
-queenstown_forest <- queenstown[queenstown$landcover == "Forest",]
-
+queenstown_forest <- sampling_forest[sampling_forest$area == "QT" & sampling_forest$period == 2,]
 ```
 
 Run `random_pt_gen()` with the above parameters and plot to visualise the generated points. 
 
-**Take note**: `random_pt_gen` uses `st_read`, throwing an error when example data is used as it's meant to read shapefiles from local directories.
-
-```{r random point generation, eval = FALSE}
-points <- random_pt_gen(x = queenstown,
+```{r random point generation, message = FALSE, warning = FALSE}
+points <- random_pt_gen(boundaries = queenstown,
                         area_per_pt = 500000,
                         pt_buffer = 50,
                         forest = queenstown_forest,
@@ -65,25 +63,31 @@ ggplot(data = queenstown) +
           show.legend = "point")
 ```
 
-![](sample-point-plot.png)
-
 <br>
 
 
 If there is a need to retain survey points from a previous Survey Period, the example below shows how new points can be generated without overlap. Here, the file path to a shapefile with the previous survey points is given to the argument `retain`. Load the example points within the same area of Queenstown from period `1` to simulate point selection for re-surveying in a subsequent Survey Period 2. If only half of the previous points are to be retained, the proportion `retain_prop` can be set to `"0.5"`.  
 
-```{r random point generation with retain, eval = FALSE}
-data("sampling_points")
+```{r random point generation with retain, message = FALSE, warning = FALSE}
+data(sampling_points)
 
 queenstown_retain <- sampling_points[sampling_points$area %in% "QT" & sampling_points$period %in% "1", ]
 
-points <- random_pt_gen(x = queenstown,
+points <- random_pt_gen(boundaries = queenstown,
                         area_per_pt = 500000,
                         pt_buffer = 50,
                         forest = queenstown_forest,
                         retain = queenstown_retain,
                         retain_prop = 0.5,
                         excess_modifier = 1.5)
+
+ggplot(data = queenstown) +
+  geom_sf(fill = NA) +
+  theme_void() +
+  geom_sf(data = queenstown_forest, fill = "darkgreen") +
+  geom_sf(data = points,
+          aes(col = class, shape = status),
+          show.legend = "point")
 ```
 
 After obtaining the generated points, surveyors are to then assess the points and the surrounding areas up to the above buffer radius (50 m) for potential on-site disturbances to wild animals. Approved points are then selected according to the order in which they were generated (i.e. the point `id`) to maintain randomness.
