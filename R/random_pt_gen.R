@@ -77,7 +77,7 @@ random_pt_gen <- function(x, area_per_pt, pt_buffer, excess_modifier = 1,
                 dplyr::rename(id = 1) %>%
                 dplyr::select(id, .data$geometry) %>%
                 sf::st_zm(drop = TRUE, what = "ZM")
-            retain_forest <- dplyr::filter(retain, landcover == "Forest")
+            retain_forest <- dplyr::filter(retain, .data$landcover == "Forest")
 
             retain_n <- retain_prop * n
             retain_n_forest <- retain_prop * n_forest

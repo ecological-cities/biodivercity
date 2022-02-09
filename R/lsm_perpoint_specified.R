@@ -59,7 +59,7 @@ lsm_perpoint_specified <- function(raster_list, predictors_lsm,
     tidyr::drop_na() %>%
 
     dplyr::mutate(value = dplyr::case_when(!is.na(class) ~ tibble::deframe(tibble(class_names, class_values))[class])) %>% # assign value to class name
-    dplyr::arrange(class, metric)
+    dplyr::arrange(.data$class, .data$metric)
 
 
   # parallel processing
