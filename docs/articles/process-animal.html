@@ -46,11 +46,11 @@
 <li class="nav-item">
   <a class="nav-link" href="../articles/biodivercity.html">Get started</a>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <h6 class="dropdown-header" data-toc-skip>1. Process landscape data</h6>
-    <h6 class="dropdown-header" data-toc-skip>2. Process animal data</h6>
+    <a class="dropdown-item" href="../articles/process-landscape.html">1. Process landscape data</a>
+    <a class="dropdown-item" href="../articles/process-animal.html">2. Process animal data</a>
     <h6 class="dropdown-header" data-toc-skip>3. Build models</h6>
     <a class="dropdown-item" href="../articles/apply-models.html">4. Apply models</a>
     <h6 class="dropdown-header" data-toc-skip>5. Test models</h6>
@@ -104,9 +104,9 @@
   <main id="main"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Process Animal Data</h1>
             <h3 data-toc-skip class="subtitle">Process animal survey data for model building</h3>
-                        <h4 data-toc-skip class="author">Author</h4>
+                        <h4 data-toc-skip class="author">Edwin Tan</h4>
             
-            <h4 data-toc-skip class="date">2022-02-07</h4>
+            <h4 data-toc-skip class="date">2022-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/process-animal.Rmd" class="external-link"><code>vignettes/process-animal.Rmd</code></a></small>
       <div class="d-none name"><code>process-animal.Rmd</code></div>
@@ -115,19 +115,95 @@
     
     
 <div class="section level2">
-<h2 id="process-survey-data">Process survey data<a class="anchor" aria-label="anchor" href="#process-survey-data"></a>
+<h2 id="dealing-with-data">Dealing with data<a class="anchor" aria-label="anchor" href="#dealing-with-data"></a>
 </h2>
-<p>Collected fauna survey data in the format detailed in the previous section can be easily subset with respect to <code>town</code>, <code>round</code> and/or <code>priority</code> with the <code><a href="../reference/filter_observations.html">filter_observations()</a></code> function. For example, a specific set of surveys (i.e. butterfly surveys in Tampines from 2020-2021) can be filtered as follows:</p>
+<p>Collected fauna survey data in the format detailed in the previous section can be easily subset with respect to <code>town</code>, <code>round</code> and/or <code>priority</code> with the <code><a href="../reference/filter_observations.html">filter_observations()</a></code> function. A second survey reference dataset is required for input to account for surveys with zero observations. For example, a specific set of surveys (i.e. butterfly surveys in Tampines from 2020-2021) can be filtered as follows.</p>
+<p>First, load the necessary packages to run the analysis:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">fauna</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">surveys</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">"biodivercity"</a></span><span class="op">)</span></code></pre></div>
+<p>Load the example datasets and run the function <code><a href="../reference/filter_observations.html">filter_observations()</a></code>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_observations</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_surveys</span><span class="op">)</span>
 
-<span class="va">butterflies_tampines_round_2</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="../reference/filter_observations.html">filter_observations</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna</span>, survey_ref <span class="op">=</span> <span class="va">surveys</span>,
-                      specify_taxon <span class="op">=</span> <span class="st">"Lepidoptera"</span>,
-                      specify_area <span class="op">=</span> <span class="st">"TP"</span>,
-                      specify_period <span class="op">=</span> <span class="st">"2"</span><span class="op">)</span></code></pre></div>
-<p>Checks are then performed to remove uncertain fauna identifications to prevent over-counting.</p>
+<span class="fu"><a href="../reference/filter_observations.html">filter_observations</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">animal_observations</span>, 
+                    survey_ref <span class="op">=</span> <span class="va">animal_surveys</span>,
+                    specify_taxon <span class="op">=</span> <span class="st">"Lepidoptera"</span>,
+                    specify_area <span class="op">=</span> <span class="st">"TP"</span>,
+                    specify_period <span class="op">=</span> <span class="st">"2"</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 1,780 x 13</span></span>
+<span class="co">##    survey_id           point_id area  period cycle resampled start_time         </span>
+<span class="co">##    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>             </span>
+<span class="co">## <span style="color: #BCBCBC;"> 1</span> 2 TPb13_E 2 Lepido~ TPb13_E  TP         2     2 FALSE     2020-09-25 <span style="color: #949494;">09:26:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 2</span> 2 TPa70_P 3 Lepido~ TPa70_P  TP         2     3 FALSE     2020-11-02 <span style="color: #949494;">09:28:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 3</span> 2 TPa68a_P 6 Lepid~ TPa68a_P TP         2     6 FALSE     2021-06-03 <span style="color: #949494;">09:25:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 4</span> 2 TPa70_P 6 Lepido~ TPa70_P  TP         2     6 FALSE     2021-06-03 <span style="color: #949494;">10:02:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 5</span> 2 TPa70_P 6 Lepido~ TPa70_P  TP         2     6 FALSE     2021-06-03 <span style="color: #949494;">10:02:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 6</span> 2 TPb13_E 6 Lepido~ TPb13_E  TP         2     6 FALSE     2021-05-04 <span style="color: #949494;">09:33:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 7</span> 2 TPa6a 6 Lepidopt~ TPa6a    TP         2     6 TRUE      2021-05-17 <span style="color: #949494;">10:04:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 8</span> 2 TPa72_P 6 Lepido~ TPa72_P  TP         2     6 FALSE     2021-05-27 <span style="color: #949494;">09:25:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 9</span> 2 TPa68a_P 6 Lepid~ TPa68a_P TP         2     6 FALSE     2021-06-03 <span style="color: #949494;">09:25:00</span></span>
+<span class="co">## <span style="color: #BCBCBC;">10</span> 2 TPa15a 1 Lepidop~ TPa15a   TP         2     1 TRUE      2020-07-01 <span style="color: #949494;">09:25:00</span></span>
+<span class="co">## <span style="color: #949494;"># ... with 1,770 more rows, and 6 more variables: time &lt;dttm&gt;, taxon &lt;chr&gt;,</span></span>
+<span class="co">## <span style="color: #949494;">#   species &lt;chr&gt;, family &lt;chr&gt;, genus &lt;chr&gt;, abundance &lt;dbl&gt;</span></span></code></pre>
+<hr>
+<p>Checks can be performed to remove ambiguous fauna identifications to prevent over-counting of species. These observations are usually identifiable only to the Family or Genus level and should be recorded as such. The function <code><a href="../reference/check_taxongrps.html">check_taxongrps()</a></code> returns a dataframe of species entries to be filtered out at the point/area level when all species of the specified Family or Genus across all points have been observed at the point/area of interest.</p>
+<p>For example, there are two species of swallows observed across all points in the sample dataset, <em>Hirundo tahitica</em> and <em>Hirundo rustica</em>. <em>Hirundo spp.</em> is entered when the species cannot be identified with confidence.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">animal_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">species</span>, <span class="st">"Hirundo"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">area</span>, <span class="va">taxon</span>, <span class="va">period</span>, <span class="va">species</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 27 x 4</span></span>
+<span class="co">## <span style="color: #949494;"># Groups:   area, taxon, period [10]</span></span>
+<span class="co">##    area  taxon period species         </span>
+<span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span>
+<span class="co">## <span style="color: #BCBCBC;"> 1</span> BS    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;"> 2</span> BS    Aves       1 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;"> 3</span> JW    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;"> 4</span> JW    Aves       1 Hirundo spp.    </span>
+<span class="co">## <span style="color: #BCBCBC;"> 5</span> JW    Aves       1 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;"> 6</span> JW    Aves       2 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;"> 7</span> JW    Aves       2 Hirundo spp.    </span>
+<span class="co">## <span style="color: #BCBCBC;"> 8</span> JW    Aves       2 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;"> 9</span> PG    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;">10</span> PG    Aves       1 Hirundo spp.    </span>
+<span class="co">## <span style="color: #949494;"># ... with 17 more rows</span></span></code></pre>
+<p>If data entries containing <em>Hirundo spp.</em> are found in areas where both species appear in the same period, the function <code><a href="../reference/check_taxongrps.html">check_taxongrps()</a></code> will flag <code>Hirundo spp.</code> for removal at the <code>area</code> level.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rmspp_town</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_taxongrps.html">check_taxongrps</a></span><span class="op">(</span><span class="va">animal_observations</span>, level <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span>
+
+<span class="va">filtered_observations</span> <span class="op">&lt;-</span> <span class="va">animal_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">anti_join</a></span><span class="op">(</span><span class="va">rmspp_town</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"species"</span> <span class="op">=</span> <span class="st">"name"</span>, <span class="st">"period"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">filtered_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">species</span>, <span class="st">"Hirundo"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">area</span>, <span class="va">taxon</span>, <span class="va">period</span>, <span class="va">species</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 20 x 4</span></span>
+<span class="co">## <span style="color: #949494;"># Groups:   area, taxon, period [10]</span></span>
+<span class="co">##    area  taxon period species         </span>
+<span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span>
+<span class="co">## <span style="color: #BCBCBC;"> 1</span> BS    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;"> 2</span> BS    Aves       1 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;"> 3</span> JW    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;"> 4</span> JW    Aves       1 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;"> 5</span> JW    Aves       2 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;"> 6</span> JW    Aves       2 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;"> 7</span> PG    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;"> 8</span> PG    Aves       1 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;"> 9</span> PG    Aves       2 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;">10</span> PG    Aves       2 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;">11</span> QT    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;">12</span> QT    Aves       1 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;">13</span> QT    Aves       2 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;">14</span> QT    Aves       2 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;">15</span> TP    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;">16</span> TP    Aves       1 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;">17</span> TP    Aves       2 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;">18</span> TP    Aves       2 Hirundo tahitica</span>
+<span class="co">## <span style="color: #BCBCBC;">19</span> WL    Aves       1 Hirundo rustica </span>
+<span class="co">## <span style="color: #BCBCBC;">20</span> WL    Aves       1 Hirundo tahitica</span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

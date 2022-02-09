@@ -59,9 +59,9 @@ navbar:
       text: Articles
       menu:
       - text: 1. Process landscape data
-        href:
+        href: articles/process-landscape.html
       - text: 2. Process animal data
-        href:
+        href: articles/process-animal.html
       - text: 3. Build models
         href:
       - text: 4. Apply models
