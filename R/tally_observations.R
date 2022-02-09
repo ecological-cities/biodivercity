@@ -154,7 +154,7 @@ tally_observations <- function(observations, survey_ref, specify_area, specify_p
         # No. of species per survey or point
         sptally <- obs_subset %>%
             dplyr::group_by(area, period, taxon, point_id, species) %>%
-            dplyr::summarise() %>%  dplyr::summarise() %>%
+            dplyr::summarise() %>%
         # exclude genus/family lvl records if all sp within grp
         # observed
         dplyr::anti_join(rmspp, by = c(species = "name", "point_id", "period")) %>%
