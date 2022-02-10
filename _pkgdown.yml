@@ -67,7 +67,7 @@ navbar:
       - text: 4. Apply models
         href: articles/apply-models.html
       - text: 5. Test models
-        href:
+        href: articles/test-models.html
       - text: 6. Scoring and benchmarking
         href:
     more:
