@@ -115,7 +115,6 @@
     
 <p><br></p>
 <p>This article describes a systematic way to conduct animal surveys, in order to collect a representative sample of data for a given area. The sampling strategy involves observations made at point locations (i.e. point surveys) for a fixed duration of time, within a fixed buffer radius from the point. The example data in this package were collected using the methods detailed here.</p>
-<p><br></p>
 <p>To begin, load the main libraries used in this analysis.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">"biodivercity"</a></span><span class="op">)</span>
@@ -133,13 +132,41 @@
 <p>Load the example data <code>sampling_areas</code> (sf polygons) for six residential towns (areas) in Singapore, as well as patches of forest cover <code>sampling_forest</code> that are within these towns (sub-areas of interest). Note that forest cover for multiple Survey Periods (see column name <code>period</code>) are present in <code>sampling_forest</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sampling_areas</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sampling_forest</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sampling_forest</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sampling_areas</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## Simple feature collection with 6 features and 1 field</span>
+<span class="co">## Geometry type: POLYGON</span>
+<span class="co">## Dimension:     XY</span>
+<span class="co">## Bounding box:  xmin: 353618.5 ymin: 141963.4 xmax: 384748.9 ymax: 161017.8</span>
+<span class="co">## Projected CRS: WGS 84 / UTM zone 48N</span>
+<span class="co">##   area                       geometry</span>
+<span class="co">## 1   BS POLYGON ((371976.9 150656, ...</span>
+<span class="co">## 2   JW POLYGON ((358502.3 149045, ...</span>
+<span class="co">## 3   PG POLYGON ((379073.3 156986.3...</span>
+<span class="co">## 4   QT POLYGON ((365379.3 145134.7...</span>
+<span class="co">## 5   TP POLYGON ((384558.6 150112.5...</span>
+<span class="co">## 6   WL POLYGON ((363419.4 160258.2...</span></code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sampling_forest</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## Simple feature collection with 6 features and 4 fields</span>
+<span class="co">## Geometry type: POLYGON</span>
+<span class="co">## Dimension:     XY</span>
+<span class="co">## Bounding box:  xmin: 364789.6 ymin: 141985.4 xmax: 366695.6 ymax: 145712.4</span>
+<span class="co">## Projected CRS: WGS 84 / UTM zone 48N</span>
+<span class="co">##   area period name isConey                       geometry</span>
+<span class="co">## 1   QT      1 &lt;NA&gt;   FALSE POLYGON ((364789.6 145712.4...</span>
+<span class="co">## 2   QT      1 &lt;NA&gt;   FALSE POLYGON ((365541.3 144630.1...</span>
+<span class="co">## 3   QT      1 &lt;NA&gt;   FALSE POLYGON ((365538.2 144603.3...</span>
+<span class="co">## 4   QT      1    0   FALSE POLYGON ((365992 142465.8, ...</span>
+<span class="co">## 5   QT      1    0   FALSE POLYGON ((365472.9 143750.2...</span>
+<span class="co">## 6   QT      1    0   FALSE POLYGON ((365615.5 143720.4...</span></code></pre>
 <p>Using the area <code>QT</code> (Queenstown) as an example, sampling points can be randomly generated. Subset both the example data to this area, focusing on survey period <code>2</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">queenstown</span> <span class="op">&lt;-</span> <span class="va">sampling_areas</span><span class="op">[</span><span class="va">sampling_areas</span><span class="op">$</span><span class="va">area</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">"QT"</span>, <span class="op">]</span>
 <span class="va">queenstown_forest</span> <span class="op">&lt;-</span> <span class="va">sampling_forest</span><span class="op">[</span><span class="va">sampling_forest</span><span class="op">$</span><span class="va">area</span> <span class="op">==</span> <span class="st">"QT"</span> <span class="op">&amp;</span> <span class="va">sampling_forest</span><span class="op">$</span><span class="va">period</span> <span class="op">==</span> <span class="fl">2</span>,<span class="op">]</span></code></pre></div>
-<p>Next, generate sampling points at a specified density and buffer radius using the function <code><a href="../../reference/random_pt_gen.html">random_pt_gen()</a></code>. In this case, we specify one point per 50 hectares (500000 m<sup>2</sup>), and radius of 50 m for each point. Providing the buffer radius ensures that the survey region of the generated points do not extend beyond the boundaries of the area of interest. An excess of sampling points can be generated, in case some of these points are unsuitable for surveys (e.g. within inaccessible areas); for instance, based on the specified parameters, <code>1.5</code> times the required number points can be generated. Finally, sub-areas of interest (<code>queenstown_forest</code>) can also be specified; sampling points will be stratified between the areas within and outside of <code>queenstown_forest</code> (i.e. ‘Forest’ and ‘Urban’ land cover types, respectively):</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>Next, within the area of interest, generate sampling points at a specified density and buffer radius using the function <code><a href="../../reference/random_pt_gen.html">random_pt_gen()</a></code>. In this case, we specify one point per 50 hectares (500000 m<sup>2</sup>), and a radius of 50 m for each point. The radius value is the minimum distance between the generated points and the boundaries—this ensures that the region for animal surveys does not extend beyond the boundaries of Queenstown. An excess of sampling points can be generated, in case some of these points are unsuitable for surveys (e.g. within areas inaccessible to surveyors); for instance, based on the specified parameters, <code>1.5</code> times the required number points can be generated. Finally, sub-areas of interest (<code>queenstown_forest</code>) can also be specified; sampling points will be stratified between the areas <em>within</em> and <em>outside</em> of <code>queenstown_forest</code> (i.e. ‘Forest’ and ‘Urban’ land cover types, respectively):</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
 <span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/random_pt_gen.html">random_pt_gen</a></span><span class="op">(</span>boundaries <span class="op">=</span> <span class="va">queenstown</span>,
@@ -156,7 +183,7 @@
 <span class="co">##  Number of points within 'normal' areas that were generated: 18 (n = 12, excess_modifier = 1.5).</span>
 <span class="co">##  Number of points within 'sub-areas' that were generated: 2 (n = 1, excess_modifier = 1.5).</span></code></pre>
 <p>The output <code>points</code> is an sf object (POINT geometry) containing the unique identifier, type (‘Normal’ or ‘Sub-area’) and geographical coordinates for each point:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">points</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## Simple feature collection with 6 features and 2 fields</span>
 <span class="co">## Geometry type: POINT</span>
@@ -170,30 +197,30 @@
 <span class="co">## 4 Normal normal4 POINT (367118.5 142757.4)</span>
 <span class="co">## 5 Normal normal5   POINT (364719 143528.1)</span>
 <span class="co">## 6 Normal normal6 POINT (366407.7 142761.1)</span></code></pre>
-<p>Visualise the generated points within <code>queenstown</code>. Blue points denote ‘normal’ points within the area of interest, and yellow points denote those within the ‘sub-area’ of interest (forests patches in green):</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p>Visualise the generated points within <code>queenstown</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">queenstown</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">queenstown_forest</span>, fill <span class="op">=</span> <span class="st">"darkgreen"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">points</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">points</span><span class="op">$</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Normal"</span>, <span class="st">"blue"</span>, <span class="st">"yellow"</span><span class="op">)</span>, 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>col <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,
           show.legend <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span></code></pre></div>
-<p><img src="animals-survey-protocols_files/figure-html/plot%20queenstown%20&amp;%20generated%20points-1.png" width="700"></p>
+<p><img src="animals-survey-protocols_files/figure-html/plot%20queenstown%20&amp;%20generated%20points-1.png" width="700" style="display: block; margin: auto;"></p>
 <p><br></p>
 </div>
 <div class="section level3">
 <h3 id="generate-sampling-points---retained">Generate sampling points - Retained<a class="anchor" aria-label="anchor" href="#generate-sampling-points---retained"></a>
 </h3>
-<p>If surveys are conducted across multiple periods (e.g. years), there may be a need to retain sampling points from a previous period, for example, for long-term monitoring at the same location. If this is the case, new points can be generated while ensuring that a certain proportion of these points are similar to those from a previous period. Note that the column <code>type</code> must also exist in the old dataset, with the value of either <code>Normal</code> or <code>Sub-area</code>. For example, we can choose to retain points in Queenstown from Survey Period <code>1</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p>If surveys are conducted across multiple periods (e.g. years), there may be a need to retain sampling points from a previous period, for example, for long-term monitoring at the same location. If this is the case, new points can be generated while ensuring that a certain proportion of these points are similar to those from a previous period. Note that the column <code>type</code> must also exist in the old dataset, with the value of either <code>Normal</code> or <code>Sub-area</code>. For example, we can choose to retain points in Queenstown from Survey Period <code>1</code>, which we assign to the variable <code>queenstown_retain</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sampling_points</span><span class="op">)</span>
 <span class="va">queenstown_retain</span> <span class="op">&lt;-</span> <span class="va">sampling_points</span><span class="op">[</span><span class="va">sampling_points</span><span class="op">$</span><span class="va">area</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">"QT"</span> <span class="op">&amp;</span> <span class="va">sampling_points</span><span class="op">$</span><span class="va">period</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">"1"</span>, <span class="op">]</span>
 
 <span class="co"># create column 'type', which is based on the column 'landcover' in this example data</span>
 <span class="va">queenstown_retain</span> <span class="op">&lt;-</span> <span class="va">queenstown_retain</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">landcover</span> <span class="op">==</span> <span class="st">"Urban"</span>, <span class="st">"Normal"</span>, <span class="st">"Sub-area"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>If we wish to retain half of the points, add <code>queenstown_retain</code> to the function argument ‘retain’, and set the argument <code>retain_prop</code> to <code>0.5</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<p>If we wish to retain half of the points, add <code>queenstown_retain</code> to the function argument ‘<code>retain</code>’, and set the argument ‘<code>retain_prop</code>’ to <code>0.5</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/random_pt_gen.html">random_pt_gen</a></span><span class="op">(</span>boundaries <span class="op">=</span> <span class="va">queenstown</span>,
                         area_per_pt <span class="op">=</span> <span class="fl">500000</span>,
                         pt_radius <span class="op">=</span> <span class="fl">50</span>,
@@ -212,7 +239,7 @@
 <span class="co">##  Number of new points within 'normal' areas that were generated: 9 (n = 6, excess_modifier = 1.5).</span>
 <span class="co">##  Number of new points within 'sub-areas' that were generated: 1 (n = 0.5, excess_modifier = 1.5).</span></code></pre>
 <p>If there were points that were retained, the additional column ‘<code>status</code>’ indicates whether the points generated are ‘<code>Old</code>’ or ‘<code>New</code>’.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">points</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## Simple feature collection with 6 features and 3 fields</span>
 <span class="co">## Geometry type: POINT</span>
@@ -226,17 +253,16 @@
 <span class="co">## 4 normal4    New Normal   POINT (365267.7 145167)</span>
 <span class="co">## 5 normal5    New Normal POINT (365277.3 144234.9)</span>
 <span class="co">## 6 normal6    New Normal POINT (367253.4 143360.6)</span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">queenstown</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">queenstown_forest</span>, fill <span class="op">=</span> <span class="st">"darkgreen"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">points</span>,
-          <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>col <span class="op">=</span> <span class="va">type</span>, shape <span class="op">=</span> <span class="va">status</span><span class="op">)</span>,
-          show.legend <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span></code></pre></div>
-<p><img src="animals-survey-protocols_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+          <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>col <span class="op">=</span> <span class="va">type</span>, shape <span class="op">=</span> <span class="va">status</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="animals-survey-protocols_files/figure-html/plot%20queenstown%20&amp;%20generated%20points%20with%20retained%20data-1.png" width="700" style="display: block; margin: auto;"></p>
 <p><br></p>
-<p>Finally, surveyors can proceed to assess the sampling points and their surrounding areas (up to the buffer radius, e.g., 50 m). Factors to take note of include (1) accessibility; (2) presence of nearby construction; (3) potential disturbance to wild animals. To ensure that random sampling is maintained, suitable points should be selected according to the order in which they were generated (the column <code>id</code>).</p>
+<p>Finally, surveyors can proceed to assess the sampling points and their surrounding areas (up to the buffer radius, e.g., 50 m). Factors to take note of include (1) accessibility; (2) potential disturbance to wild animals (e.g. nearby construction). To ensure that random sampling is maintained, suitable points should be selected according to the order in which they were generated (the column <code>id</code>).</p>
 <p><br></p>
 <hr>
 </div>
@@ -249,7 +275,7 @@
 </h3>
 <p>Animal survey data are organised into two separate tables, shown below.</p>
 <div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
-<table class="table table table-striped" style="font-size: 10px; margin-left: auto; margin-right: auto;">
+<table class="table table table-striped" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 <strong>Table: Example showing animal observations recorded during surveys.</strong> Each row represents a unique observation at a specified time, which includes the species name and count (abundance) of individuals. Refer to <code><a href="../../reference/animal_observations.html">help(animal_observations)</a></code> for more information.
 </caption>
@@ -545,7 +571,8 @@ Neurothemis spp.
 </table>
 </div>
 <p><br></p>
-<table class="table table table-striped" style="font-size: 10px; margin-left: auto; margin-right: auto;">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
+<table class="table table table-striped" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 <strong>Table: Example showing the information recorded for each animal survey.</strong> Each row represents a unique 30-minute survey. Refer to <code><a href="../../reference/animal_surveys.html">help(animal_surveys)</a></code> for more information.
 </caption>
@@ -755,13 +782,15 @@ NA
 </tr>
 </tbody>
 </table>
+</div>
 <p><br></p>
 </div>
 <div class="section level3">
 <h3 id="data-collection">Data collection<a class="anchor" aria-label="anchor" href="#data-collection"></a>
 </h3>
 <p>In the example datasets <code>animal_observations</code> and <code>animal_surveys</code>, 30-minute surveys were conducted within the designated buffer radius for the specific animal (taxon) group. For example, the buffer radius for Bird (Aves) surveys is 50 m, while those for Butterflies (Lepidoptera), Odonates (Odonata) and Amphibians (Amphibia) are at 20 m from the sampling point location. The survey time window also varies for each animal group, and were chosen based on previous research. In addition, Odonate and Amphibian surveys conducted at sampling points with ephemeral water bodies had to be performed within 24 hours after a rain event. The rain event had to be of at least a light–moderate intensity, based on <a href="http://www.weather.gov.sg/weather-rain-area-50km/" class="external-link">real-time updates from Meteorological Service Singapore</a>.</p>
-<table class="table table table-striped" style="font-size: 10px; margin-left: auto; margin-right: auto;">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
+<table class="table table table-striped" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 <strong>Table: Types of animal surveys in the example data.</strong>
 </caption>
@@ -823,10 +852,12 @@ Amphibians
 </tr>
 </tbody>
 </table>
+</div>
 <p><br></p>
 <p>Surveyors move within the buffer radius to identify and count the number of species. Each encounter is recorded according to individual species; information about the time, abundance and distance from the center point are also recorded. Refer to <code><a href="../../reference/animal_observations.html">help(animal_observations)</a></code> for more information.</p>
+<p><br></p>
 <div class="figure">
-<img src="survey-diagram.png" alt=""><p class="caption"><strong>Figure</strong>: Example showing the information recorded for animal observations from the surveyor’s point-of-view.</p>
+<img src="survey-diagram.png" style="width:90.0%" alt=""><p class="caption"><strong>Figure</strong>: Example showing the information recorded for animal observations from the surveyor’s point-of-view.</p>
 </div>
 <p><br></p>
 <p>Sampling points were surveyed once every two months (<code>cycle</code> adds up to six per survey <code>period</code>); each sampling period thus stretched across a year-long duration.</p>
