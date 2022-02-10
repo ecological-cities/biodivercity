@@ -67,6 +67,9 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/animal_surveys.html</loc>
   </url>
   <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/booter.html</loc>
+  </url>
+  <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/calculate_sac.html</loc>
   </url>
   <url>
@@ -106,6 +109,9 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/pipe.html</loc>
   </url>
   <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/points_landscape.html</loc>
+  </url>
+  <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/random_pt_gen.html</loc>
   </url>
   <url>
@@ -125,5 +131,8 @@
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/tidyeval.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/validate_newdata.html</loc>
   </url>
 </urlset>

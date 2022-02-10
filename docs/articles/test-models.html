@@ -46,14 +46,14 @@
 <li class="nav-item">
   <a class="nav-link" href="../articles/biodivercity.html">Get started</a>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <h6 class="dropdown-header" data-toc-skip>1. Process landscape data</h6>
     <h6 class="dropdown-header" data-toc-skip>2. Process animal data</h6>
     <h6 class="dropdown-header" data-toc-skip>3. Build models</h6>
     <a class="dropdown-item" href="../articles/apply-models.html">4. Apply models</a>
-    <h6 class="dropdown-header" data-toc-skip>5. Test models</h6>
+    <a class="dropdown-item" href="../articles/test-models.html">5. Test models</a>
     <h6 class="dropdown-header" data-toc-skip>6. Scoring and benchmarking</h6>
   </div>
 </li>
@@ -103,9 +103,9 @@
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Test Models</h1>
-                        <h4 data-toc-skip class="author">Author</h4>
+                        <h4 data-toc-skip class="author">Song, Xiao Ping</h4>
             
-            <h4 data-toc-skip class="date">2022-02-07</h4>
+            <h4 data-toc-skip class="date">2022-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/test-models.Rmd" class="external-link"><code>vignettes/test-models.Rmd</code></a></small>
       <div class="d-none name"><code>test-models.Rmd</code></div>
@@ -113,10 +113,72 @@
 
     
     
-<p><em>In the works…</em></p>
-<ul>
-<li>Validate models with new data - visualise both scaled &amp; unscaled values</li>
-</ul></main>
+<p><br></p>
+<p>First, load the necessary packages to run the analysis:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">"biodivercity"</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span> <span class="co"># for visualisation</span></code></pre></div>
+<p><br></p>
+<p>Load the models for each of the animal groups:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"models-manually-mapped.Rdata"</span>, package <span class="op">=</span> <span class="st">"biodivercity"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span></code></pre></div>
+<p><br></p>
+<p>Load the new data from animal surveys, which will be used to check the accuracy of the models. In this example, we focus on birds (the taxon ‘Aves’). We subset the animal data using the function <code><a href="../reference/tally_observations.html">tally_observations()</a></code>:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_observations"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_surveys"</span><span class="op">)</span>
+
+<span class="va">birds_new</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../reference/tally_observations.html">tally_observations</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">animal_observations</span>, 
+                                 survey_ref <span class="op">=</span> <span class="va">animal_surveys</span>,
+                                 specify_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PG"</span>, <span class="st">"QT"</span>, <span class="st">"TP"</span>, <span class="st">"JW"</span>, <span class="st">"BS"</span>, <span class="st">"WL"</span><span class="op">)</span>,
+                                 specify_period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"2"</span><span class="op">)</span>,
+                                 specify_taxon <span class="op">=</span> <span class="st">"Aves"</span>, <span class="co"># birds</span>
+                                 level <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span> <span class="co"># at sampling points</span></code></pre></div>
+<p>We also need the data for landscape predictors summarised at sampling points where these animal surveys were conducted. The <code>biodivercity</code> package includes examples at some of these points, found in the dataset <code>points_landscape</code>. Join these landscape data to the bird data using the function <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join()</a></code>, then transform the data to the appropriate format (e.g. ‘wide format’, remove NAs).</p>
+<p>Note that the model object also includes the random effect <code>town</code>, based on the sampling strategy used in the input data. If this random effect (column) is not provided in the new data, predictions will be based on the ‘average’ value for the random effect (in this example, the ‘average town’).</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">points_landscape</span><span class="op">)</span>
+  
+<span class="va">birds_new</span> <span class="op">&lt;-</span> <span class="va">birds_new</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">points_landscape</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"point_id"</span>, <span class="st">"area"</span>, <span class="st">"period"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="co"># pivot to wide format (add radius info into colnames)</span>
+<span class="va">birds_new</span> <span class="op">&lt;-</span> <span class="va">birds_new</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">pivot_wider</span><span class="op">(</span>names_from <span class="op">=</span> <span class="st">"radius_m"</span>, 
+              values_from <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"man"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"lsm"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"osm"</span><span class="op">)</span>,
+              names_glue <span class="op">=</span> <span class="st">"r{radius_m}m_{.value}"</span><span class="op">)</span>  <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="op">~</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># remove columns where all values are NA</span>
+  <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>  <span class="co"># remove any remaining NAs</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>town <span class="op">=</span> <span class="va">area</span><span class="op">)</span> <span class="co"># town was the random effect used to fit model</span></code></pre></div>
+<p><br></p>
+<p>Run the function <code><a href="../reference/validate_newdata.html">validate_newdata()</a></code> to obtain the accuracy metrics:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bird_xv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_newdata.html">validate_newdata</a></span><span class="op">(</span>models <span class="op">=</span> <span class="va">models_birds</span>,
+                            recipe_data <span class="op">=</span> <span class="va">recipe_birds</span>,
+                            newdata <span class="op">=</span> <span class="va">birds_new</span>,
+                            response_var <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></code></pre></div>
+<p>Perform bootstrapped sampling of the output, to obtain bootstrapped statistics of the accuracy metrics. The helper function <code><a href="../reference/booter.html">booter()</a></code> is used:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+
+<span class="co"># combine animal groups as list </span>
+<span class="va">XV_dfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Birds <span class="op">=</span> <span class="va">bird_xv</span><span class="op">)</span>, <span class="co"># only one animal group in this example</span>
+                 <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="../reference/booter.html">booter</a></span><span class="op">(</span><span class="va">x</span>, n <span class="op">=</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="co"># 100 repetitions</span></code></pre></div>
+<p><br></p>
+<p>Visualise the accuracy metrics using the package <code>ggplot2</code>:</p>
+<div class="figure" style="text-align: center">
+<img src="test-models_files/figure-html/print%20xvalid%20plots%20for%20new%20data-1.png" alt="**Figure: The accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples." width="70%"><p class="caption">
+<strong>Figure: The accuracy of predictions for each taxon based on new data supplied.</strong> Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.
+</p>
+</div>
+<p><br></p>
+<div class="figure" style="text-align: center">
+<img src="test-models_files/figure-html/print%20xvalid%20plots%20for%20new%20data%20-%20scaled-1.png" alt="**Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples." width="70%"><p class="caption">
+<strong>Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.</strong> Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.
+</p>
+</div>
+  </main>
 </div>
 
 
