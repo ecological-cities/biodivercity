@@ -1,6 +1,6 @@
 ---
 title: "Test Models"
-subtitle: " "
+subtitle: "Test the accuracy of models using new data obtained from animal surveys"
 author: "Song, Xiao Ping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -29,15 +29,13 @@ library("ggplot2")
 Load the models for each of the animal groups:
 
 ```{r load model objects}
-
 filepath <- system.file("extdata", "models-manually-mapped.Rdata", package = "biodivercity")
 load(filepath)
-
 ```
 
 <br>
 
-Load the new data from animal surveys, which will be used to check the accuracy of the models. In this example, we focus on birds (the taxon 'Aves'). We subset the animal data using the function `tally_observations()`:
+Load the new data from animal surveys, which will be used to check the accuracy of the models. In this example, we focus on birds (the taxon 'Aves') in the example data `animal_observations` and `animal_surveys`. Subset the full data to our area/period/taxon of interest, and then tally the species richness (no. of species) of birds using the function `tally_observations()`:
 
 ```{r load validation data for birds, message = FALSE}
 
@@ -49,13 +47,13 @@ birds_new <-  tally_observations(observations = animal_observations,
                                  specify_area = c("PG", "QT", "TP", "JW", "BS", "WL"),
                                  specify_period = c("1", "2"),
                                  specify_taxon = "Aves", # birds
-                                 level = "point") # at sampling points
+                                 level = "point")  # at sampling points
 
 ```
 
-We also need the data for landscape predictors summarised at sampling points where these animal surveys were conducted. The `biodivercity` package includes examples at some of these points, found in the dataset `points_landscape`. Join these landscape data to the bird data using the function `inner_join()`, then transform the data to the appropriate format (e.g. 'wide format', remove NAs).
+To predict the number of bird species where the new animal surveys were conducted, we also need the data for landscape predictors summarised at these locations. The `biodivercity` package includes examples at some of these sampling points, found in the dataset `points_landscape`. Join these landscape data to the bird data using the function `inner_join()`, then transform the data to the appropriate format.
 
-Note that the model object also includes the random effect `town`, based on the sampling strategy used in the input data. If this random effect (column) is not provided in the new data, predictions will be based on the 'average' value for the random effect (in this example, the 'average town').
+Note that the model object also includes the random effect `town`, based on the sampling strategy used in the model's input data. If this random effect (column) is not provided in the new data, predictions will be based on the 'average' value for the random effect (in this example, the 'average town').
 
 ```{r get & join landscape data to animal data}
 
@@ -64,20 +62,24 @@ data(points_landscape)
 birds_new <- birds_new %>% 
   dplyr::inner_join(points_landscape, by = c("point_id", "area", "period"))
 
-# pivot to wide format (add radius info into colnames)
 birds_new <- birds_new %>% 
-  pivot_wider(names_from = "radius_m", 
-              values_from = starts_with("man") | starts_with("lsm") | starts_with("osm"),
-              names_glue = "r{radius_m}m_{.value}")  %>%
-  select(where(~!all(is.na(.x)))) %>% # remove columns where all values are NA
-  drop_na() %>%  # remove any remaining NAs
-  rename(town = area) # town was the random effect used to fit model
+  tidyr::pivot_wider(names_from = "radius_m", # pivot to wide format (add radius info to the column names)
+                     values_from = !matches("^area$") & 
+                       !matches("^period$") & 
+                       !matches("^taxon$") & 
+                       !matches("^point_id$") & 
+                       !matches("^n$") & 
+                       !matches("^radius_m$"),
+                     names_glue = "r{radius_m}m_{.value}") %>% 
+  dplyr::select(where(~!all(is.na(.x)))) %>% # remove columns where all values are NA
+  tidyr::drop_na() %>%  # remove any remaining NAs
+  dplyr::rename(town = area) # in this example, new data also from specific towns used to fit the models (random effect)
 
 ```
 
 <br>
 
-Run the function `validate_newdata()` to obtain the accuracy metrics:
+Run the function `validate_newdata()` to obtain the accuracy of each prediction based on the new data:
 
 ```{r run xvalid for new data}
 
@@ -88,7 +90,7 @@ bird_xv <- validate_newdata(models = models_birds,
 ```
 
 
-Perform bootstrapped sampling of the output, to obtain bootstrapped statistics of the accuracy metrics. The helper function `booter()` is used:
+Perform bootstrapped sampling of the output `bird_xv`, in order to obtain bootstrapped statistics of accuracy metrics (100 scenarios). The helper function `booter()` is used:
 
 
 ```{r}
@@ -102,94 +104,65 @@ XV_dfs <- lapply(list(Birds = bird_xv), # only one animal group in this example
 
 <br>
 
-Visualise the accuracy metrics using the package `ggplot2`: 
+Finally, we can visualise the accuracy of the model for birds using the package `ggplot2`. This can be done in the original scale of the response variable (counts):
 
-```{r print xvalid plots for new data, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = glue::glue("**Figure: The accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.")}
+```{r print xvalid plots for new data, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = glue::glue("**Figure: The accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.")}
 
-library(ggplot2)
-
-# combine lists into single df, prep for plotting
+# if multiple animal groups present, combine lists into single df for plotting
 XV_dfs <- XV_dfs %>% 
   bind_rows(.id = "priority")
 
   
+# get lower/upper bounds for confidence interval and the root mean squared error (RMSE)
 XV_summaries <- XV_dfs %>% 
-  group_by(priority) %>% 
-  summarise(error_lwr = quantile(error_mean, 0.025, na.rm = TRUE),
-            error_upr = quantile(error_mean, 0.975, na.rm = TRUE),
-            error_normalised_lwr = quantile(error_normalised_mean, 0.025, na.rm = TRUE),
-            error_normalised_upr = quantile(error_normalised_mean, 0.975, na.rm = TRUE),
-            rmse_mean = mean(rmse, na.rm = TRUE))
+  dplyr::group_by(priority) %>% 
+  dplyr::summarise(error_lwr = quantile(error_mean, 0.025, na.rm = TRUE),
+                   error_upr = quantile(error_mean, 0.975, na.rm = TRUE),
+                   error_normalised_lwr = quantile(error_normalised_mean, 0.025, na.rm = TRUE),
+                   error_normalised_upr = quantile(error_normalised_mean, 0.975, na.rm = TRUE),
+                   rmse_mean = mean(rmse, na.rm = TRUE))
 
 
 # plot
- XV_dfs %>%  
+XV_dfs %>%  
   ggplot() +
-    
-    geom_hline(yintercept = 0,
-               color = "black",
-               size = 0.5, linetype = 2) +
-
+    geom_hline(yintercept = 0, linetype = 2) +
     geom_jitter(aes(x = priority, y = error_mean),
                 position = position_jitter(0.05),
-                color = "gray",
-                size = 0.1) +
-   
+                color = "gray", size = 0.1) +
    geom_errorbar(data = XV_summaries,
-                  aes(x = priority,
-                      ymin = error_lwr, 
-                      ymax = error_upr),
-                 width = 0.1,
-                 size = 0.9) +
-   
+                 aes(x = priority, ymin = error_lwr, ymax = error_upr),
+                 width = 0.1) +
    geom_text(data = XV_summaries,
-             aes(x = priority, y = max(error_upr)+2.0, 
-                  label = paste("RMSE =\n", round(rmse_mean, 2))), 
+             aes(x = priority, y = max(error_upr) + 2.0, 
+                 label = paste("RMSE =\n", round(rmse_mean, 2))), 
              size = 3.5) +
-    
-    scale_y_continuous(breaks = scales::breaks_pretty(), expand = c(0, 2)) +
-
+    scale_y_continuous(expand = c(0, 2)) +
     xlab("Animal group") +
     ylab("Mean prediction error (no. of species)") +
-    theme_bw(base_size = 12) +
-    theme(panel.grid.minor.x = element_blank(),
-          panel.grid.minor.y = element_blank(),
-          panel.grid.major.x = element_blank(),
-          axis.text = element_text(size = 11))
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank())
 
 ```
 
 <br>
 
-```{r print xvalid plots for new data - scaled, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = glue::glue("**Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.")}
+The values can also be normalised, which is especially useful when comparing between multiple animal groups (in this example, only birds are shown):
+
+```{r print xvalid plots for new data - scaled, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = glue::glue("**Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.")}
 
  XV_dfs %>%  
   ggplot() +
-
-    geom_hline(yintercept = 0,
-               color = "black",
-               size = 0.5, linetype = 2) +
-    
+    geom_hline(yintercept = 0, linetype = 2) +
     geom_jitter(aes(x = priority, y = error_normalised_mean),
                 position = position_jitter(0.05),
-                color = "gray",
-                size = 0.1) +
-   
+                color = "gray", size = 0.1) +
    geom_errorbar(data = XV_summaries,
-                  aes(x = priority,
-                      ymin = error_normalised_lwr, 
-                      ymax = error_normalised_upr),
-                 width = 0.1,
-                 size = 0.9) +
-   
-    scale_y_continuous(breaks = scales::breaks_pretty()) +
-    
-
+                  aes(x = priority, ymin = error_normalised_lwr, ymax = error_normalised_upr),
+                 width = 0.1) +
     xlab("Animal group") +
     ylab("Mean prediction error (scaled)") +
-    theme_bw(base_size = 12) +
-    theme(panel.grid.minor.x = element_blank(),
-          panel.grid.minor.y = element_blank(),
-          panel.grid.major.x = element_blank())
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank())
 
 ```
