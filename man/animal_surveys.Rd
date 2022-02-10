@@ -27,7 +27,7 @@ corresponding to four animal groups (column \code{taxon}): Birds (Aves), Butterf
 Odonates (Odonata) and Amphibians (Amphibia).
 
 Each sampling \code{period} stretched across a year-long duration, where sampling points
-were sampled once every two months (\code{cycle} adds up to 6 per \code{period}).
+were surveyed once every two months (\code{cycle} adds up to 6 per \code{period}).
 Some points were sampled again in the second period (column \code{resampled} is \code{TRUE}).
 All surveys took place between the years 2016 to 2022.
 }

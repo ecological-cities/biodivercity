@@ -16,7 +16,7 @@
 #' Odonates (Odonata) and Amphibians (Amphibia).
 #'
 #' Each sampling `period` stretched across a year-long duration, where sampling points
-#' were sampled once every two months (`cycle` adds up to 6 per `period`).
+#' were surveyed once every two months (`cycle` adds up to 6 per `period`).
 #' Some points were sampled again in the second period (column `resampled` is `TRUE`).
 #' All surveys took place between the years 2016 to 2022.
 #'

@@ -29,8 +29,9 @@ Odonates (Odonata) and Amphibians (Amphibia). In addition to the name of the \co
 are also made available.
 
 Each sampling \code{period} stretched across a year-long duration, where sampling points
-were sampled once every two months (\code{cycle} adds up to 6 per \code{period}).
+were surveyed once every two months (\code{cycle} adds up to 6 per \code{period}).
 Some points were sampled again in the second period (column \code{resampled} is \code{TRUE}).
+The \code{start_time} represents the start time of the 30-minute survey.
 All surveys took place between the years 2016 to 2022.
 }
 \examples{
