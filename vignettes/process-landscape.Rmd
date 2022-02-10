@@ -1,6 +1,6 @@
 ---
 title: "Process Landscape Data"
-subtitle: "Process remotely-sensed images"
+subtitle: "Download and process satellite and OpenStreetMap data"
 author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette

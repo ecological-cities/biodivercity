@@ -1,6 +1,6 @@
 ---
 title: "Animals: Data summaries"
-subtitle: "Comparing local diversity between sampled areas"
+subtitle: "Compare local diversity between sampled areas"
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette

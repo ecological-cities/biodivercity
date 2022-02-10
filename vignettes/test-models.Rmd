@@ -1,6 +1,6 @@
 ---
 title: "Test Models"
-subtitle: "Test the accuracy of models using new data obtained from animal surveys"
+subtitle: "Calculate accuracy metrics using new data obtained from animal surveys"
 author: "Song, Xiao Ping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette

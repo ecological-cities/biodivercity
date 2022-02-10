@@ -1,6 +1,6 @@
 ---
 title: "Animals: Survey Protocols"
-subtitle: " "
+subtitle: "A systematic sampling strategy to record animal observations"
 author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
