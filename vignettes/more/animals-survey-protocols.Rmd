@@ -10,22 +10,18 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This article describes how surveys were carried out for the example data in this package, as well as how the data was recorded.
+<br>
 
-## Pre-survey preparations
+This article describes a systematic way to conduct animal surveys, in order to collect a representative sample of data for a given area. The sampling strategy involves observations made at point locations (i.e. point surveys) for a fixed duration of time, within a fixed buffer radius from the point. The example data in this package were collected using the methods detailed here.
 
-### Sampling point generation
+<br>
 
-Before surveys can begin, survey points are randomly generated to best represent the area of interest. If new data is to be collected, survey points can be randomly generated with respect to the two land cover types: `Urban` and `Forest`. 
-
-The following example covers how the residential town of Queenstown can be randomly sampled at a point density of one point per 50 hectares, with a survey radius of 50 m for each point. An excess modifier of `1.5` can be set to generate `1.5` times the points that are required for the specified point density, in case any of the points were determined to be inaccessible later in the Survey Period.
-
-First, load main libraries for this analysis.
+To begin, load the main libraries used in this analysis.
 
 ```{r load required libraries, eval = FALSE}
 library("biodivercity")
-library("dplyr")
-library("ggplot2")
+library("dplyr") # data processing
+library("ggplot2") # data visualisation
 ```
 
 ```{r load libraries while in dev, include = FALSE}
@@ -36,92 +32,146 @@ library("ggplot2")
 devtools::load_all() #knit manually with latest changes to circumvent library("biodivercity") (use in final version)
 ```
 
-Then, load and process the example dataset to retrieve the Queenstown data only. 
+<br>
 
-```{r process example data, message = FALSE, warning = FALSE}
+---
+
+## Pre-survey preparations
+
+### Generate sampling points - New
+
+Before surveys can begin, survey points have to be randomly generated within the area of interest. If necessary, stratified random sampling can be performed to ensure sufficient representation between sub-areas of interest. 
+
+Load the example data `sampling_areas` (sf polygons) for six residential towns (areas) in Singapore, as well as patches of forest cover `sampling_forest` that are within these towns (sub-areas of interest). Note that forest cover for multiple Survey Periods (see column name `period`) are present in `sampling_forest`.
+
+```{r import example data, message = FALSE, warning = FALSE}
 data(sampling_areas)
 data(sampling_forest)
+```
 
+Using the area `QT` (Queenstown) as an example, sampling points can be randomly generated. Subset both the example data to this area, focusing on survey period `2`. 
+
+```{r process example data, message = FALSE, warning = FALSE}
 queenstown <- sampling_areas[sampling_areas$area %in% "QT", ]
 queenstown_forest <- sampling_forest[sampling_forest$area == "QT" & sampling_forest$period == 2,]
 ```
 
-Run `random_pt_gen()` with the above parameters and plot to visualise the generated points. 
+Next, generate sampling points at a specified density and buffer radius using the function `random_pt_gen()`. In this case, we specify one point per 50 hectares (500000 m<sup>2</sup>), and radius of 50 m for each point. Providing the buffer radius ensures that the survey region of the generated points do not extend beyond the boundaries of the area of interest. An excess of sampling points can be generated, in case some of these points are unsuitable for surveys (e.g. within inaccessible areas); for instance, based on the specified parameters, `1.5` times the required number points can be generated. Finally, sub-areas of interest (`queenstown_forest`) can also be specified; sampling points will be stratified between the areas within and outside of `queenstown_forest` (i.e. 'Forest' and 'Urban' land cover types, respectively):
+
 
 ```{r random point generation, message = FALSE, warning = FALSE}
+
+set.seed(123)
+
 points <- random_pt_gen(boundaries = queenstown,
                         area_per_pt = 500000,
-                        pt_buffer = 50,
-                        forest = queenstown_forest,
-                        excess_modifier = 1.5)
+                        pt_radius = 50,
+                        excess_modifier = 1.5,
+                        sub_areas = queenstown_forest)
+```
 
+The output `points` is an sf object (POINT geometry) containing the unique identifier, type ('Normal' or 'Sub-area') and geographical coordinates for each point:
+
+```{r}
+head(points)
+```
+
+
+Visualise the generated points within `queenstown`. Blue points denote 'normal' points within the area of interest, and yellow points denote those within the 'sub-area' of interest (forests patches in green):
+
+```{r plot queenstown & generated points}
 ggplot(data = queenstown) +
   geom_sf(fill = NA) +
   theme_void() +
   geom_sf(data = queenstown_forest, fill = "darkgreen") +
-  geom_sf(data = points, col = ifelse(points$class == "Urban", "blue", "yellow"), 
+  geom_sf(data = points, col = ifelse(points$type == "Normal", "blue", "yellow"), 
           show.legend = "point")
 ```
 
+
 <br>
 
+### Generate sampling points - Retained
 
-If there is a need to retain survey points from a previous Survey Period, the example below shows how new points can be generated without overlap. Here, the file path to a shapefile with the previous survey points is given to the argument `retain`. Load the example points within the same area of Queenstown from period `1` to simulate point selection for re-surveying in a subsequent Survey Period 2. If only half of the previous points are to be retained, the proportion `retain_prop` can be set to `"0.5"`.  
+If surveys are conducted across multiple periods (e.g. years), there may be a need to retain sampling points from a previous period, for example, for long-term monitoring at the same location. If this is the case, new points can be generated while ensuring that a certain proportion of these points are similar to those from a previous period. Note that the column `type` must also exist in the old dataset, with the value of either `Normal` or `Sub-area`. For example, we can choose to retain points in Queenstown from Survey Period `1`.
+
+```{r}
+data(sampling_points)
+queenstown_retain <- sampling_points[sampling_points$area %in% "QT" & sampling_points$period %in% "1", ]
+
+# create column 'type', which is based on the column 'landcover' in this example data
+queenstown_retain <- queenstown_retain %>% 
+  mutate(type = ifelse(landcover == "Urban", "Normal", "Sub-area"))
+
+```
+
+If we wish to retain half of the points, add `queenstown_retain` to the function argument 'retain', and set the argument `retain_prop` to `0.5`:
 
 ```{r random point generation with retain, message = FALSE, warning = FALSE}
-data(sampling_points)
-
-queenstown_retain <- sampling_points[sampling_points$area %in% "QT" & sampling_points$period %in% "1", ]
 
 points <- random_pt_gen(boundaries = queenstown,
                         area_per_pt = 500000,
-                        pt_buffer = 50,
-                        forest = queenstown_forest,
+                        pt_radius = 50,
+                        excess_modifier = 1.5,
+                        sub_areas = queenstown_forest,
                         retain = queenstown_retain,
-                        retain_prop = 0.5,
-                        excess_modifier = 1.5)
+                        retain_prop = 0.5)
+```
 
+If there were points that were retained, the additional column '`status`' indicates whether the points generated are '`Old`' or '`New`'.
+
+```{r}
+head(points)
+```
+
+
+```{r}
 ggplot(data = queenstown) +
   geom_sf(fill = NA) +
   theme_void() +
   geom_sf(data = queenstown_forest, fill = "darkgreen") +
   geom_sf(data = points,
-          aes(col = class, shape = status),
+          aes(col = type, shape = status),
           show.legend = "point")
 ```
 
-After obtaining the generated points, surveyors are to then assess the points and the surrounding areas up to the above buffer radius (50 m) for potential on-site disturbances to wild animals. Approved points are then selected according to the order in which they were generated (i.e. the point `id`) to maintain randomness.
+<br>
+
+Finally, surveyors can proceed to assess the sampling points and their surrounding areas (up to the buffer radius, e.g., 50 m). Factors to take note of include (1) accessibility; (2) presence of nearby construction; (3) potential disturbance to wild animals. To ensure that random sampling is maintained, suitable points should be selected according to the order in which they were generated (the column `id`).
+
+<br>
 
 ---
 
-### Animal data collection format
+## Animal surveys
 
-To conduct new surveys or to build models on collected data, the format in which the data is organised for analysis is shown below. Animal data is separated into the survey data and survey info datasets, where the former includes the individual observation records and the latter contains meta information on each 30 minutes survey.
+### Data format
+
+Animal survey data are organised into two separate tables, shown below. 
 
 ```{r sample data table, echo = FALSE, message = FALSE, warning = FALSE}
 
 data(animal_observations)
 
-knitr::kable(head(animal_observations), caption = "**Sample survey data format**") %>%
+knitr::kable(head(animal_observations), caption = "**Table: Example showing animal observations recorded during surveys.** Each row represents a unique observation at a specified time, which includes the species name and count (abundance) of individuals. Refer to `help(animal_observations)` for more information.") %>%
   kableExtra::kable_styling("striped", font_size = 10) %>% kableExtra::scroll_box(width = "100%")
 ```
 
+<br>
+
 ```{r sample info table, echo = FALSE, message = FALSE}
+
 data(animal_surveys)
 
-knitr::kable(head(animal_surveys), caption = "**Sample survey info format**") %>%
+knitr::kable(head(animal_surveys), caption = "**Table: Example showing the information recorded for each animal survey.** Each row represents a unique 30-minute survey. Refer to `help(animal_surveys)` for more information.") %>%
   kableExtra::kable_styling("striped", font_size = 10)
 ```
 
----
+<br>
 
-## Animal survey methods
+### Data collection
 
-The general animal survey protocol consisted of **30 minute** surveys in the designated buffer radius around the generated points once every two months for a year (6 cycles per Survey Period). Surveyors can move within the area to identify and count any species belonging to the priority taxon of each survey. Each encounter is recorded according to the species, with further details on the time, abundance and distance from center point.
-
-![**Figure**: Diagram of animal surveys within the respective buffer radii. Data recorded for each species observation is also shown here.](survey-diagram.png)
-
-Survey time windows and buffer radii varies for each priority taxon and they were chosen based on previous research. The four priority animal taxa surveyed and included in the example data are shown in the table below with their specific survey details. 
+In the example datasets `animal_observations` and `animal_surveys`, 30-minute surveys were conducted within the designated buffer radius for the specific animal (taxon) group. For example, the buffer radius for Bird (Aves) surveys is 50 m, while those for Butterflies (Lepidoptera), Odonates (Odonata) and Amphibians (Amphibia) are at 20 m from the sampling point location. The survey time window also varies for each animal group, and were chosen based on previous research. In addition, Odonate and Amphibian surveys conducted at sampling points with ephemeral water bodies had to be performed within 24 hours after a rain event. The rain event had to be of at least a light–moderate intensity, based on [real-time updates from Meteorological Service Singapore](http://www.weather.gov.sg/weather-rain-area-50km/).
 
 ```{r survey type table, echo = FALSE, fig.align='center'}
 
@@ -132,13 +182,10 @@ Radius <- c("50", "20", "20", "20")
 survey_types <- data.frame(Taxon, Time, Radius) %>% 
   rename("Radius (m)" = Radius)
 
-knitr::kable(survey_types, caption = "**Animal survey types**", align = "lcr", position = "center") %>%
+knitr::kable(survey_types, caption = "**Table: Types of animal surveys in the example data.**", align = "lcr", position = "center") %>%
   kableExtra::kable_styling("striped", font_size = 10)
 ```
 
-For ephemeral water points, odonate and amphibian surveys were conducted within 24 hours after a rain event at the sampling point. The rain event had to be of at least a light–moderate intensity with reference to the [Meteorological Service Singapore's live map of Rain Areas](http://www.weather.gov.sg/weather-rain-area-50km/).
-
----
 <br>
 
 Surveyors move within the buffer radius to identify and count the number of species. Each encounter is recorded according to individual species; information about the time, abundance and distance from the center point are also recorded. Refer to `help(animal_observations)` for more information.
