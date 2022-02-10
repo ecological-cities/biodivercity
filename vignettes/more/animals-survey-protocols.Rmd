@@ -139,20 +139,15 @@ knitr::kable(survey_types, caption = "**Animal survey types**", align = "lcr", p
 For ephemeral water points, odonate and amphibian surveys were conducted within 24 hours after a rain event at the sampling point. The rain event had to be of at least a light–moderate intensity with reference to the [Meteorological Service Singapore's live map of Rain Areas](http://www.weather.gov.sg/weather-rain-area-50km/).
 
 ---
+<br>
 
-## Plant survey methods
+Surveyors move within the buffer radius to identify and count the number of species. Each encounter is recorded according to individual species; information about the time, abundance and distance from the center point are also recorded. Refer to `help(animal_observations)` for more information.
 
-**Take note**: If species lists are not generated with this package, `Forest` plant survey methodology should be removed.
+![**Figure**: Example showing the information recorded for animal observations from the surveyor's point-of-view.](survey-diagram.png)
 
-Plant surveys were split into two types according to the `Urban` or `Forest` land-cover where the plants are located. 
+<br>
 
-`Urban` plant surveys were conducted within the same 50m radius of the animal survey points. Cultivated trees, palms, shrubs and turf were mapped manually on-site and identified to the species-level. For digitising in geographic information system (GIS) software, trees and palms were drawn as `Point` layers while shrubs and turfs were drawn as `Polygon` layers.
+Sampling points were surveyed once every two months (`cycle` adds up to six per survey `period`); each sampling period thus stretched across a year-long duration.
 
-![**Figure**: Original satellite imagery of the point (left) and manually-mapped vegetation digitised in QGIS (right).](mapping-diagram.png)
-
----
-
-`Forest` plant surveys were dependent on existing forest patches in the sampling areas. Available maps and satellite images were first checked for natural vegetation cover that were unmanaged within the sampling area boundaries. After locating such patches, surveys were then carried out to identify all unique vascular plant species present. Surveyors would also trace the existing outlines of these forest patches by walking the perimeter with a Global Positioning System (GPS) device. Plant specimens were collected if they were not identifiable on-site and photographs were taken of plants that were out-of-reach. 
-
-Locations of any ‘rare’ plant species identified were recorded with the GPS. These include species that were not locally cultivated, and ‘critically endangered’ or ‘extinct’ according to the Singapore Red Data Book, 2nd Edition (Davison et al., 2008).
+<br>
 
