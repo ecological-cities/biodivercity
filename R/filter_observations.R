@@ -1,35 +1,48 @@
-#'Filter species observations based on specified criteria
+#'Filter animal observations based on specified criteria
 #'
-#'Filters species observations from biodiversity surveys based on specified criteria.
+#'Helper function to filter species observations from animal surveys based on specified criteria.
 #'
-#'@param observations Dataframe of species observations.
+#'@param observations Dataframe of animal species observations.
 #'It should include columns for `survey_id`, `area`, `period`, `taxon`.
 #'@param survey_ref Dataframe of all surveys conducted. Values in the column
 #'  `survey_id` should correspond to those in the `observations`.
-#'@param specify_area Specify the `area`(s). Defaults to `NULL`, which includes all areas.
-#'@param specify_period Specify the survey `period`(s). Defaults to `NULL`, which includes all periods.
-#'@param specify_taxon Specify the `taxon` taxon/taxa. Defaults to `NULL`, which includes all taxa.
+#'@param specify_area Specify the area(s) of interest as a character string (can be a vector of multiple areas). Defaults to `NULL`, which includes all areas.
+#'@param specify_period Specify the survey period(s) of interest as a character string (can be a vector of multiple periods). Defaults to `NULL`, which includes all periods.
+#'@param specify_taxon Specify the taxon (animal group) of interest as a character string (can be a vector of multiple taxa). Defaults to `NULL`, which includes all taxa.
 #'@param survey_id Column name of the unique identifier for each survey in `observations` and
-#'`survey_ref`. Defaults to `survey_id`.
+#'`survey_ref`. Defaults to `"survey_id"`.
 #'@param point_id Column name of the unique identifier for each point in `observations` and
-#'`survey_ref`. Defaults to `point_id`.
-#'@param area Column name of the area specified in `observations` and `survey_ref`.
-#'Defaults to `area`.
-#'@param period Column name of the sampling period specified in `observations` and `survey_ref`.
-#'Defaults to `period`.
-#'@param taxon Column name of the taxon of interest specified in `observations` and `survey_ref`.
-#'Defaults to `taxon`.
+#'`survey_ref`. Defaults to `"point_id"`.
+#'@param area Column name for the areas specified in `observations` and `survey_ref`.
+#'Defaults to `"area"`.
+#'@param period Column name for the sampling periods specified in `observations` and `survey_ref`.
+#'Defaults to `"period"`.
+#'@param taxon Column name for the taxa specified in `observations` and `survey_ref`.
+#'Defaults to `"taxon"`.
 #'
-#'@return The dataframe `observations` subset according to specified criteria.
+#'@return The dataframe `observations` subset according to the specified criteria.
 #'
 #'@import checkmate
-#'@import dplyr
+#'@importFrom dplyr filter mutate
 #'@importFrom rlang .data
 #'
+#'@examples
+#'
+#' data(animal_observations)
+#' data(animal_surveys)
+#'
+#' # filter to birds in both periods 1 and 2
+#' filter_observations(observations = animal_observations,
+#'                     survey_ref = animal_surveys,
+#'                     specify_taxon = "Aves",
+#'                     specify_period = c("1","2"))
+#'
 #'@export
-filter_obs <- function(observations, survey_ref, specify_area = NULL, specify_period = NULL,
-    specify_taxon = NULL, survey_id = "survey_id", point_id = "point_id",
-    area = "area", period = "period", taxon = "taxon") {
+filter_observations <-
+  function(observations, survey_ref,
+           specify_area = NULL, specify_period = NULL,
+           specify_taxon = NULL, survey_id = "survey_id", point_id = "point_id",
+           area = "area", period = "period", taxon = "taxon") {
 
     # Error checking ------------------
 

@@ -12,19 +12,19 @@
 #'
 #' @details The sampling points (`point_id`) were randomly generated within each town (`area`).
 #' Four types of animal surveys were conducted at sampling points,
-#' corresponding to four animal groups (taxa names in column `survey_id`): Birds (Aves), Butterflies (Lepidoptera),
+#' corresponding to four animal groups (column `taxon`): Birds (Aves), Butterflies (Lepidoptera),
 #' Odonates (Odonata) and Amphibians (Amphibia).
 #'
 #' Each sampling `period` stretched across a year-long duration, where sampling points
-#' were sampled once every two months (`cycle` adds up to 6 per `period`).
+#' were surveyed once every two months (`cycle` adds up to 6 per `period`).
 #' Some points were sampled again in the second period (column `resampled` is `TRUE`).
 #' All surveys took place between the years 2016 to 2022.
 #'
 #' @keywords datasets
 #'
-#' @references TBC
-#'
-#' @source TBC
+#' @source Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys.
+#' 14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant, $1,286,979.79.
+#' Awarded to the National University of Singapore (host institution) and the Singapore Housing Development Board.
 #'
 #' @seealso
 #' * [sampling_points] where these animal surveys were conducted.

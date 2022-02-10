@@ -10,9 +10,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+_In the works..._
 
-- Show model selection process? Exclude random forest..?
-- Include option to scale results (i.e. predicted - obs / sd(obs)) to present errors in relative terms
-- How spatial predictions work
-- Spatial heat map
-- ...
+- Explain the process of model selection
+- Show how results can be scaled (predicted - observed / sd(observed)) to present errors in relative terms
+- Show how spatial predictions work (to generate heat map)
+

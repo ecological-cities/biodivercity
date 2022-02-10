@@ -1,0 +1,115 @@
+---
+title: "Animals: Simulate missing surveys"
+author: "Song, Xiao Ping"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Animals: Simulate missing surveys}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Despite best efforts to ensure consistency in sampling, there may be situations where surveys are missed. For example, animal surveys could not be performed due to movement restrictions when the COVID-19 pandemic hit Singapore.
+
+Simulations can be performed to observe the loss in species richness (number of species) if surveys are missed. The following vignette shows an example if `15` surveys conducted within the Punggol (`PG`) area are randomly excluded from Survey Cycle `5`, during Survey Period `1` (March – April 2017). This corresponds to the same time-of-year in Survey Period `2` (March – April 2020) when 15 bird surveys were missed at Punggol, due to COVID-19 movement restrictions.
+
+<br>
+
+First, load the necessary packages to run the analysis:
+
+```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
+library("biodivercity")
+library("ggplot2") # for visualisation
+```
+
+```{r load biodivercity while in dev, include = FALSE}
+devtools::load_all()
+library("ggplot2")
+```
+
+<br>
+
+Load and process the example datasets, then run the function `exclude_simulator()`. 
+
+```{r exclude_simulator, warning = FALSE, message = FALSE}
+
+data("animal_observations")
+data("animal_surveys")
+
+# filter animal observations to taxon of interest
+birds <- filter_observations(observations = animal_observations,
+                             survey_ref = animal_surveys,
+                             specify_taxon = "Aves", # birds
+                             specify_area = "PG", # punggol
+                             specify_period = "1") # survey period 1
+
+# convert animal observations to community matrix
+birds <- as.data.frame.matrix(xtabs(abundance ~ survey_id + species, data = birds))
+birds <- cbind(survey_id = rownames(birds), birds) # convert rownames to col
+
+set.seed(123)
+scenarios <- 
+  exclude_simulator(birds, animal_surveys,
+                    exclude_num = 15, exclude_level = "survey", specify_cycles = 5)
+
+```
+
+`scenarios` a tabulation of results from each simulated iteration (column). The count of sampling points with each species (row) is shown. The column `full` shows the breakdown of counts within the original dataset.
+
+```{r echo = FALSE}
+knitr::kable(head(scenarios), caption = "**First few rows of the object `scenarios`.**") %>%
+  kableExtra::kable_styling("striped", font_size = 10) %>% kableExtra::scroll_box(width = "100%")
+```
+
+<br>
+
+These 100 bootstrapped scenarios may be used in further analyses, or visualised to observe the variation in species richness within the sampled area of interest (Punggol): 
+
+```{r plot species richness, message = FALSE, message = FALSE, warning = FALSE, fig.width=3, fig.height = 4, fig.align='center', out.width = "50%", dpi = 300, fig.cap="**Figure: Number of bird species at Punggol, Singapore if 15 surveys were missed in Survey Cycle 5  (March – April 2017).** The blue cross denotes the count in full dataset, while the diamond symbol denotes the mean count across 100 scenarios where survey data were randomly excluded."}
+
+spp_richness <- colSums(!is.na(scenarios[,-1])) # calculate total no. of bird species per scenario
+spp_richness <- spp_richness %>%
+  as.data.frame() %>%
+  dplyr::rename(n = ".") %>%
+  dplyr::mutate(full = nrow(scenarios)) %>%
+  dplyr::mutate(area = "Punggol")
+
+spp_richness %>%
+  ggplot(aes(x = area, y = n)) +
+    geom_boxplot() +
+    geom_point(aes(y = full), shape=4, color = "blue") +
+    stat_summary(fun = mean, geom = "point", shape = 5) + 
+    xlab("") + ylab("No. of species") + 
+    theme_bw()
+
+```
+
+<br>
+
+Visualisations can also be performed at the level of individual species. Species that are relatively less common are more likely to be missed at sampling points: 
+
+```{r plot species-level results, message = FALSE, message = FALSE, warning = FALSE, fig.width=6, fig.height = 12, fig.align='center', dpi = 300, fig.cap="**Figure: Number of sampling points that bird species were observed at Punggol, Singapore if 15 surveys were missed in Survey Cycle 5 (March – April 2017).** The blue cross denotes the count in full dataset, while the diamond symbol denotes the mean count across 100 scenarios where survey data were randomly excluded. Species are arranged in descending order of counts."}
+
+# transform for plotting
+plot_bird_spp <- scenarios %>%
+  tidyr::pivot_longer(cols = num_range("iter", 1:ncol(scenarios)),
+                      names_to = "iteration", values_to = "n") %>%
+  dplyr::mutate(taxon = "Aves")
+
+# get order of species based on total count
+species_order <- plot_bird_spp %>%
+  dplyr::group_by(species) %>%
+  dplyr::summarise(order = mean(full))
+
+plot_bird_spp %>%
+  dplyr::left_join(species_order) %>% 
+  ggplot(aes(x = reorder(species, order), y = n)) +
+    geom_boxplot() +
+    geom_point(aes(y = full), shape = 4, color = "blue") +
+    stat_summary(fun = mean, geom = "point", shape = 5) + 
+    xlab("") + ylab("No. of sampling points") + 
+    theme_bw() +
+    coord_flip() 
+
+```
+

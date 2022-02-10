@@ -1,6 +1,6 @@
 #'Extract species accumulation curves based on specified criteria
 #'
-#'Wrapper function to `filter_obs()` which filters species observations from biodiversity surveys, based on specified criteria.
+#'Wrapper function to `filter_observations()` which filters species observations from biodiversity surveys, based on specified criteria.
 #'Subsequently forms community matrix, and removes taxon group-level (genus/family)
 #'if all species within group are observed in the area (& period), using the function `check_taxongrps()`.
 #'Finally, runs the function `specaccum()` in package `vegan`, and extracts output
@@ -43,7 +43,7 @@
 #'@importFrom stats xtabs
 #'
 #'@export
-sac_extractor <- function(observations, survey_ref,
+calculate_sac <- function(observations, survey_ref,
                           specify_area, specify_period, specify_taxon,
                           survey_id = "survey_id",
                           area = "area", period = "period", taxon = "taxon",
@@ -66,12 +66,12 @@ sac_extractor <- function(observations, survey_ref,
   # Calculations ------------------
 
   # subset
-  obs_subset <- filter_obs(observations, survey_ref,
-                           specify_area = specify_area,
-                           specify_period = specify_period,
-                           specify_taxon = specify_taxon,
-                           survey_id = survey_id,
-                           area = area, period = period, taxon = taxon)
+  obs_subset <- filter_observations(observations, survey_ref,
+                                    specify_area = specify_area,
+                                    specify_period = specify_period,
+                                    specify_taxon = specify_taxon,
+                                    survey_id = survey_id,
+                                    area = area, period = period, taxon = taxon)
 
 
 

@@ -1,6 +1,6 @@
 ---
 title: "Apply Models"
-subtitle: "Spatial predictions across the landscape"
+subtitle: "Spatial predictions across a landscape"
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -10,9 +10,30 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
+## Overview
+
+By following this vignette, users will be able to predict (using a user-provided model object) animal species richness across a target landscape, and eventually visualise the prediction using a heatmap.
+
+```{r load required libraries, eval = FALSE}
+library("biodivercity")
+library("tmap")
+library("leaflet")
+```
+
+```{r load libraries while in dev, include = FALSE}
+devtools::load_all() 
+
+library("tmap")
+library("leaflet")
+```
+
+
 ## Spatial predictions
 
-`geom_to_grid` overlays a grid over a target area where species richness predictions are desired. This function is a wrapper for the `st_make_grid` function with `what == "centers"`, from the package `sf`. The output is an object of class `sfc` that comprise of points at which landscape metrics are extracted from their respective distance buffers. Grid dimensions are variable and can be specified with `grid_dim`. `buffer_dist` is an optional argument for situations where landscape data is limited to the target area or smaller. The distance value for this argument should correspond to the largest buffer present in the variables, so as to not include areas with no landscape data.
+To make predictions across a large area, the target landscape is first broken up into many smaller points
+
+`geom_to_grid` is used to overlay a grid (see Fig. 1 for example) over a target area where species richness predictions are desired. This function is a wrapper for the `st_make_grid` function with `what == "centers"`, from the package `sf`. The output is an object of class `sfc` that comprises points around which landscape variables are extracted within their respective distance buffers. Grid dimensions are variable and can be specified with `grid_dim`. `buffer_dist` is an optional argument for situations where landscape data is limited to the target area or smaller. The distance value for this argument should correspond to the largest buffer present in the variables, so as to not include areas with no landscape data.
 
 ```{r create grid for each UGS town, eval = FALSE}
 # subset to regions where predictions can be made: >126m inwards from boundaries
@@ -20,7 +41,7 @@ bound_grid <- geom_to_grid(geom = bound,
                            buffer_dist = 126,
                            grid_dim = c(50, 50))
 ```
-![Visualisation of the `geom_to_grid` function.](geom-to-grid.png){#id .class width=60% height=60%}
+![Fig. 1: Visualisation of the `geom_to_grid` function.](geom-to-grid.png){#id .class width=60% height=60%}
 
 The `heatmap_raster` function is a combination of multiple functions that result in a final raster of species richness predictions for one taxon. A breakdown of the function is as follows:
 
@@ -48,27 +69,19 @@ bird_hm <- heatmap_raster(env_df = bird_env,
 ## Visualisation
 
 ```{r load data, include = FALSE}
+# data(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m)
 
-library("tmap")
-library("leaflet")
+bird_heatmap_100m <- system.file("extdata", "bird_heatmap_100m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
 
-# data(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m,
-#      butt_heatmap_100m, butt_heatmap_20m, butt_heatmap_50m,
-#      drag_heatmap_100m, drag_heatmap_20m, drag_heatmap_50m,
-#      frog_heatmap_100m, frog_heatmap_20m, frog_heatmap_50m)
+bird_heatmap_50m <- system.file("extdata", "bird_heatmap_50m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
 
-bird_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_100m.tif")
-bird_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_50m.tif")
-bird_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_20m.tif")
-butt_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/butt_heatmap_100m.tif")
-butt_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/butt_heatmap_20m.tif")
-butt_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/butt_heatmap_50m.tif")
-drag_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/drag_heatmap_100m.tif")
-drag_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/drag_heatmap_50m.tif")
-drag_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/drag_heatmap_20m.tif")
-frog_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/frog_heatmap_100m.tif")
-frog_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/frog_heatmap_50m.tif")
-frog_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/frog_heatmap_20m.tif")
+bird_heatmap_20m <- system.file("extdata", "bird_heatmap_20m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
 ```
 
 ```{r plotting maps, include = FALSE}
@@ -82,7 +95,7 @@ tmap_options(check.and.fix = TRUE, #turf, natveg and shrubs layers contain inval
 tm <- 
   tm_basemap(c("CartoDB.Positron", "CartoDB.DarkMatter", "OpenStreetMap")) +
 
-  #100m heatmaps
+  #100m heatmap
   tm_shape(bird_heatmap_100m, raster.downsample = FALSE) +
     tm_raster(title = "Bird SR",
                 group = paste0("Bird Heatmap Raster ", 100, "m"),
@@ -92,34 +105,7 @@ tm <-
               #legend.show = FALSE,
                 alpha = 0.8) +
   
-  tm_shape(butt_heatmap_100m, raster.downsample = FALSE) +
-    tm_raster(title = "Butt SR",
-                group = paste0("Butterfly Heatmap Raster ", 100, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(drag_heatmap_100m, raster.downsample = FALSE) +
-    tm_raster(title = "Odonate SR",
-                group = paste0("Odonate Heatmap Raster ", 100, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(frog_heatmap_100m, raster.downsample = FALSE) +
-    tm_raster(title = "Amphibian SR",
-                group = paste0("Amphibian Heatmap Raster ", 100, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  #50m heatmaps
+  #50m heatmap
   tm_shape(bird_heatmap_50m, raster.downsample = FALSE) +
     tm_raster(title = "Bird SR",
                 group = paste0("Bird Heatmap Raster ", 50, "m"),
@@ -129,34 +115,7 @@ tm <-
               #legend.show = FALSE,
                 alpha = 0.8) +
   
-  tm_shape(butt_heatmap_50m, raster.downsample = FALSE) +
-    tm_raster(title = "Butt SR",
-                group = paste0("Butterfly Heatmap Raster ", 50, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(drag_heatmap_50m, raster.downsample = FALSE) +
-    tm_raster(title = "Odonate SR",
-                group = paste0("Odonate Heatmap Raster ", 50, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(frog_heatmap_50m, raster.downsample = FALSE) +
-    tm_raster(title = "Amphibian SR",
-                group = paste0("Amphibian Heatmap Raster ", 50, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  #20m heatmaps
+  #20m heatmap
   tm_shape(bird_heatmap_20m, raster.downsample = FALSE) +
     tm_raster(title = "Bird SR",
                 group = paste0("Bird Heatmap Raster ", 20, "m"),
@@ -164,34 +123,7 @@ tm <-
                 palette = "YlOrRd",
                 # labels = c(" "),
               #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(butt_heatmap_20m, raster.downsample = FALSE) +
-    tm_raster(title = "Butt SR",
-                group = paste0("Butterfly Heatmap Raster ", 20, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(drag_heatmap_20m, raster.downsample = FALSE) +
-    tm_raster(title = "Odonate SR",
-                group = paste0("Odonate Heatmap Raster ", 20, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  tm_shape(frog_heatmap_20m, raster.downsample = FALSE) +
-    tm_raster(title = "Amphibian SR",
-                group = paste0("Amphibian Heatmap Raster ", 20, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) 
+                alpha = 0.8)
   
 ```
 
@@ -202,23 +134,12 @@ tm <-
 tm %>% 
   tmap_leaflet() %>%
   
-  leaflet::hideGroup("Butterfly Heatmap Raster 100m") %>%
-  leaflet::hideGroup("Butterfly Heatmap Raster 50m") %>% 
-  leaflet::hideGroup("Butterfly Heatmap Raster 20m") %>% 
-  leaflet::hideGroup("Odonate Heatmap Raster 100m") %>% 
-  leaflet::hideGroup("Odonate Heatmap Raster 50m") %>% 
-  leaflet::hideGroup("Odonate Heatmap Raster 20m") %>% 
-  leaflet::hideGroup("Amphibian Heatmap Raster 100m") %>% 
-  leaflet::hideGroup("Amphibian Heatmap Raster 50m") %>% 
-  leaflet::hideGroup("Amphibian Heatmap Raster 20m")
-  
+  leaflet::hideGroup("Bird Heatmap Raster 50m") %>% 
+  leaflet::hideGroup("Bird Heatmap Raster 20m")
   
 ```
 
 ```{r rm obj, include = FALSE}
-rm(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m,
-   butt_heatmap_100m, butt_heatmap_20m, butt_heatmap_50m,
-   drag_heatmap_100m, drag_heatmap_20m, drag_heatmap_50m,
-   frog_heatmap_100m, frog_heatmap_20m, frog_heatmap_50m)
+rm(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m)
 ```
 

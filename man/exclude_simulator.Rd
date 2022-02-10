@@ -2,85 +2,108 @@
 % Please edit documentation in R/exclude_simulator.R
 \name{exclude_simulator}
 \alias{exclude_simulator}
-\title{Simulate multiple scenarios with randomly excluded surveys}
+\title{Simulate multiple scenarios with animal surveys randomly excluded}
 \usage{
 exclude_simulator(
-  community,
+  community_matrix,
   survey_ref,
   exclude_level = "survey",
   exclude_num,
-  specify_towns = NULL,
+  specify_areas = NULL,
   specify_points = NULL,
-  specify_rounds = NULL,
+  specify_periods = NULL,
   specify_cycles = NULL,
-  town_ignore = NULL,
-  round_ignore = NULL,
+  area_ignore = NULL,
+  period_ignore = NULL,
   cycle_ignore = NULL,
   survey_id = "survey_id",
   point_id = "point_id",
-  town = "town",
-  round = "round",
+  area = "area",
+  period = "period",
   cycle = "cycle",
   rep = 100
 )
 }
 \arguments{
-\item{community}{Dataframe of the species community matrix (one survey per row).
-It should include columns for \code{survey_id}, \code{point_id}, \code{town}, and \code{cycle}.}
+\item{community_matrix}{Dataframe of the species community matrix (one survey per row).
+It should a column containing the unique IDs for the animal surveys conducted (e.g. \code{survey_id}).}
 
-\item{survey_ref}{Dataframe of all surveys conducted. Values in the column
-\code{survey_id} should correspond to those in the \code{community} data.}
+\item{survey_ref}{Dataframe containing information of the surveys conducted
+(e.g. \code{survey_id}, \code{point_id}, \code{period}, \code{area}, \code{cycle}). Values in the column
+\code{survey_id} should correspond to those in \code{community_matrix}.}
 
-\item{exclude_level}{Exclude randomly based on one of two levels: \code{"survey"} or \code{"point"}.}
+\item{exclude_level}{Whether to exclude based on \code{"survey"} or \code{"point"}. Defaults to \code{"survey"}.}
 
-\item{exclude_num}{Number of surveys to exclude. Value should be a single integer.}
+\item{exclude_num}{Number of surveys/points to exclude (remove) from the full dataset \code{community_matrix}.
+Value should be a single integer.}
 
-\item{specify_towns}{Specify the \code{town}(s) to randomly exclude surveys from.
-Defaults to \code{NULL}, which excludes surveys randomly across all towns.}
+\item{specify_areas}{Specify the \code{area}(s) to randomly exclude surveys from (character string or vector).
+Defaults to \code{NULL}, which excludes surveys randomly across all areas.}
 
-\item{specify_points}{Specify the \code{point_id}(s) of sampling points to randomly exclude surveys from.
+\item{specify_points}{Specify the \code{point_id}(s) of sampling points to randomly exclude surveys from (character string or vector).
 Defaults to \code{NULL}, which excludes surveys randomly across all points.}
 
-\item{specify_rounds}{Specify the survey \code{round} to exclude surveys from. Defaults to \code{NULL},
-which excludes surveys randomly across all rounds.}
+\item{specify_periods}{Specify the survey \code{period}(s) to exclude surveys from (character string or vector). Defaults to \code{NULL},
+which excludes surveys randomly across all periods.}
 
-\item{specify_cycles}{Specify the survey \code{cycle}(s) to exclude surveys from. Defaults to \code{NULL},
+\item{specify_cycles}{Specify the survey \code{cycle}(s) to exclude surveys from (character string or vector). Defaults to \code{NULL},
 which excludes surveys randomly across all cycles.}
 
-\item{town_ignore}{Ignore specified \code{town}(s) in \code{community} data from analysis and results. Defaults to \code{NULL},
-which includes all towns in the simulation.}
+\item{area_ignore}{Ignore specified \code{area}(s) from the simulation and output (character string or vector). Defaults to \code{NULL},
+which includes all areas in the simulation.}
 
-\item{round_ignore}{Ignore specified \code{round} in \code{community} data from analysis and results. Defaults to \code{NULL},
-which includes all rounds in the simulation.}
+\item{period_ignore}{Ignore specified \code{period} from the simulation and output (character string or vector). Defaults to \code{NULL},
+which includes all periods in the simulation.}
 
-\item{cycle_ignore}{Ignore specified \code{cycles}s in \code{community} data from analysis and results. Defaults to \code{NULL},
+\item{cycle_ignore}{Ignore specified \code{cycles}(s) from the simulation and output (character string or vector). Defaults to \code{NULL},
 which includes all cycles in the simulation.}
 
-\item{survey_id}{Column name of the unique identifier for each survey in \code{community} and
+\item{survey_id}{Column name of the unique identifier for each survey in \code{community_matrix} and
 \code{survey_ref}. Defaults to \code{survey_id}.}
 
 \item{point_id}{Column name of the unique identifier for each sampling point in \code{survey_ref}.
 Defaults to \code{survey_id}.}
 
-\item{town}{Column name of the town specified in \code{survey_ref}.
-Defaults to \code{town}.}
+\item{area}{Column name of the area specified in \code{survey_ref}.
+Defaults to \code{area}.}
 
-\item{round}{Column name of the survey round specified in \code{survey_ref}.
-Defaults to \code{round}.}
+\item{period}{Column name of the survey period specified in \code{survey_ref}.
+Defaults to \code{period}.}
 
 \item{cycle}{Column name of the survey cycle specified in \code{survey_ref}.
 Defaults to \code{cycle}.}
 
-\item{rep}{Specify number of repetitions (scenarios) of randomly excluded survey data.
-Defaults to \code{100}.}
+\item{rep}{Specify number of repetitions (scenarios) to simulate. Defaults to \code{100}.}
 }
 \value{
-A dataframe containing the count of points with each species for the full dataset,
-as well as for each repetition scenario with randomly excluded data.
+A dataframe containing the results of each iteration (column).
+The count of sampling points with each species (row) is shown. The column \code{full}
+shows the breakdown of counts within the original dataset.
 }
 \description{
-Randomly exclude either surveys or sampling points (and their associated surveys) from a
+Randomly exclude either animal surveys or sampling points (and all their associated surveys) from a
 species community matrix. Each column of the community matrix should represent a unique species,
-while each row represents a single unique survey (for a particular sampling point in a town,
-as well as survey round and cycle).
+while each row represents a single unique survey.
+}
+\examples{
+data(animal_observations)
+data(animal_surveys)
+
+# filter animal observations to taxon of interest
+birds <- filter_observations(observations = animal_observations,
+                            survey_ref = animal_surveys,
+                            specify_taxon = "Aves")
+
+# convert animal observations to community matrix
+birds <- as.data.frame.matrix(xtabs(abundance ~ survey_id + species, data = birds))
+birds <- cbind(survey_id = rownames(birds), birds) # convert rownames to col
+
+# run function
+set.seed(123)
+exclude_simulator(birds, animal_surveys,
+                 exclude_num = 15, exclude_level = "survey", # exclude 15 surveys
+                 specify_cycles = 5, # exclude those in cycle 5 only
+                 period_ignore = "2", # remove all data from period 2
+                 rep = 10) # 10 scenarios only
+
 }

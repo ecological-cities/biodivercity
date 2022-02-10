@@ -2,36 +2,44 @@
 % Please edit documentation in R/random_pt_gen.R
 \name{random_pt_gen}
 \alias{random_pt_gen}
-\title{Randomly generate sampling points within supplied area}
+\title{Randomly generate sampling points within a supplied area}
 \usage{
 random_pt_gen(
-  x,
+  boundaries,
   area_per_pt,
-  pt_buffer,
+  pt_radius,
   excess_modifier = 1,
-  natveg = NULL,
+  sub_areas = NULL,
   retain = NULL,
   retain_prop = NULL
 )
 }
 \arguments{
-\item{x}{Shapefile (polygon or multipolygon) of site boundaries for sampling.}
+\item{boundaries}{Shapefile (polygon or multipolygon) of site boundaries for sampling.}
 
-\item{area_per_pt}{Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000)}
+\item{area_per_pt}{Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000).}
 
-\item{pt_buffer}{Buffer radius of point surveys in meters so as to not survey outside area of interest.}
+\item{pt_radius}{Buffer radius of survey points in meters.
+Ensures that the generated points do not extend beyond the boundaries of the area of interest.}
 
 \item{excess_modifier}{Numeric value of a multiplicative modifier for excess points to be generated (i.e. a value of 1.5 = 1.5 times the expected number of points will be generated). The default value is '1'.}
 
-\item{natveg}{Shapefile (polygon or multipolygon) of natural vegetation area for separate point generation.}
+\item{sub_areas}{Shapefile (polygon or multipolygon) of sub-area of interest,
+where sampling points will be generated separately (stratified random sampling).}
 
-\item{retain}{Shapefile (point) of previous round of surveys to retain in the new set of survey points.}
+\item{retain}{Shapefile (point) of previous round of surveys to retain in the new set of survey points.
+The column \code{type} must exist, with the value of either \code{Normal} or \code{Sub-area}.}
 
 \item{retain_prop}{Value of 0 to 1 for proportion of points to retain from previous round of surveys.}
 }
 \value{
-The sf object \code{sampling_points} containing the coordinates of generated points.
+The sf object \code{sampling_points} containing the geographical coordinates of generated points.
 }
 \description{
-Randomly generate fauna sampling points at a density of one point per specified area of supplied boundaries.
+Randomly generate sampling points at a specified density and buffer radius, within
+supplied polygons. An excess of sampling points can be generated,
+in case some of the generated points are unsuitable for surveys (e.g. within inaccessible areas).
+If necessary, stratified random sampling can be performed to ensure sufficient representation
+between sub-areas of interest. By supplying the \code{sub_areas} of interest,
+sampling points will be stratified between the areas outside ('normal' areas) and within these 'sub-areas'.
 }
