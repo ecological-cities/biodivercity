@@ -36,7 +36,7 @@ normalised_perpt <-
   for(j in 1:nrow(unique)){
   
     sptally_data <- 
-      sptally_extractor(observations = fauna_normalised[[i]],
+      tally_observations(observations = fauna_normalised[[i]],
                         survey_ref = surveys_normalised[[i]],
                         specify_town = unique$town[j], 
                         specify_round = unique$round[j], 
@@ -89,7 +89,7 @@ plot_sac <-
   
   for(j in 1:nrow(unique)){
     
-    sac_data <- sac_extractor(observations = fauna[[i]], 
+    sac_data <- calculate_sac(observations = fauna[[i]], 
                               survey_ref = surveys[[i]],
                               specify_town = unique$town[j], 
                               specify_round = unique$round[j], 

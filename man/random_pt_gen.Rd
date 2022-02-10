@@ -5,27 +5,27 @@
 \title{Randomly generate sampling points within supplied area}
 \usage{
 random_pt_gen(
-  x,
+  boundaries,
   area_per_pt,
   pt_buffer,
   excess_modifier = 1,
-  natveg = NULL,
+  forest = NULL,
   retain = NULL,
   retain_prop = NULL
 )
 }
 \arguments{
-\item{x}{Shapefile (polygon or multipolygon) of site boundaries for sampling.}
+\item{boundaries}{Shapefile (polygon or multipolygon) of site boundaries for sampling.}
 
-\item{area_per_pt}{Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000)}
+\item{area_per_pt}{Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000).}
 
-\item{pt_buffer}{Buffer radius of point surveys in meters so as to not survey outside area of interest.}
+\item{pt_buffer}{Buffer radius of survey points in meters. Points will be generated at this distance away from the boundary so as to not survey outside area of interest.}
 
 \item{excess_modifier}{Numeric value of a multiplicative modifier for excess points to be generated (i.e. a value of 1.5 = 1.5 times the expected number of points will be generated). The default value is '1'.}
 
-\item{natveg}{Shapefile (polygon or multipolygon) of natural vegetation area for separate point generation.}
+\item{forest}{Shapefile (polygon or multipolygon) of forest area for separate point generation.}
 
-\item{retain}{Shapefile (point) of previous round of surveys to retain in the new set of survey points.}
+\item{retain}{Shapefile (point) of previous round of surveys to retain in the new set of survey points. There must exist a column \code{landcover} with either \code{Urban} or \code{Forest} as values.}
 
 \item{retain_prop}{Value of 0 to 1 for proportion of points to retain from previous round of surveys.}
 }

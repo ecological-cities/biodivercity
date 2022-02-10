@@ -24,8 +24,8 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <h6 class="dropdown-header" data-toc-skip>1. Process landscape data</h6>
-    <h6 class="dropdown-header" data-toc-skip>2. Process animal data</h6>
+    <a class="dropdown-item" href="../articles/process-landscape.html">1. Process landscape data</a>
+    <a class="dropdown-item" href="../articles/process-animal.html">2. Process animal data</a>
     <h6 class="dropdown-header" data-toc-skip>3. Build models</h6>
     <a class="dropdown-item" href="../articles/apply-models.html">4. Apply models</a>
     <a class="dropdown-item" href="../articles/test-models.html">5. Test models</a>
@@ -37,11 +37,12 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-more-details">
     <a class="dropdown-item" href="../articles/more/animals-survey-protocols.html">Animals - Survey Protocols</a>
     <a class="dropdown-item" href="../articles/more/animals-data-summaries.html">Animals - Data summaries</a>
-    <a class="dropdown-item" href="../articles/more/animals-species-analyses.html">Animals - Species-level analyses</a>
-    <a class="dropdown-item" href="../articles/more/landscapes-landcover-patterns.html">Landscapes - Land cover patterns</a>
+    <h6 class="dropdown-header" data-toc-skip>Animals - Species-level analyses</h6>
+    <a class="dropdown-item" href="../articles/more/animals-simulate-missing-surveys.html">Animals - Simulate missing surveys</a>
+    <h6 class="dropdown-header" data-toc-skip>Landscapes - Land cover patterns</h6>
     <h6 class="dropdown-header" data-toc-skip>Landscapes - Urban density</h6>
     <h6 class="dropdown-header" data-toc-skip>Landscapes - Monitoring vs. Planning</h6>
-    <a class="dropdown-item" href="../articles/more/models-local-diversity.html">Models - Local diversity</a>
+    <h6 class="dropdown-header" data-toc-skip>Models - Local diversity</h6>
     <h6 class="dropdown-header" data-toc-skip>Models - Community diversity</h6>
     <h6 class="dropdown-header" data-toc-skip>Models - Future updates</h6>
   </div>
@@ -80,7 +81,13 @@
 <ul><li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
 </ul><div class="section level5">
 <h5 id="key-features-development-version">Key features<a class="anchor" aria-label="anchor" href="#key-features-development-version"></a></h5>
-<ul><li>To add..</li>
+<ul><li>Step-by-step protocols for random point sampling of an animal group within areas of interest.</li>
+<li>Generate data summaries of the animals surveyed at multiple levels (e.g. areas, periods, animal groups, species).</li>
+<li>Download and process landscape predictors within areas of interest (e.g. satellite imagery, OpenStreetMap data).</li>
+<li>Build and validate predictive models to assess local (alpha), community (beta) and total (gamma) diversity for an animal group.</li>
+<li>Convert vector data generated from future design scenarios into formats suitable for model predictions.</li>
+<li>Use models to make pixel-based spatial predictions across new areas, for both monitoring and future scenario planning purposes.</li>
+<li>Summarise predictions for city-wide scoring and benchmarking (i.e. allow comparisons to be made between zones used in city planning).</li>
 </ul></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

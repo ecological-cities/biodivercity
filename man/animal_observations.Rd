@@ -8,7 +8,9 @@
 Dataframe
 }
 \source{
-TBC
+Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys.
+14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant, $1,286,979.79.
+Awarded to the National University of Singapore (host institution) and the Singapore Housing Development Board.
 }
 \usage{
 data(animal_observations)
@@ -34,9 +36,6 @@ All surveys took place between the years 2016 to 2022.
 \examples{
 head(animal_observations)
 
-}
-\references{
-TBC
 }
 \seealso{
 \itemize{

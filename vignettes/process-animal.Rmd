@@ -1,7 +1,7 @@
 ---
 title: "Process Animal Data"
 subtitle: "Process animal survey data for model building"
-author: "Author"
+author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -10,22 +10,57 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Process survey data
+## Dealing with data
 
-Collected fauna survey data in the format detailed in the previous section can be easily subset with respect to `town`, `round` and/or `priority` with the `filter_obs` function. For example, a specific set of surveys (i.e. butterfly surveys in Tampines from 2020-2021) can be filtered as follows:
+Collected fauna survey data in the format detailed in the previous section can be easily subset with respect to `town`, `round` and/or `priority` with the `filter_observations()` function. A second survey reference dataset is required for input to account for surveys with zero observations. For example, a specific set of surveys (i.e. butterfly surveys in Tampines from 2020-2021) can be filtered as follows.
 
-```{r filter_obs example, eval = FALSE}
-data(fauna)
-data(surveys)
+First, load the necessary packages to run the analysis:
 
-butterflies_tampines_round_2 <- filter_obs(observations = fauna, survey_ref = surveys,
-                   specify_taxon = "Lepidoptera",
-                   specify_area = "TP",
-                   specify_period = "2")
+```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
+library("biodivercity")
 ```
 
-Checks are then performed to remove uncertain fauna identifications to prevent over-counting. 
+```{r load biodivercity while in dev, include = FALSE}
+devtools::load_all()
+```
 
-```{r check taxon groups, eval = FALSE}
+Load the example datasets and run the function `filter_observations()`.
+
+```{r filter_obs example, message = FALSE, warning = FALSE}
+data(animal_observations)
+data(animal_surveys)
+
+filter_observations(observations = animal_observations, 
+                    survey_ref = animal_surveys,
+                    specify_taxon = "Lepidoptera",
+                    specify_area = "TP",
+                    specify_period = "2")
+```
+
+---
+
+Checks can be performed to remove ambiguous fauna identifications to prevent over-counting of species. These observations are usually identifiable only to the Family or Genus level and should be recorded as such. The function `check_taxongrps()` returns a dataframe of species entries to be filtered out at the point/area level when all species of the specified Family or Genus across all points have been observed at the point/area of interest.
+
+For example, there are two species of swallows observed across all points in the sample dataset, *Hirundo tahitica* and *Hirundo rustica*. *Hirundo spp.* is entered when the species cannot be identified with confidence.
+
+```{r check taxon groups 1, message = FALSE, warning = FALSE}
+animal_observations %>% 
+  dplyr::filter(stringr::str_detect(species, "Hirundo")) %>% 
+  group_by(area, taxon, period, species) %>% 
+  summarise()
+```
+
+If data entries containing *Hirundo spp.* are found in areas where both species appear in the same period, the function `check_taxongrps()` will flag `Hirundo spp.` for removal at the `area` level.
+
+```{r check taxon groups 2, message = FALSE, warning = FALSE}
+rmspp_town <- check_taxongrps(animal_observations, level = "area")
+
+filtered_observations <- animal_observations %>%
+  anti_join(rmspp_town, by = c("species" = "name", "period"))
+
+filtered_observations %>% 
+  dplyr::filter(stringr::str_detect(species, "Hirundo")) %>% 
+  group_by(area, taxon, period, species) %>% 
+  summarise()
 
 ```

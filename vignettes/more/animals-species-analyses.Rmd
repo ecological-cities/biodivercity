@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-- Add spp. lists as example data 
-- Most common/abundant animal species
-- Plants too? nat veg?
-- Other interesting info 
+_In the works..._
+
+- Example data: Animal species lists (e.g. conservation status, etc.)
+- Visualise most common/abundant animal species

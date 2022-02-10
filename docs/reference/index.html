@@ -24,8 +24,8 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <h6 class="dropdown-header" data-toc-skip>1. Process landscape data</h6>
-    <h6 class="dropdown-header" data-toc-skip>2. Process animal data</h6>
+    <a class="dropdown-item" href="../articles/process-landscape.html">1. Process landscape data</a>
+    <a class="dropdown-item" href="../articles/process-animal.html">2. Process animal data</a>
     <h6 class="dropdown-header" data-toc-skip>3. Build models</h6>
     <a class="dropdown-item" href="../articles/apply-models.html">4. Apply models</a>
     <a class="dropdown-item" href="../articles/test-models.html">5. Test models</a>
@@ -37,11 +37,12 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-more-details">
     <a class="dropdown-item" href="../articles/more/animals-survey-protocols.html">Animals - Survey Protocols</a>
     <a class="dropdown-item" href="../articles/more/animals-data-summaries.html">Animals - Data summaries</a>
-    <a class="dropdown-item" href="../articles/more/animals-species-analyses.html">Animals - Species-level analyses</a>
-    <a class="dropdown-item" href="../articles/more/landscapes-landcover-patterns.html">Landscapes - Land cover patterns</a>
+    <h6 class="dropdown-header" data-toc-skip>Animals - Species-level analyses</h6>
+    <a class="dropdown-item" href="../articles/more/animals-simulate-missing-surveys.html">Animals - Simulate missing surveys</a>
+    <h6 class="dropdown-header" data-toc-skip>Landscapes - Land cover patterns</h6>
     <h6 class="dropdown-header" data-toc-skip>Landscapes - Urban density</h6>
     <h6 class="dropdown-header" data-toc-skip>Landscapes - Monitoring vs. Planning</h6>
-    <a class="dropdown-item" href="../articles/more/models-local-diversity.html">Models - Local diversity</a>
+    <h6 class="dropdown-header" data-toc-skip>Models - Local diversity</h6>
     <h6 class="dropdown-header" data-toc-skip>Models - Community diversity</h6>
     <h6 class="dropdown-header" data-toc-skip>Models - Future updates</h6>
   </div>
@@ -105,6 +106,11 @@
           <code><a href="animal_observations.html">animal_observations</a></code> 
         </dt>
         <dd>Animal observation records from point surveys</dd>
+      </dl><dl><dt>
+          
+          <code><a href="points_landscape.html">points_landscape</a></code> 
+        </dt>
+        <dd>Sampling points with landscape data summarised at multiple buffer radii</dd>
       </dl></div><div class="section level2">
       <h2 id="animal-surveys">Animal surveys<a class="anchor" aria-label="anchor" href="#animal-surveys"></a></h2>
       
@@ -123,14 +129,14 @@
         <dd>Randomly generate sampling points within supplied area</dd>
       </dl><dl><dt>
           
-          <code><a href="filter_obs.html">filter_obs()</a></code> 
+          <code><a href="filter_observations.html">filter_observations()</a></code> 
         </dt>
-        <dd>Filter species observations based on specified criteria</dd>
+        <dd>Filter animal observations based on specified criteria</dd>
       </dl><dl><dt>
           
-          <code><a href="sptally_extractor.html">sptally_extractor()</a></code> 
+          <code><a href="tally_observations.html">tally_observations()</a></code> 
         </dt>
-        <dd>Tally number of species based on specified criteria</dd>
+        <dd>Tally number of species observations based on specified criteria</dd>
       </dl><dl><dt>
           
           <code><a href="check_taxongrps.html">check_taxongrps()</a></code> 
@@ -138,14 +144,14 @@
         <dd>Check taxon-group-level records in survey data</dd>
       </dl><dl><dt>
           
-          <code><a href="exclude_simulator.html">exclude_simulator()</a></code> 
-        </dt>
-        <dd>Simulate multiple scenarios with randomly excluded surveys</dd>
-      </dl><dl><dt>
-          
-          <code><a href="sac_extractor.html">sac_extractor()</a></code> 
+          <code><a href="calculate_sac.html">calculate_sac()</a></code> 
         </dt>
         <dd>Extract species accumulation curves based on specified criteria</dd>
+      </dl><dl><dt>
+          
+          <code><a href="exclude_simulator.html">exclude_simulator()</a></code> 
+        </dt>
+        <dd>Simulate multiple scenarios with animal surveys randomly excluded</dd>
       </dl></div><div class="section level2">
       <h2 id="landscapes">Landscapes<a class="anchor" aria-label="anchor" href="#landscapes"></a></h2>
       
@@ -174,11 +180,6 @@
         <dd>Calculate pixel value threshold of a single-band image via Otsu's method</dd>
       </dl><dl><dt>
           
-          <code><a href="lsm_perpoint.html">lsm_perpoint()</a></code> 
-        </dt>
-        <dd>Calculate landscape metrics at sampling points</dd>
-      </dl><dl><dt>
-          
           <code><a href="get_roads_osm.html">get_roads_osm()</a></code> 
         </dt>
         <dd>Get road lines from OpenStreetMap</dd>
@@ -187,6 +188,21 @@
           <code><a href="get_buildings_osm.html">get_buildings_osm()</a></code> 
         </dt>
         <dd>Get building polygons from OpenStreetMap</dd>
+      </dl><dl><dt>
+          
+          <code><a href="lsm_perpoint.html">lsm_perpoint()</a></code> 
+        </dt>
+        <dd>Calculate landscape metrics at sampling points</dd>
+      </dl><dl><dt>
+          
+          <code><a href="lsm_perpoint_specified.html">lsm_perpoint_specified()</a></code> 
+        </dt>
+        <dd>Calculate landscape metrics at sampling points specified by name</dd>
+      </dl><dl><dt>
+          
+          <code><a href="osm_perpoint_specified.html">osm_perpoint_specified()</a></code> 
+        </dt>
+        <dd>Calculate OpenStreetMap metrics at sampling points specified by name</dd>
       </dl></div><div class="section level2">
       <h2 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a></h2>
       
@@ -203,6 +219,11 @@
           <code><a href="summarise_landscape_perpt.html">summarise_landscape_perpt()</a></code> 
         </dt>
         <dd>Summarise landscape variables per point based on supplied data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="validate_newdata.html">validate_newdata()</a></code> 
+        </dt>
+        <dd>Validate the accuracy of provided models using new data from animal surveys</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

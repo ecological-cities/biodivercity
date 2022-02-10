@@ -10,9 +10,24 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
 ## Overview
 
 By following this vignette, users will be able to predict (using a user-provided model object) animal species richness across a target landscape, and eventually visualise the prediction using a heatmap.
+
+```{r load required libraries, eval = FALSE}
+library("biodivercity")
+library("tmap")
+library("leaflet")
+```
+
+```{r load libraries while in dev, include = FALSE}
+devtools::load_all() 
+
+library("tmap")
+library("leaflet")
+```
+
 
 ## Spatial predictions
 
@@ -54,15 +69,19 @@ bird_hm <- heatmap_raster(env_df = bird_env,
 ## Visualisation
 
 ```{r load data, include = FALSE}
-
-library("tmap")
-library("leaflet")
-
 # data(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m)
 
-bird_heatmap_100m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_100m.tif")
-bird_heatmap_50m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_50m.tif")
-bird_heatmap_20m <- terra::rast("../data-raw/rasters/heatmaps/bird_heatmap_20m.tif")
+bird_heatmap_100m <- system.file("extdata", "bird_heatmap_100m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
+
+bird_heatmap_50m <- system.file("extdata", "bird_heatmap_50m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
+
+bird_heatmap_20m <- system.file("extdata", "bird_heatmap_20m.tif",
+                              package="biodivercity") %>% 
+  terra::rast()
 ```
 
 ```{r plotting maps, include = FALSE}

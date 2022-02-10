@@ -24,8 +24,8 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <h6 class="dropdown-header" data-toc-skip>1. Process landscape data</h6>
-    <h6 class="dropdown-header" data-toc-skip>2. Process animal data</h6>
+    <a class="dropdown-item" href="../articles/process-landscape.html">1. Process landscape data</a>
+    <a class="dropdown-item" href="../articles/process-animal.html">2. Process animal data</a>
     <h6 class="dropdown-header" data-toc-skip>3. Build models</h6>
     <a class="dropdown-item" href="../articles/apply-models.html">4. Apply models</a>
     <a class="dropdown-item" href="../articles/test-models.html">5. Test models</a>
@@ -37,11 +37,12 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-more-details">
     <a class="dropdown-item" href="../articles/more/animals-survey-protocols.html">Animals - Survey Protocols</a>
     <a class="dropdown-item" href="../articles/more/animals-data-summaries.html">Animals - Data summaries</a>
-    <a class="dropdown-item" href="../articles/more/animals-species-analyses.html">Animals - Species-level analyses</a>
-    <a class="dropdown-item" href="../articles/more/landscapes-landcover-patterns.html">Landscapes - Land cover patterns</a>
+    <h6 class="dropdown-header" data-toc-skip>Animals - Species-level analyses</h6>
+    <a class="dropdown-item" href="../articles/more/animals-simulate-missing-surveys.html">Animals - Simulate missing surveys</a>
+    <h6 class="dropdown-header" data-toc-skip>Landscapes - Land cover patterns</h6>
     <h6 class="dropdown-header" data-toc-skip>Landscapes - Urban density</h6>
     <h6 class="dropdown-header" data-toc-skip>Landscapes - Monitoring vs. Planning</h6>
-    <a class="dropdown-item" href="../articles/more/models-local-diversity.html">Models - Local diversity</a>
+    <h6 class="dropdown-header" data-toc-skip>Models - Local diversity</h6>
     <h6 class="dropdown-header" data-toc-skip>Models - Community diversity</h6>
     <h6 class="dropdown-header" data-toc-skip>Models - Future updates</h6>
   </div>
@@ -83,11 +84,11 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">random_pt_gen</span><span class="op">(</span>
-  <span class="va">x</span>,
+  <span class="va">boundaries</span>,
   <span class="va">area_per_pt</span>,
   <span class="va">pt_buffer</span>,
   excess_modifier <span class="op">=</span> <span class="fl">1</span>,
-  natveg <span class="op">=</span> <span class="cn">NULL</span>,
+  forest <span class="op">=</span> <span class="cn">NULL</span>,
   retain <span class="op">=</span> <span class="cn">NULL</span>,
   retain_prop <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
@@ -95,18 +96,18 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>x</dt>
+    <dl><dt>boundaries</dt>
 <dd><p>Shapefile (polygon or multipolygon) of site boundaries for sampling.</p></dd>
 <dt>area_per_pt</dt>
-<dd><p>Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000)</p></dd>
+<dd><p>Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000).</p></dd>
 <dt>pt_buffer</dt>
-<dd><p>Buffer radius of point surveys in meters so as to not survey outside area of interest.</p></dd>
+<dd><p>Buffer radius of survey points in meters. Points will be generated at this distance away from the boundary so as to not survey outside area of interest.</p></dd>
 <dt>excess_modifier</dt>
 <dd><p>Numeric value of a multiplicative modifier for excess points to be generated (i.e. a value of 1.5 = 1.5 times the expected number of points will be generated). The default value is '1'.</p></dd>
-<dt>natveg</dt>
-<dd><p>Shapefile (polygon or multipolygon) of natural vegetation area for separate point generation.</p></dd>
+<dt>forest</dt>
+<dd><p>Shapefile (polygon or multipolygon) of forest area for separate point generation.</p></dd>
 <dt>retain</dt>
-<dd><p>Shapefile (point) of previous round of surveys to retain in the new set of survey points.</p></dd>
+<dd><p>Shapefile (point) of previous round of surveys to retain in the new set of survey points. There must exist a column <code>landcover</code> with either <code>Urban</code> or <code>Forest</code> as values.</p></dd>
 <dt>retain_prop</dt>
 <dd><p>Value of 0 to 1 for proportion of points to retain from previous round of surveys.</p></dd>
 </dl></div>

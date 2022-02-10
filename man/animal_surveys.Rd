@@ -8,7 +8,9 @@
 Dataframe
 }
 \source{
-TBC
+Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys.
+14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant, $1,286,979.79.
+Awarded to the National University of Singapore (host institution) and the Singapore Housing Development Board.
 }
 \usage{
 data(animal_surveys)
@@ -21,7 +23,7 @@ Jurong West (JW), Bishan (BS) and Woodlands (WL).
 \details{
 The sampling points (\code{point_id}) were randomly generated within each town (\code{area}).
 Four types of animal surveys were conducted at sampling points,
-corresponding to four animal groups (taxa names in column \code{survey_id}): Birds (Aves), Butterflies (Lepidoptera),
+corresponding to four animal groups (column \code{taxon}): Birds (Aves), Butterflies (Lepidoptera),
 Odonates (Odonata) and Amphibians (Amphibia).
 
 Each sampling \code{period} stretched across a year-long duration, where sampling points
@@ -32,9 +34,6 @@ All surveys took place between the years 2016 to 2022.
 \examples{
 head(animal_surveys)
 
-}
-\references{
-TBC
 }
 \seealso{
 \itemize{
