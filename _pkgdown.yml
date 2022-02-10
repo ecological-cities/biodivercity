@@ -136,3 +136,4 @@ reference:
   desc: "**_Predict and validate animal diversity_**"
 - contents:
   - summarise_landscape_perpt
+  - validate_newdata

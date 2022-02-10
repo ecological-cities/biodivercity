@@ -1,7 +1,7 @@
 ---
 title: "Test Models"
 subtitle: " "
-author: "Author"
+author: "Song, Xiao Ping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -10,6 +10,186 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-_In the works..._
+<br>
 
-- Validate models with new data - visualise both scaled & unscaled values
+First, load the necessary packages to run the analysis:
+
+```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
+library("biodivercity")
+library("ggplot2") # for visualisation
+```
+
+```{r load biodivercity while in dev, include = FALSE}
+devtools::load_all()
+library("ggplot2")
+```
+
+<br>
+
+Load the models for each of the animal groups:
+
+```{r load model objects}
+
+filepath <- system.file("extdata", "models-manually-mapped.Rdata", package = "biodivercity")
+load(filepath)
+
+```
+
+<br>
+
+Load the new data from animal surveys, which will be used to check the accuracy of the models. In this example, we focus on birds (the taxon 'Aves'). We subset the animal data using the function `tally_observations()`:
+
+```{r load validation data for birds, message = FALSE}
+
+data("animal_observations")
+data("animal_surveys")
+
+birds_new <-  tally_observations(observations = animal_observations, 
+                                 survey_ref = animal_surveys,
+                                 specify_area = c("PG", "QT", "TP", "JW", "BS", "WL"),
+                                 specify_period = c("1", "2"),
+                                 specify_taxon = "Aves", # birds
+                                 level = "point") # at sampling points
+
+```
+
+We also need the data for landscape predictors summarised at sampling points where these animal surveys were conducted. The `biodivercity` package includes examples at some of these points, found in the dataset `points_landscape`. Join these landscape data to the bird data using the function `inner_join()`, then transform the data to the appropriate format (e.g. 'wide format', remove NAs).
+
+Note that the model object also includes the random effect `town`, based on the sampling strategy used in the input data. If this random effect (column) is not provided in the new data, predictions will be based on the 'average' value for the random effect (in this example, the 'average town').
+
+```{r get & join landscape data to animal data}
+
+data(points_landscape)
+  
+birds_new <- birds_new %>% 
+  dplyr::inner_join(points_landscape, by = c("point_id", "area", "period"))
+
+# pivot to wide format (add radius info into colnames)
+birds_new <- birds_new %>% 
+  pivot_wider(names_from = "radius_m", 
+              values_from = starts_with("man") | starts_with("lsm") | starts_with("osm"),
+              names_glue = "r{radius_m}m_{.value}")  %>%
+  select(where(~!all(is.na(.x)))) %>% # remove columns where all values are NA
+  drop_na() %>%  # remove any remaining NAs
+  rename(town = area) # town was the random effect used to fit model
+
+```
+
+<br>
+
+Run the function `validate_newdata()` to obtain the accuracy metrics:
+
+```{r run xvalid for new data}
+
+bird_xv <- validate_newdata(models = models_birds,
+                            recipe_data = recipe_birds,
+                            newdata = birds_new,
+                            response_var = "n")
+```
+
+
+Perform bootstrapped sampling of the output, to obtain bootstrapped statistics of the accuracy metrics. The helper function `booter()` is used:
+
+
+```{r}
+
+set.seed(123)
+
+# combine animal groups as list 
+XV_dfs <- lapply(list(Birds = bird_xv), # only one animal group in this example
+                 function(x) booter(x, n =100)) # 100 repetitions
+```
+
+<br>
+
+Visualise the accuracy metrics using the package `ggplot2`: 
+
+```{r print xvalid plots for new data, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = glue::glue("**Figure: The accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.")}
+
+library(ggplot2)
+
+# combine lists into single df, prep for plotting
+XV_dfs <- XV_dfs %>% 
+  bind_rows(.id = "priority")
+
+  
+XV_summaries <- XV_dfs %>% 
+  group_by(priority) %>% 
+  summarise(error_lwr = quantile(error_mean, 0.025, na.rm = TRUE),
+            error_upr = quantile(error_mean, 0.975, na.rm = TRUE),
+            error_normalised_lwr = quantile(error_normalised_mean, 0.025, na.rm = TRUE),
+            error_normalised_upr = quantile(error_normalised_mean, 0.975, na.rm = TRUE),
+            rmse_mean = mean(rmse, na.rm = TRUE))
+
+
+# plot
+ XV_dfs %>%  
+  ggplot() +
+    
+    geom_hline(yintercept = 0,
+               color = "black",
+               size = 0.5, linetype = 2) +
+
+    geom_jitter(aes(x = priority, y = error_mean),
+                position = position_jitter(0.05),
+                color = "gray",
+                size = 0.1) +
+   
+   geom_errorbar(data = XV_summaries,
+                  aes(x = priority,
+                      ymin = error_lwr, 
+                      ymax = error_upr),
+                 width = 0.1,
+                 size = 0.9) +
+   
+   geom_text(data = XV_summaries,
+             aes(x = priority, y = max(error_upr)+2.0, 
+                  label = paste("RMSE =\n", round(rmse_mean, 2))), 
+             size = 3.5) +
+    
+    scale_y_continuous(breaks = scales::breaks_pretty(), expand = c(0, 2)) +
+
+    xlab("Animal group") +
+    ylab("Mean prediction error (no. of species)") +
+    theme_bw(base_size = 12) +
+    theme(panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          panel.grid.major.x = element_blank(),
+          axis.text = element_text(size = 11))
+
+```
+
+<br>
+
+```{r print xvalid plots for new data - scaled, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = glue::glue("**Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.")}
+
+ XV_dfs %>%  
+  ggplot() +
+
+    geom_hline(yintercept = 0,
+               color = "black",
+               size = 0.5, linetype = 2) +
+    
+    geom_jitter(aes(x = priority, y = error_normalised_mean),
+                position = position_jitter(0.05),
+                color = "gray",
+                size = 0.1) +
+   
+   geom_errorbar(data = XV_summaries,
+                  aes(x = priority,
+                      ymin = error_normalised_lwr, 
+                      ymax = error_normalised_upr),
+                 width = 0.1,
+                 size = 0.9) +
+   
+    scale_y_continuous(breaks = scales::breaks_pretty()) +
+    
+
+    xlab("Animal group") +
+    ylab("Mean prediction error (scaled)") +
+    theme_bw(base_size = 12) +
+    theme(panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          panel.grid.major.x = element_blank())
+
+```
