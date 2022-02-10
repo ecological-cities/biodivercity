@@ -5,7 +5,7 @@
 \title{Randomly generate sampling points within supplied area}
 \usage{
 random_pt_gen(
-  x,
+  boundaries,
   area_per_pt,
   pt_buffer,
   excess_modifier = 1,
@@ -15,7 +15,7 @@ random_pt_gen(
 )
 }
 \arguments{
-\item{x}{Shapefile (polygon or multipolygon) of site boundaries for sampling.}
+\item{boundaries}{Shapefile (polygon or multipolygon) of site boundaries for sampling.}
 
 \item{area_per_pt}{Area component for point density in square meters (e.g. one point every 50 hectares, area_per_pt = 500000).}
 
