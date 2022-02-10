@@ -1,6 +1,6 @@
 ---
 title: "Apply Models"
-subtitle: "Spatial predictions across a landscape"
+subtitle: "Generate spatial predictions across a landscape"
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
