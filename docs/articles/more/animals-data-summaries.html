@@ -104,7 +104,7 @@
   <main id="main"><div class="page-header">
       <img src="../../logo.png" class="logo" alt=""><h1>Animals: Data summaries</h1>
             <h3 data-toc-skip class="subtitle">Compare local diversity between sampled areas</h3>
-                        <h4 data-toc-skip class="author">Author</h4>
+                        <h4 data-toc-skip class="author">Song, Xiao Ping</h4>
             
             <h4 data-toc-skip class="date">2022-02-11</h4>
       
@@ -114,103 +114,134 @@
 
     
     
-<div class="section level2">
-<h2 id="summarise-survey-data">Summarise survey data<a class="anchor" aria-label="anchor" href="#summarise-survey-data"></a>
-</h2>
-<p>Surveys are filtered to remove all surveys at sampling points that are surveyed less than three times. The remaining surveys are normalised by randomly removing sampling points from sampling zones to achieve similar point densities across all areas. Three surveys are then randomly selected per sampling point and taxon, and the removal process is repeated 30 times to obtain bootstrapped results. This normalised dataset is used to summarise species richness and species accumulation curves across sampling areas:</p>
+<p>Data generated from animal surveys can be summarised at multiple levels (e.g. area, period, animal groups), in order to make direct comparisons between these groups. For example, one may be interested in differences in the number of species between different areas, or across two different time periods. This article demonstrates how such summaries may be performed and visualised.</p>
+<p>First, load the necessary packages to run the analysis:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># BY POINT</span>
-<span class="va">normalised_perpt</span> <span class="op">&lt;-</span> 
-  <span class="fu">foreach</span><span class="op">(</span>i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">fauna_normalised</span><span class="op">)</span>, 
-          .packages <span class="op">=</span> <span class="st">"tidyverse"</span><span class="op">)</span> <span class="op">%dopar%</span> <span class="op">{</span>
- 
-  <span class="co">#get unique data to input to loop later</span>
-  <span class="va">unique</span> <span class="op">&lt;-</span> <span class="va">surveys_normalised</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
-    <span class="fu">distinct</span><span class="op">(</span><span class="va">town</span>, <span class="va">round</span>, <span class="va">priority</span><span class="op">)</span>
-  
-  <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>
-  
-  <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">unique</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-  
-    <span class="va">sptally_data</span> <span class="op">&lt;-</span> 
-      <span class="fu"><a href="../../reference/tally_observations.html">tally_observations</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna_normalised</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>,
-                        survey_ref <span class="op">=</span> <span class="va">surveys_normalised</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>,
-                        specify_town <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">town</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, 
-                        specify_round <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">round</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, 
-                        specify_priority <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">priority</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>,
-                        level <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span>
-    
-    <span class="co"># bind to plot_sac &amp; overwrite</span>
-    <span class="va">results</span> <span class="op">&lt;-</span> <span class="va">results</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
-      <span class="fu">bind_rows</span><span class="op">(</span><span class="va">sptally_data</span><span class="op">)</span>
-    
-    <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">sptally_data</span><span class="op">)</span>
-  <span class="op">}</span>
-            
-  <span class="va">results</span>                     
-<span class="op">}</span>
-
-<span class="co"># summarise &amp; stats</span>
-<span class="va">normalised_perpt</span> <span class="op">&lt;-</span> <span class="va">normalised_perpt</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">map_dfr</span><span class="op">(</span><span class="op">~</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">.</span><span class="op">)</span>, .id <span class="op">=</span> <span class="st">"iteration"</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> <span class="co"># unlist </span>
-  <span class="fu">mutate</span><span class="op">(</span>iteration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">iteration</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
-    
-  <span class="co"># add iteration-level summaries</span>
-  <span class="fu">group_by</span><span class="op">(</span><span class="va">iteration</span>, 
-           <span class="va">town</span>, <span class="va">round</span>, <span class="va">priority</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">summarise</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">n</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="co">#,</span>
-            <span class="co">#se = sd(n, na.rm = T)/sqrt(length(n))</span>
-            <span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">mutate</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"Point"</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
-  
-  <span class="co"># for plotting</span>
-  <span class="fu">mutate</span><span class="op">(</span>town <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">town</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PG"</span>, <span class="st">"QT"</span>, <span class="st">"TP"</span>,<span class="st">"JW"</span>, <span class="st">"BS"</span>, <span class="st">"WL"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu">mutate</span><span class="op">(</span>priority <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">priority</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Aves"</span>, <span class="st">"Lepidoptera"</span>, <span class="st">"Odonata"</span>,<span class="st">"Amphibia"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu">mutate</span><span class="op">(</span>round <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">round</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="figure">
-<img src="sample-stacked-bar-plot.png" id="id" class="class" style="width:80.0%;height:80.0%" alt=""><p class="caption">Mean species richness (no. of species) per sampling point and survey, for each town and taxon. The error bars denote two standard deviations of the mean across all iterations. Note that the scale of the y-axis varies between the plots.</p>
-</div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">"biodivercity"</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span> <span class="co"># data processing</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span> <span class="co"># data visualisation</span></code></pre></div>
+<p><br></p>
+<div class="section level2">
+<h2 id="summarise-data">Summarise data<a class="anchor" aria-label="anchor" href="#summarise-data"></a>
+</h2>
+<p>Load the example data. Refer to <code><a href="../../reference/animal_observations.html">help(animal_observations)</a></code> and <code><a href="../../reference/animal_surveys.html">help(animal_surveys)</a></code> for more details on these datasets.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="co"># loop across all bootstrapped iterations</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_observations"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_surveys"</span><span class="op">)</span></code></pre></div>
+<p>Next, define the unique combinations of the grouping variables of interest. These will be used to summarise the data. For example, animal surveys can be summarised for each of the six towns (column <code>area</code>), two survey periods (column <code>period</code>), as well as four animal groups (column <code>taxon</code>):</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">unique</span> <span class="op">&lt;-</span> <span class="va">animal_surveys</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">area</span>, <span class="va">period</span>, <span class="va">taxon</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 
-<span class="va">plot_sac</span> <span class="op">&lt;-</span> 
-  <span class="fu">foreach</span><span class="op">(</span>i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">fauna</span><span class="op">)</span>, 
-          .packages <span class="op">=</span> <span class="st">"tidyverse"</span><span class="op">)</span> <span class="op">%dopar%</span> <span class="op">{</span>
-  
-  <span class="va">unique</span> <span class="op">&lt;-</span> <span class="va">surveys</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
-    <span class="fu">distinct</span><span class="op">(</span><span class="va">town</span>, <span class="va">round</span>, <span class="va">priority</span><span class="op">)</span>
-            
-  <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>
-  
-  <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">unique</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-    
-    <span class="va">sac_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/calculate_sac.html">calculate_sac</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">fauna</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, 
-                              survey_ref <span class="op">=</span> <span class="va">surveys</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>,
-                              specify_town <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">town</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, 
-                              specify_round <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">round</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, 
-                              specify_priority <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">priority</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span>
-    
-    <span class="co"># bind to plot_sac &amp; overwrite</span>
-    <span class="va">results</span> <span class="op">&lt;-</span> <span class="va">results</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
-      <span class="fu">bind_rows</span><span class="op">(</span><span class="va">sac_data</span><span class="op">)</span>
-    
-    <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">sac_data</span><span class="op">)</span>
-  <span class="op">}</span>
-  
-  <span class="va">results</span>
-<span class="op">}</span>
+<span class="va">unique</span></code></pre></div>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 40 × 3</span></span>
+<span class="co">##    area  period taxon      </span>
+<span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
+<span class="co">## <span style="color: #BCBCBC;"> 1</span> BS         1 Odonata    </span>
+<span class="co">## <span style="color: #BCBCBC;"> 2</span> BS         1 Lepidoptera</span>
+<span class="co">## <span style="color: #BCBCBC;"> 3</span> BS         1 Aves       </span>
+<span class="co">## <span style="color: #BCBCBC;"> 4</span> BS         1 Amphibia   </span>
+<span class="co">## <span style="color: #BCBCBC;"> 5</span> JW         1 Aves       </span>
+<span class="co">## <span style="color: #BCBCBC;"> 6</span> JW         1 Lepidoptera</span>
+<span class="co">## <span style="color: #BCBCBC;"> 7</span> JW         1 Odonata    </span>
+<span class="co">## <span style="color: #BCBCBC;"> 8</span> JW         1 Amphibia   </span>
+<span class="co">## <span style="color: #BCBCBC;"> 9</span> JW         2 Aves       </span>
+<span class="co">## <span style="color: #BCBCBC;">10</span> JW         2 Lepidoptera</span>
+<span class="co">## <span style="color: #949494;"># … with 30 more rows</span></span></code></pre>
+<p>For each of these (rows of) unique combinations, calculate the species accumulation curve using the function <code><a href="../../reference/calculate_sac.html">calculate_sac()</a></code>. Species accumulation curves provide useful information on how much sampling effort is required to be reasonably certain of the total number of species (‘gamma’ diversity) within a given sampling unit. In this example, they allow the number of species between different animal groups, areas and survey periods to be compared at the same amount of sampling effort, i.e., same point along the curves.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">plot_sac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>
 
-<span class="co"># unlist &amp; calc mean across iterations</span>
-<span class="va">plot_sac</span> <span class="op">&lt;-</span> <span class="va">plot_sac</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">map_dfr</span><span class="op">(</span><span class="op">~</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">.</span><span class="op">)</span>, .id <span class="op">=</span> <span class="st">"iteration"</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">mutate</span><span class="op">(</span>iteration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">iteration</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">group_by</span><span class="op">(</span><span class="va">town</span>, <span class="va">round</span>, <span class="va">priority</span>, <span class="va">sites</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">summarise</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">richness</span><span class="op">)</span>,
-            sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">richness</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="figure">
-<img src="sac-sample-plot.png" id="id" class="class" style="width:80.0%;height:80.0%" alt=""><p class="caption">Species accumulation curves compare total, or ‘gamma’, diversity for the total sampling area, while accounting for differences in sampling effort. The mean species richness (line) and two standard deviations of the mean (shaded region) across all iterations are shown. Note that the scale of the y-axis varies between taxa.</p>
+<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">unique</span><span class="op">)</span><span class="op">)</span><span class="op">{</span> <span class="co"># calculate for each row of 'unique'</span>
+  
+  <span class="va">sac_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/calculate_sac.html">calculate_sac</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">animal_observations</span>, 
+                            survey_ref <span class="op">=</span> <span class="va">animal_surveys</span>,
+                            specify_area <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">area</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, 
+                            specify_period <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">period</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, 
+                            specify_taxon <span class="op">=</span> <span class="va">unique</span><span class="op">$</span><span class="va">taxon</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
+  
+  <span class="co"># append results to plot_sac (overwrite), and order each grouping factor</span>
+  <span class="va">plot_sac</span> <span class="op">&lt;-</span> <span class="va">plot_sac</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">sac_data</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">area</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PG"</span>, <span class="st">"QT"</span>, <span class="st">"TP"</span>, <span class="st">"JW"</span>, <span class="st">"BS"</span>, <span class="st">"WL"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>taxon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">taxon</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Aves"</span>, <span class="st">"Lepidoptera"</span>, <span class="st">"Odonata"</span>, <span class="st">"Amphibia"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> 
+<span class="op">}</span></code></pre></div>
+<p>The output <code>plot_sac</code> contains data points along the species accumulation curves, i.e., the estimated number of species (column <code>richness</code>) with increasing survey effort (column <code>sites</code>), as well as the standard deviation (column <code>sd</code>) for the estimates:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">plot_sac</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">##   area period   taxon sites richness        sd</span>
+<span class="co">## 1   BS      1 Odonata     1 2.533333 0.6900281</span>
+<span class="co">## 2   BS      1 Odonata     2 4.430508 1.1270489</span>
+<span class="co">## 3   BS      1 Odonata     3 5.902016 1.4111596</span>
+<span class="co">## 4   BS      1 Odonata     4 7.083565 1.6020460</span>
+<span class="co">## 5   BS      1 Odonata     5 8.063188 1.7352009</span>
+<span class="co">## 6   BS      1 Odonata     6 8.898539 1.8317823</span></code></pre>
+<p><br></p>
 </div>
+<div class="section level2">
+<h2 id="make-comparisons">Make comparisons<a class="anchor" aria-label="anchor" href="#make-comparisons"></a>
+</h2>
+<p>For each animal group, we can only compare between the survey areas/periods based on similar levels of sampling effort. Thus, we need to extract the estimates (column <code>richness</code>) which have a similar value for the column <code>sites</code>. To improve the certainty of comparisons, the sampling effort used for comparisons should be as high as possible (where the curves plateau); accordingly, choose the highest available value for <code>sites</code> that are present among all grouping variables (area, period, taxon):</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">n_refer</span> <span class="op">&lt;-</span> <span class="va">plot_sac</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">area</span>, <span class="va">period</span>, <span class="va">taxon</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n_max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">sites</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> <span class="co"># highest value for 'sites' across grouping vars</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">area</span>, <span class="va">period</span>, <span class="va">taxon</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>sites <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">n_max</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> <span class="co"># lowest common denominator among the grouping vars (value for 'sites' present among all)</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">taxon</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>sites <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">sites</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> <span class="co"># analyse each taxon separately</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">plot_sac</span><span class="op">)</span> <span class="co"># join data of 'richness' for all grouping variables at corresponding value for 'sites'</span></code></pre></div>
+<p>The resulting dataframe <code>n_refer</code> allows direct comparisons to be made between the different areas/periods, based on the estimated number of species (column <code>richness</code>):</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">n_refer</span></code></pre></div>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 40 × 6</span></span>
+<span class="co">##    taxon sites area  period richness    sd</span>
+<span class="co">##    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">## <span style="color: #BCBCBC;"> 1</span> Aves     84 BS         1     62    2.66</span>
+<span class="co">## <span style="color: #BCBCBC;"> 2</span> Aves     84 JW         1     59.1  4.19</span>
+<span class="co">## <span style="color: #BCBCBC;"> 3</span> Aves     84 JW         2     58.5  4.50</span>
+<span class="co">## <span style="color: #BCBCBC;"> 4</span> Aves     84 PG         1     69.1  5.04</span>
+<span class="co">## <span style="color: #BCBCBC;"> 5</span> Aves     84 PG         2     70.6  4.04</span>
+<span class="co">## <span style="color: #BCBCBC;"> 6</span> Aves     84 QT         1     76.4  3.46</span>
+<span class="co">## <span style="color: #BCBCBC;"> 7</span> Aves     84 QT         2     66.6  3.90</span>
+<span class="co">## <span style="color: #BCBCBC;"> 8</span> Aves     84 TP         1     68.6  4.24</span>
+<span class="co">## <span style="color: #BCBCBC;"> 9</span> Aves     84 TP         2     63.9  4.87</span>
+<span class="co">## <span style="color: #BCBCBC;">10</span> Aves     84 WL         1     62.6  4.70</span>
+<span class="co">## <span style="color: #949494;"># … with 30 more rows</span></span></code></pre>
+<p>Finally, the species accumulation curves (<code>plot_sac</code>) and comparisons based on similar sampling efforts (<code>n_refer</code>) can be visualised:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">plot_sac</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
+  
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">taxon</span> <span class="op">~</span> <span class="va">area</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sites</span>, y <span class="op">=</span> <span class="va">richness</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">period</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sites</span>,
+                    ymin <span class="op">=</span> <span class="op">(</span><span class="va">richness</span> <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">sd</span><span class="op">)</span>,
+                    ymax <span class="op">=</span> <span class="op">(</span><span class="va">richness</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">sd</span><span class="op">)</span>,
+                    fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">period</span><span class="op">)</span><span class="op">)</span>,
+                alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">n_refer</span>,
+               <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sites</span>, y <span class="op">=</span> <span class="va">richness</span><span class="op">)</span>, shape <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html" class="external-link">geom_segment</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">n_refer</span>,
+                 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sites</span>, y <span class="op">=</span> <span class="fl">0</span>, xend <span class="op">=</span> <span class="va">sites</span>, yend <span class="op">=</span> <span class="va">richness</span><span class="op">)</span>,
+                 linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html" class="external-link">geom_segment</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">n_refer</span>,
+                 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="va">richness</span>, xend <span class="op">=</span> <span class="va">sites</span>, yend <span class="op">=</span> <span class="va">richness</span><span class="op">)</span>, 
+                 linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Cumulative no. of species"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"No. of surveys"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"Survey\nPeriod"</span>, fill <span class="op">=</span> <span class="st">"Survey\nPeriod"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid.major.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,
+          panel.grid.minor.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="figure">
+<img src="animals-data-summaries_files/figure-html/species%20accumulation%20curves_filtered-1.png" alt="**Figure: Species accumulation curves showing the number of species for each area and taxon, across two survey periods.** The average number of species (solid lines) and two standard deviations of the mean (shaded region) are shown. Note that the scale of the y-axis varies between the animal groups." width="100%"><p class="caption">
+<strong>Figure: Species accumulation curves showing the number of species for each area and taxon, across two survey periods.</strong> The average number of species (solid lines) and two standard deviations of the mean (shaded region) are shown. Note that the scale of the y-axis varies between the animal groups.
+</p>
+</div>
+<p><br></p>
+<p>Note that some of the curves have yet to reach a clear plateau, despite the high sampling effort. At each of the six towns (<code>area</code>), six surveys (<code>cycles</code>) were conducted per sampling point (<code>point_id</code>), per survey <code>period</code> (duration of one year). This was conducted for each of the four animal groups (column <code>taxon</code>): Birds (Aves), Butterflies (Lepidoptera), Odonates (Odonata) and Amphibians (Amphibia).</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
