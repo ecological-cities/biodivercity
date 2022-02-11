@@ -50,7 +50,7 @@ check_taxongrps <- function(observations, level,
   checkmate::assert_subset(genus, choices = colnames(observations), empty.ok = FALSE, add = coll)
   checkmate::assert_subset(family, choices = colnames(observations), empty.ok = FALSE, add = coll)
   checkmate::assert_subset(area, choices = colnames(observations), empty.ok = FALSE, add = coll)
-  checkmate::assert_subset(period, choices = colnames(observations), empty.ok = FALSE, add = coll)
+  # checkmate::assert_subset(period, choices = colnames(observations), empty.ok = FALSE, add = coll) # may be absent
   checkmate::assert_subset(point_id, choices = colnames(observations), empty.ok = FALSE, add = coll)
 
   # level
@@ -67,18 +67,20 @@ check_taxongrps <- function(observations, level,
     dplyr::mutate(genus = .data[[genus]]) %>%
     dplyr::mutate(family = .data[[family]]) %>%
     dplyr::mutate(area = .data[[area]]) %>%
-    dplyr::mutate(period = .data[[period]]) %>%
+    { if(period %in% colnames(observations)) dplyr::mutate(., period = .data[[period]]) else . } %>%
     dplyr::mutate(point_id = .data[[point_id]])
 
 
   # Summary tables for total no. of genus/family
   genus_all <- observations %>%
+    dplyr::ungroup() %>%
     dplyr::distinct(species, genus) %>%
     dplyr::filter(species != genus & !is.na(genus)) %>% # dont count if species name is genus-lvl or NA
     dplyr::group_by(genus) %>%
     dplyr::summarise(n_total = n())
 
   family_all <- observations %>%
+    dplyr::ungroup() %>%
     dplyr::distinct(species, family) %>%
     dplyr::filter(species != family & !is.na(family)) %>% # dont count if species name is family-lvl or NA
     dplyr::group_by(family) %>%
@@ -89,29 +91,29 @@ check_taxongrps <- function(observations, level,
   if(level == "area"){
 
     genus_remove <- observations %>%
-      dplyr::group_by(area, period, species, genus) %>%
+      { if(period %in% colnames(observations)) dplyr::group_by(., area, period, species, genus) else dplyr::group_by(., area, species, genus) } %>%
       dplyr::distinct(species, genus) %>%
       dplyr::filter(species != genus & !is.na(genus)) %>% # dont count if species name is genus or NA
-      dplyr::group_by(area, period, genus) %>%
+      { if(period %in% colnames(observations)) dplyr::group_by(., area, period, genus) else dplyr::group_by(., area, genus) } %>%
       dplyr::summarise(n = n()) %>%
       dplyr::left_join(genus_all, by = "genus") %>%
       dplyr::filter(n == .data$n_total) %>%
       dplyr::select(-.data$n_total) %>%
       dplyr::rename(name = "genus") %>%
-      dplyr::rename(!!period := period) %>% # rename back to original colname
+      { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>% # rename back to original colname
       dplyr::rename(!!area := area)
 
     family_remove <- observations %>%
-      dplyr::group_by(area, period, species, family) %>%
+      { if(period %in% colnames(observations)) dplyr::group_by(., area, period, species, family) else dplyr::group_by(., area, species, family) } %>%
       dplyr::distinct(species, family) %>%
       dplyr::filter(species != family & !is.na(family)) %>% # dont count if species name is family or NA
-      dplyr::group_by(area, period, family) %>%
+      { if(period %in% colnames(observations)) dplyr::group_by(., area, period, family) else dplyr::group_by(., area, family) } %>%
       dplyr::summarise(n = n()) %>%
       dplyr::left_join(family_all, by = "family") %>%
       dplyr::filter(n == .data$n_total) %>%
       dplyr::select(-.data$n_total) %>%
       dplyr::rename(name = "family") %>%
-      dplyr::rename(!!period := period) %>%
+      { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>% # rename back to original colname
       dplyr::rename(!!area := area)
 
     all_remove <- bind_rows(genus_remove, family_remove)
@@ -121,29 +123,29 @@ check_taxongrps <- function(observations, level,
   }else if(level == "point"){
 
     genus_remove <- observations %>%
-      dplyr::group_by(point_id, period, species, genus) %>%
+      { if(period %in% colnames(observations)) dplyr::group_by(., point_id, period, species, genus) else dplyr::group_by(., point_id, species, genus) } %>%
       dplyr::distinct(species, genus) %>%
       dplyr::filter(species != genus & !is.na(genus)) %>% # dont count if species name is genus or NA
-      dplyr::group_by(point_id, period, genus) %>%
+      { if(period %in% colnames(observations)) dplyr::group_by(., point_id, period, genus) else dplyr::group_by(., point_id, genus) } %>%
       dplyr::summarise(n = n()) %>%
       dplyr::left_join(genus_all, by = "genus") %>%
       dplyr::filter(n == .data$n_total) %>%
       dplyr::select(-.data$n_total) %>%
       dplyr::rename(name = "genus") %>%
-      dplyr::rename(!!period := period) %>% # rename back to original colname
+      { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>%
       dplyr::rename(!!point_id := point_id)
 
     family_remove <- observations %>%
-      dplyr::group_by(point_id, period, species, family) %>%
+      { if(period %in% colnames(observations)) dplyr::group_by(., point_id, period, species, family) else dplyr::group_by(., point_id, species, family) } %>%
       dplyr::distinct(species, family) %>%
       dplyr::filter(species != family & !is.na(family)) %>% # dont count if species name is family or NA
-      dplyr::group_by(point_id, period, family) %>%
+      { if(period %in% colnames(observations)) dplyr::group_by(., point_id, period, family) else dplyr::group_by(., point_id, family) } %>%
       dplyr::summarise(n = n()) %>%
       dplyr::left_join(family_all, by = "family") %>%
       dplyr::filter(n == .data$n_total) %>%
       dplyr::select(-.data$n_total) %>%
       dplyr::rename(name = "family") %>%
-      dplyr::rename(!!period := period) %>%
+      { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>%
       dplyr::rename(!!point_id := point_id)
 
     all_remove <- bind_rows(genus_remove, family_remove)

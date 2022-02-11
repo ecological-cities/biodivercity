@@ -2,7 +2,7 @@
 #'
 #'Summarise specified landscape metrics at sampling points, for classified raster object(s).
 #'Multiple (list of) rasters may be classified, each corresponding
-#'to a survey period in the dataset `points`. Calls the function `lsm_perpoint()` internally.
+#'to a survey period (integer values) in the dataset `points`. Calls the function `lsm_perpoint()` internally.
 #'The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 #'Refer to `landscapemetrics::list_lsm()` for the full list of metric names and abbreviations.
 #'
@@ -15,7 +15,7 @@
 #'@param class_values Vector of (integer) values of interest within the classified rasters in `raster_list`. Should not include the value `0`.
 #'@param points Sampling points (sf object) representing the locations to calculate the metrics.
 #'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.
-#'@param period Column name of the survey period within the `points` sf. Defaults to `"period"`.
+#'@param period Column name of the survey period (integers) within the `points` sf. Defaults to `"period"`.
 #'The column should contain integers that correspond to the number of elements in `raster_list`.
 #'
 #'@return A list containing the specified landscape metrics summarised at the sampling points provided.
@@ -80,7 +80,7 @@ lsm_perpoint_specified <- function(raster_list, predictors_lsm,
         suppressMessages(result <-
                            lsm_perpoint(raster = raster_list[[i]],
                                         points = points %>%
-                                          filter(.data[[period]] == i),
+                                          dplyr::filter(.data[[period]] == i),
                                         buffer_sizes = as.numeric(input$radius[j]),
                                         class_names = input$class[j],
                                         class_values = input$value[j],
@@ -92,7 +92,8 @@ lsm_perpoint_specified <- function(raster_list, predictors_lsm,
           tidyr::pivot_wider(id_cols = c(.data[[period]], .data[[point_id]]),
                       names_from = "buffer",
                       values_from = tidyselect::matches("lsm") | tidyselect::matches("osm"), # only pivot cols with these strings
-                      names_glue = "r{buffer}m_{.value}") # edit col name
+                      names_glue = "r{buffer}m_{.value}")
+        result[[period]] <- as.numeric(result[[period]])   # edit col var type
 
         message(paste0(Sys.time(), " Summarised at sampling points for ", j, "/", nrow(input), " predictor variables (period ", i,").\n"))
 
@@ -105,12 +106,18 @@ lsm_perpoint_specified <- function(raster_list, predictors_lsm,
 
       }, error = function(e){
 
-        cat(paste0(Sys.time(), " Error in summarising predictor variable ", j, "/", nrow(input), " - Returning empty list. Original warning message:"), sep = "\n")
+        warning(paste0(Sys.time(), " Error in summarising predictor variable ", j, "/", nrow(input), " - Returning NAs. Original warning message:"), sep = "\n")
         warning(e)
         return("error")
       })
       if(succeeded == "error"){
-        results[[j]] <- list() # append to list empty object
+
+        # append to list NAs
+        results[[j]] <- points %>%
+             dplyr::filter(.data[[period]] == i) %>%
+             dplyr::select(.data[[period]], .data[[point_id]]) %>%
+             sf::st_set_geometry(NULL) %>%
+             dplyr::mutate("r{input$radius[j]}m_lsm_{input$class[j]}_{input$metric[j]}" := NA)
       }
       rm(succeeded, j)
     }
