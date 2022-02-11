@@ -78,7 +78,7 @@ navbar:
       - text: Animals - Data summaries
         href: articles/more/animals-data-summaries.html
       - text: Animals - Species-level analyses
-        href:
+        href: articles/more/animals-species-analyses.html
       - text: Animals - Simulate missing surveys
         href: articles/more/animals-simulate-missing-surveys.html
       - text: Landscapes - Land cover patterns
