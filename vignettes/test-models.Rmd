@@ -10,8 +10,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-<br>
-
 First, load the necessary packages to run the analysis:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
@@ -25,6 +23,8 @@ library("ggplot2")
 ```
 
 <br>
+
+## Prepare data
 
 Load the models for each of the animal groups:
 
@@ -79,6 +79,8 @@ birds_new <- birds_new %>%
 
 <br>
 
+## Bootstrapping validation
+
 Run the function `validate_newdata()` to obtain the accuracy of each prediction based on the new data:
 
 ```{r run xvalid for new data}
@@ -103,6 +105,8 @@ XV_dfs <- lapply(list(Birds = bird_xv), # only one animal group in this example
 ```
 
 <br>
+
+## Visualise accuracy
 
 Finally, we can visualise the accuracy of the model for birds using the package `ggplot2`. This can be done in the original scale of the response variable (counts):
 

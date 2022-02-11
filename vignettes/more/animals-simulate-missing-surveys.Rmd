@@ -14,8 +14,6 @@ Despite best efforts to ensure consistency in sampling, there may be situations 
 
 Simulations can be performed to observe the loss in species richness (number of species) if surveys are missed. The following vignette shows an example if `15` surveys conducted within the Punggol (`PG`) area are randomly excluded from Survey Cycle `5`, during Survey Period `1` (March – April 2017). This corresponds to the same time-of-year in Survey Period `2` (March – April 2020) when 15 bird surveys were missed at Punggol, due to COVID-19 movement restrictions.
 
-<br>
-
 First, load the necessary packages to run the analysis:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
@@ -29,6 +27,8 @@ library("ggplot2")
 ```
 
 <br>
+
+## Run simulation
 
 Load and process the example datasets, then run the function `exclude_simulator()`. 
 
@@ -64,6 +64,8 @@ knitr::kable(head(scenarios), caption = "**First few rows of the object `scenari
 
 <br>
 
+## Visualise reuslts
+
 These 100 bootstrapped scenarios may be used in further analyses, or visualised to observe the variation in species richness within the sampled area of interest (Punggol): 
 
 ```{r plot species richness, message = FALSE, message = FALSE, warning = FALSE, fig.width=3, fig.height = 4, fig.align='center', out.width = "50%", dpi = 300, fig.cap="**Figure: Number of bird species at Punggol, Singapore if 15 surveys were missed in Survey Cycle 5  (March – April 2017).** The blue cross denotes the count in full dataset, while the diamond symbol denotes the mean count across 100 scenarios where survey data were randomly excluded."}
@@ -89,7 +91,7 @@ spp_richness %>%
 
 Visualisations can also be performed at the level of individual species. Species that are relatively less common are more likely to be missed at sampling points: 
 
-```{r plot species-level results, message = FALSE, message = FALSE, warning = FALSE, fig.width=6, fig.height = 12, fig.align='center', dpi = 300, fig.cap="**Figure: Number of sampling points that bird species were observed at Punggol, Singapore if 15 surveys were missed in Survey Cycle 5 (March – April 2017).** The blue cross denotes the count in full dataset, while the diamond symbol denotes the mean count across 100 scenarios where survey data were randomly excluded. Species are arranged in descending order of counts."}
+```{r plot species-level results, message = FALSE, message = FALSE, warning = FALSE, fig.width=6, fig.height = 12, fig.align='center', out.width = "90%", dpi = 300, fig.cap="**Figure: Number of sampling points that bird species were observed at Punggol, Singapore if 15 surveys were missed in Survey Cycle 5 (March – April 2017).** The blue cross denotes the count in full dataset, while the diamond symbol denotes the mean count across 100 scenarios where survey data were randomly excluded. Species are arranged in descending order of counts."}
 
 # transform for plotting
 plot_bird_spp <- scenarios %>%
