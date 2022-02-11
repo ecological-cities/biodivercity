@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 
 ## Obtain latest taxonomic names and local statuses
 
-<<<<<<< HEAD
 Obtain latest accepted taxonomic names and local statuses for all four surveyed fauna groups (Birds, Butterflies, Odonates, Amphibians). Our sources for accepted taxonomic names and local statuses are listed below.
 
 - Birds: ebird Clements Checklist and The Singapore Red Data Book (Davison et al. 2008)
@@ -33,7 +32,7 @@ The taxonomic names and local statuses are then matched to fauna list.
 
 Surveys are summarised according to the top 10 most common animal species per town, which means the species with the most number of observed instances in the sampling points. This is done by filtering the dataset according to each animal group, town, round and number of entries of each species.
 
-```{r sptally, eval = FALSE}
+```{r sptally - most common animal species, eval = FALSE}
 # summarise sp density sampling pt per town
 plot_fauna <- fauna %>%
   
@@ -202,7 +201,7 @@ ggpubr::ggarrange(plot_bird, plot_butt, plot_dragon, plot_frog,
 
 Surveys are summarised according to the top 10 most abundant animal species per town, which means the most number of individuals of a species observed in the sampling points. This is done by filtering the dataset according to each animal group, town, round and total number of individuals observed of each species
 
-```{r sptally, eval = FALSE}
+```{r sptally - most abundant species, eval = FALSE}
 # summarise sp density per town
 plot_fauna <- fauna %>%
   ungroup() %>%
@@ -360,7 +359,7 @@ ggpubr::ggarrange(plot_bird, plot_butt, plot_dragon, plot_frog,
 
 Using a treemap, we are able to visualise the most common species relative to each town and each species.
 
-```{r sptally, eval = FALSE}
+```{r sptally - visualise most common species, eval = FALSE}
 
 library(tidyverse)
 library(treemapify)
