@@ -108,6 +108,7 @@ reference:
   desc: "**_Example datasets_**"
 - contents:
   - sampling_areas
+  - sampling_forest
   - sampling_points
   - animal_surveys
   - animal_observations
