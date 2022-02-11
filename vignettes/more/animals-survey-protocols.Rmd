@@ -38,16 +38,16 @@ devtools::load_all() #knit manually with latest changes to circumvent library("b
 
 Before surveys can begin, survey points have to be randomly generated within the area of interest. If necessary, stratified random sampling can be performed to ensure sufficient representation between sub-areas of interest. 
 
-Load the example data `sampling_areas` (sf polygons) for six residential towns (areas) in Singapore, as well as patches of forest cover `sampling_forest` that are within these towns (sub-areas of interest). Note that forest cover for multiple Survey Periods (see column name `period`) are present in `sampling_forest`.
+Load the example data `sampling_areas` (sf polygons) for six residential towns (areas) in Singapore, as well as patches of forest cover `sampling_forests` that are within these towns (sub-areas of interest). Note that forest cover for multiple Survey Periods (see column name `period`) are present in `sampling_forests`. Refer to `help(sampling_areas)` and `help(sampling_forests)` for more details.
 
 ```{r import example data, message = FALSE, warning = FALSE}
 data(sampling_areas)
-data(sampling_forest)
+data(sampling_forests)
 ```
 
 ```{r}
 head(sampling_areas)
-head(sampling_forest)
+head(sampling_forests)
 ```
 
 
@@ -55,7 +55,7 @@ Using the area `QT` (Queenstown) as an example, sampling points can be randomly 
 
 ```{r process example data, message = FALSE, warning = FALSE}
 queenstown <- sampling_areas[sampling_areas$area %in% "QT", ]
-queenstown_forest <- sampling_forest[sampling_forest$area == "QT" & sampling_forest$period == 2,]
+queenstown_forest <- sampling_forests[sampling_forests$area == "QT" & sampling_forests$period == 2,]
 ```
 
 Next, within the area of interest, generate sampling points at a specified density and buffer radius using the function `random_pt_gen()`. In this case, we specify one point per 50 hectares (500000 m<sup>2</sup>), and a radius of 50 m for each point. The radius value is the minimum distance between the generated points and the boundaries—this ensures that the region for animal surveys does not extend beyond the boundaries of Queenstown. An excess of sampling points can be generated, in case some of these points are unsuitable for surveys (e.g. within areas inaccessible to surveyors); for instance, based on the specified parameters, `1.5` times the required number points can be generated. Finally, sub-areas of interest (`queenstown_forest`) can also be specified; sampling points will be stratified between the areas _within_ and _outside_ of `queenstown_forest` (i.e. 'Forest' and 'Urban' land cover types, respectively):

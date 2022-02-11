@@ -21,6 +21,6 @@
 #' * [sampling_areas] are the encompassing areas of interest where these forest patches are located within.
 #'
 #' @examples
-#' head(sampling_forest)
+#' head(sampling_forests)
 #'
-"sampling_forest"
+"sampling_forests"
