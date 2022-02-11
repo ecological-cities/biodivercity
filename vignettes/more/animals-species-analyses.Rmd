@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 
 ## Obtain latest taxonomic names and local statuses
 
-<<<<<<< HEAD
 Obtain latest accepted taxonomic names and local statuses for all four surveyed fauna groups (Birds, Butterflies, Odonates, Amphibians). Our sources for accepted taxonomic names and local statuses are listed below.
 
 - Birds: ebird Clements Checklist and The Singapore Red Data Book (Davison et al. 2008)
