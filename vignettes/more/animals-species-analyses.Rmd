@@ -10,7 +10,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Data generated from animal surveys can be summarised at multiple levels (e.g. area, period, animal groups). For a particular animal (taxon) group of interest, finer-grained summaries can also be generated—at the level of individual species.
+Survey data for each animal (taxon) group can be summarised at multiple levels (e.g. area, period). For a particular animal group of interest, finer-grained summaries can also be generated—at the level of individual species.
 
 
 First, load the necessary packages to run the analysis:
@@ -36,7 +36,7 @@ data("animal_observations")
 data("animal_surveys")
 ```
 
-Show group-level (family/genus) observations where all species in the group are observed at each sampling point. These entries present will later be removed at the respective points, in order to prevent over-counting the number of species. More details in the vignette _Process animal data_.
+Show group-level (family/genus) observations where all species in the group are observed at each sampling point, using the function `check_taxongrps()`. These entries will later be removed at the respective points, in order to prevent over-counting the number of species. More details in `vignette("process-animal")`.
 
 ```{r show grp level observations}
 remove <- check_taxongrps(animal_observations, level = "point")
@@ -47,46 +47,41 @@ remove
 
 ## Most abundant species
 
-Summarise the animal surveys based on how many individuals of each species are present at each sampling point.
+Summarise the animal surveys based on how many individuals of each species are present at each sampling point. Tally the number of individuals per `species`, within each `area`, `period` and `taxon`:
+
+```{r warning = FALSE, message = FALSE}
+plot_fauna <- animal_observations %>%
+  group_by(species, area, period, taxon) %>% 
+  summarise(count = sum(abundance)) %>% 
+  mutate(area = factor(area, # re-arrange factors
+                       levels = c("PG", "QT", "TP","JW", "BS", "WL")))
+plot_fauna
+```
+
+The results can be visualised, for example, for bird species at the six areas (towns) in Singapore, across two survey periods:
 
 ```{r most abundant animal species per town, message = FALSE, warning = FALSE, fig.width=8.0, fig.height =4.0, out.width="100%", dpi = 300, fig.cap="**Figure: Most abundant bird species within each area (town), per survey round.** Up to ten species are shown; species are arranged in descending order according to their cumulative counts."}
 
-# no. of species per area
-plot_fauna <- animal_observations %>%
-  ungroup() %>%
-  group_by(area, period, taxon, species) %>% 
-  summarise(count = sum(abundance)) %>% 
-  mutate(area = factor(area, levels = c("PG", "QT", "TP","JW", "BS", "WL"))) 
-  
-
-# Birds
-order  <- plot_fauna %>% # summarise order of species
-  filter(taxon == "Aves") %>%
-  ungroup() %>%
+# get the (descending) order of species to be plot
+order  <- plot_fauna %>% 
+  filter(taxon == "Aves") %>% # birds only
   group_by(species) %>%
   summarise(order = sum(count))
 
 plot_fauna %>%
-  filter(taxon == "Aves") %>%
-
-  # only plot top 10 species in each area 
-  ungroup() %>%
-  group_by(area, period) %>%
+  filter(taxon == "Aves") %>% # birds only
+  group_by(area, period) %>% # only plot top 10 species
   slice_max(count, n = 10) %>%
-  left_join(order) %>% # get order
-
+  left_join(order) %>% # get the order
   ggplot(aes(y = count, x = reorder(species, count))) +
-    geom_col(width = 0.8, 
-             color = "black", size =0.1) +
-    facet_grid(taxon ~ area + period) +
-    
+    geom_col(width = 0.8, color = "black") +
+    facet_grid(~ area + period) +
     ylab("Number of individuals") +
     xlab("")+
     theme_bw()+
     theme(text = element_text(size=8.0),
           axis.text.y = element_text(face = "italic"),
           panel.grid.major.y = element_blank(),
-          panel.grid.minor.y = element_blank(),
           panel.grid.minor.x = element_blank()) +
     coord_flip() +
     scale_y_continuous(expand = c(0,0), breaks = scales::breaks_pretty(n = 3))
@@ -96,150 +91,78 @@ plot_fauna %>%
 
 ## Most common species
 
-Summarise the animal surveys based on whether each species is present at sampling points  (observed instances).
+Summarise the animal surveys based on whether each species is present at sampling points. Tally the instances where each `species` is observed within each `area`, `period`, `taxon` and `point_id`:
+
+```{r warning = FALSE, message = FALSE}
+
+plot_fauna <- animal_observations %>%
+  group_by(species, area, period, taxon, point_id) %>% # counts of unique species at each sampling pt, per survey area/period/taxon
+  summarise() %>% 
+  anti_join(remove, by = c("species" = "name","point_id", "period")) %>% # exclude genus/family lvl records if all species within grp observed
+  group_by(species, area, period, taxon) %>% # no. of points that each species occurs (per area/period/taxon)
+  summarise(count = n()) %>% 
+  mutate(area = factor(area, # re-arrange factors
+                       levels = c("PG", "QT", "TP","JW", "BS", "WL"))) 
+```
+
+Similarly, common bird species within the six areas (towns) in Singapore can be visualised:
 
 ```{r common animal species per town, message = FALSE, warning = FALSE, fig.width=8.0, fig.height =4.0, out.width="100%", dpi = 300, fig.cap="**Figure: Most common bird species within each area (town), per survey round.** Up to ten species are shown; species are arranged in descending order according to the cumulative number of sampling points they are present in."}
 
-# summarise sp density sampling pt per area
-plot_fauna <- animal_observations %>%
-  
-  # add up same sp recorded at diff times in same survey, & diff cycles (result in counts of unique species per sampling pt in survey year)
-  ungroup() %>%
-  group_by(species, area, period, taxon, point_id) %>%
-  summarise() %>% 
-  
-  # exclude genus/family lvl records if all sp within grp observed
-  anti_join(remove, by = c("species" = "name","point_id", "period")) %>%
-   
-  # no of points that each sp occur (per taxa per area)
-  ungroup() %>%
-  group_by(species, area, period, taxon) %>% 
-  summarise(count = n()) %>% 
-  mutate(area = factor(area, levels = c("PG", "QT", "TP","JW", "BS", "WL"))) 
-
-  
-# Birds
-order  <- plot_fauna %>% # summarise order of species
-  filter(taxon == "Aves") %>%
-  ungroup() %>%
+# get the (descending) order of species to be plot
+order  <- plot_fauna %>% 
+  filter(taxon == "Aves") %>% # birds only
   group_by(species) %>%
   summarise(order = sum(count))
 
 plot_fauna %>%
-  filter(taxon == "Aves") %>%
-
-  # only plot top 10 species in each area 
-  ungroup() %>%
-  group_by(area, period) %>%
+  filter(taxon == "Aves") %>% # birds only
+  group_by(area, period) %>% # only plot top 10 species 
   slice_max(count, n = 10) %>%
   left_join(order) %>% # get order
-
   ggplot(aes(y = count, x = reorder(species, order))) +
-    geom_col(width = 0.8, 
-             color = "black", size =0.1) +
-    facet_grid(taxon ~ area + period) +
-    
+    geom_col(width = 0.8, color = "black") +
+    facet_grid(~ area + period) +
     ylab("Number of sampling points") +
     xlab("")+
     theme_bw()+
     theme(text = element_text(size=8.0),
           axis.text.y = element_text(face = "italic"),
           panel.grid.major.y = element_blank(),
-          panel.grid.minor.y = element_blank(),
           panel.grid.minor.x = element_blank()) +
     coord_flip() +
     scale_y_continuous(expand = c(0,0), breaks = scales::breaks_pretty(n = 4))
-
 ```
 
 <br>
 
-We can also visualise the most common species using a hierarchical tree map:
+More interesting visualisations can also be generated. For example, a hierarchical tree map may be used to show the ten most common bird species in the first survey period:
 
 ```{r visualise most common species using treemap, out.width="100%", dpi = 300, fig.width=8.0, fig.height =10.0, warning = FALSE, message = FALSE}
 
 library(treemapify)
 
-surveys_normalised <- animal_surveys %>%
-  mutate(area = factor(area, levels = c("PG", "QT", "TP","JW", "BS", "WL"))) %>%
-  mutate(taxon = factor(taxon, levels = c("Aves", "Lepidoptera", "Odonata", "Amphibia"))) %>%
-  mutate(survey_id = as.factor(survey_id)) %>%
-  mutate(point_id = as.factor(point_id)) %>% 
-  filter(period == 1) # only for period 1!
-
-fauna_normalised <- animal_observations %>%
-  mutate(area = factor(area, levels = c("PG", "QT", "TP","JW", "BS", "WL"))) %>%
-  mutate(taxon = factor(taxon, levels = c("Aves", "Lepidoptera", "Odonata", "Amphibia"))) %>%
-  mutate(survey_id = factor(survey_id, 
-                            levels = surveys_normalised$survey_id)) %>%
-  mutate(point_id = factor(point_id, 
-                           levels = unique(surveys_normalised$point_id))) %>% 
-  filter(period == 1) # only for period 1!
-
-# grp-lvl observations to remove
-remove_area <- check_taxongrps(fauna_normalised, level = "area")
-remove_point <- check_taxongrps(fauna_normalised, level = "point")
-remove_normalised <- list(area = remove_area, point = remove_point)
-rm(remove_area, remove_point)
-
-
-
-# summarise sp density sampling pt per area
-plot_fauna <- fauna_normalised %>%
-  ungroup() %>%
-  group_by(species, area, # period, 
-           taxon, point_id) %>%
-  summarise() %>% 
-  
-  # exclude genus/family lvl records if all sp within grp observed
-  anti_join(remove_normalised$point, by = c("species" = "name","point_id" 
-                                           #, # "period"
-                                           )) %>%
-  
-  # no of points that each sp occur (per taxa per area)
-  ungroup() %>%
-  group_by(species, area, # period, 
-           taxon) %>% 
-  summarise(count = n())
-
-  
-# Birds - top 10 common spp in each area 
 plot_fauna %>%
-  filter(taxon == "Aves") %>%
-  ungroup() %>%
-  group_by(area #, period
-           ) %>%
+  filter(taxon == "Aves" & period == 1) %>% # birds in period 1 only
+  group_by(area) %>% # only plot top 10 species
   slice_max(count, n = 10) %>% 
-  
-  ggplot(aes(area = count, fill = area, # label = species,
-             subgroup = species)) +
+  ggplot(aes(area = count, fill = area, subgroup = species)) +
     geom_treemap() +
     geom_treemap_subgroup_border(color = "white", size = 7) +
     geom_treemap_subgroup_text(place = "centre", 
                                size = 16,
-                               # min.size = 12, 
-                               grow = FALSE,
                                reflow = TRUE, # wrap text
-                               alpha = 0.7, colour = "black",
                                fontface = "bold") +
-
   colorspace::scale_fill_discrete_qualitative("Harmonic") +
-  
   labs(title="Urban birds of Singapore",
        caption="Most common spp. during surveys in 2016–2019",
        fill = NULL) +
   theme(aspect.ratio = 5/4,
-        plot.background = element_blank(),
-        panel.background = element_rect(fill = "transparent"),
-        panel.border = element_blank(),
-        rect = element_rect(fill = "transparent"),
-        plot.title.position = 'plot', 
         plot.title = element_text(hjust = 0.5, size = 30, face = "bold"),
         plot.caption = element_text(size = 12, face = "italic"),
         legend.position="bottom",
-        legend.title = element_text(face = "bold", size = 12),
         legend.text = element_text(size = 12)) +
-    guides(fill = guide_legend(nrow = 1))
+  guides(fill = guide_legend(nrow = 1))
 ```
 
 <br>
