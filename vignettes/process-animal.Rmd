@@ -23,7 +23,7 @@ devtools::load_all()
 
 ## Data format
 
-Data from animal surveys can be organised into two separate tables: (1) a record of animal observations during each survey; and (2) reference information about each survey. The existence of (2) also ensures that surveys with zero animal observations are accounted for. Examples of data within the two tables are shown below:
+Data from animal surveys can be organised into two separate tables: (1) a record of animal observations during each survey; and (2) reference information about each survey. The existence of (2) also ensures that surveys with zero animal observations are accounted for. More details on how data are collected can be found in `vignette("animals-survey-protocols")`. Examples of data within the two tables are shown below:
 
 ```{r sample data table, echo = FALSE, message = FALSE, warning = FALSE}
 
