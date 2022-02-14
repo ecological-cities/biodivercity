@@ -11,12 +11,12 @@
 #'@import sf
 #'
 #'@export
-heatmap_raster <- function(env_df, mods, landscape, geom, buffer_dist, grid_dim, name){
+heatmap_raster <- function(means,sds, mods, landscape, geom, buffer_dist, grid_dim, name){
   pixel_pred <-
     function(points,
              taxon_mods, #what if user only wants to use one model
              mod_env,
-             mod_attr) {
+             means,sds) {
 
       #load grid_landscape then process for each column: if NA, replace with mean; else, scale the UGS values with mod_attr
 
@@ -28,25 +28,27 @@ heatmap_raster <- function(env_df, mods, landscape, geom, buffer_dist, grid_dim,
       new.rescale <- new.us %>%
         dplyr::select(site_id)
 
-      for (i in seq_along(mod_attr$env_names)) {
+      for (i in seq_along(colnames(new.us))) {
 
-        var <- mod_attr$env_names[i]
+        if(colnames(new.us)[i] %in% colnames(means)){
+          var <- colnames(new.us)[i]
+          j <- match(var,colnames(mean_vec))
 
-        new.us <- new.us %>%
-          mutate(!!sym(var) := replace_na(data = !!sym(var), replace = 0))
+          new.us <- new.us %>%
+            mutate(!!sym(var) := replace_na(data = !!sym(var), replace = 0))
 
-        scaling.temp <- new.us %>%
-          dplyr::select(site_id, !!sym(var)) %>%
-          mutate(!!sym(var) := (!!sym(var)-mod_attr$env_mean[[i]])/mod_attr$env_sd[[i]])
+          scaling.temp <- new.us %>%
+            dplyr::select(site_id, !!sym(var)) %>%
+            mutate(!!sym(var) := (!!sym(var)-means[1,j])) %>%
+            mutate(!!sym(var) := (!!sym(var)/sds[1,j]))
 
-        new.rescale <- new.rescale %>%
-          left_join(scaling.temp, by = "site_id")
+          new.rescale <- new.rescale %>%
+            left_join(scaling.temp, by = "site_id")
+        }
       }
 
-      best_models <- MuMIn::get.models(taxon_mods,
-                                       delta < params$delta_threshold)
-
-      sr.pred<-modavgPred(best_models, newdata=new.rescale)$mod.avg.pred
+      sr.pred_all<- AICcmodavg::modavgPred(taxon_mods, newdata=new.rescale,type="response") %>% as.data.frame()
+      sr.pred <- sr.pred_all$mod.avg.pred
 
       points <- points %>%
         mutate(sr.pred = sr.pred) %>%
@@ -75,15 +77,10 @@ heatmap_raster <- function(env_df, mods, landscape, geom, buffer_dist, grid_dim,
     dplyr::select(sites, site_id, geometry) %>%
     ungroup()
 
-  attr <- data.frame(colnames(env_df)) %>%
-    mutate(env_mean = sapply(env_df, function(x) {attr(x, "scaled:center")})) %>%
-    mutate(env_sd = sapply(env_df, function(x) {attr(x, "scaled:scale")})) %>%
-    rename(env_names = colnames.env_df.)
-
   pix <- pixel_pred(points = bound_grid,
                taxon_mods = mods,
                mod_env = landscape,
-               mod_attr = attr)
+               means=means, sds=sds)
 
   bound_gridlines <- bound_diff %>%
     st_make_grid(cellsize = grid_dim, # regular grid across entire region
@@ -99,7 +96,7 @@ heatmap_raster <- function(env_df, mods, landscape, geom, buffer_dist, grid_dim,
     dplyr::select(sites, sr.pred, geometry)
 
   raster_template <- bound_gridlines %>%
-    raster::raster(res = grid_dim, crs = crs(bound_gridlines))
+    raster::raster(res = grid_dim, crs = raster::crs(bound_gridlines))
 
   heatmap <- terra::rasterize(terra::vect(hm), terra::rast(raster_template),
                               field = "sr.pred", crs = crs(bound_gridlines))
