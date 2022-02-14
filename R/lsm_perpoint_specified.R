@@ -9,7 +9,7 @@
 #'@param raster_list List of SpatRaster objects (`terra::rast()`). Each element is a classified land cover raster object to be analysed,
 #'and its sequence (number) should correspond to the survey periods (an integer) present in `points`.
 #'@param predictors_lsm Vector (character) of predictor variables to be calculated from the raster(s).
-#'Naming format is formatted as `<radius in metres>_lsm_<metric>` (e.g. `r50m_lsm_pland`).
+#'Naming format is formatted as `<radius in metres>_lsm_<class>_<metric>` (e.g. `r50m_lsm_veg_pland`).
 #'Refer to `landscapemetrics::list_lsm()` for the full list of metrics.
 #'@param class_names Vector (character) of land cover class names to be used to identify the corresponding integer values in `class_values`.
 #'@param class_values Vector of (integer) values of interest within the classified rasters in `raster_list`. Should not include the value `0`.
