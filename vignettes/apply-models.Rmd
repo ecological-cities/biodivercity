@@ -13,7 +13,7 @@ vignette: >
 
 ## Overview
 
-By following this vignette, users will be able to predict (using a user-provided model object) animal species richness across a target landscape, and eventually visualise the prediction using a heatmap. Begin by loading the required libraries and data files:
+By following this vignette, users will be able to predict (using a user-provided model object) animal species richness across a target landscape, and eventually visualise the predictions in the form of a heatmap. Begin by loading the required libraries and data files:
 
 ```{r load required libraries, eval = FALSE}
 library("biodivercity")
@@ -21,7 +21,7 @@ library("tmap")
 library("leaflet")
 ```
 
-```{r load libraries while in dev, include = FALSE}
+```{r load libraries while in dev, eval = FALSE}
 devtools::load_all() 
 
 library("tmap")
@@ -34,6 +34,11 @@ load(filepath)
 
 mod_filepath <- system.file("extdata", "models-manually-mapped.Rdata", package = "biodivercity")
 load(mod_filepath)
+
+attr_filepath <- system.file("extdata", "mean-sd.Rdata", package = "biodivercity")
+load(attr_filepath)
+
+data(points_landscape)
 ```
 
 ## Spatial predictions
@@ -67,7 +72,8 @@ grid_landscape <-
     layer_natveg = natveg, radii_natveg = c(50, 126),
     layer_water = water, radii_water = 50,
     layer_buildings = buildings, radii_buildings = 50, buildings_levels = "building_l",
-    layer_roads = roads, radii_roads = c(50, 126), roads_lanes = "lanes")
+    layer_roads = roads, radii_roads = c(50, 126), roads_lanes = "lanes") %>% 
+  dplyr::select(!contains("sites")) %>% dplyr::select(!contains("shannon")&!contains("simpson"))
 ```
 
 For interested readers, a breakdown of the `heatmap_raster` function is as follows (half a mind to remove this part):
@@ -76,9 +82,6 @@ For interested readers, a breakdown of the `heatmap_raster` function is as follo
 2. A second grid is created using `st_make_grid` with `what == "polygons"` as a template for the final raster.
 3. The grid template and prediction values are combined with `rasterize` from the `terra` package.
 
-**Note**: Variables used in `landscape` should match variables in `env_df`.
-
-
 
 ```{r heatmap_raster, eval = FALSE}
 # Minor edits to the env_df had to be made
@@ -86,13 +89,14 @@ For interested readers, a breakdown of the `heatmap_raster` function is as follo
 #   dplyr::select(where(is.numeric) & !sprich) %>% 
 #   dplyr::select(!r50m_man_GnPR) # non-GnPR dataset
 
-bird_hm <- heatmap_raster(env_df = bird_env,
-                          mods = birdmods,
+bird_hm <- heatmap_raster(means=mean_vec, sds=sd_vec,
+                          mods = models_birds,
                           landscape = grid_landscape,
                           geom = bound,
                           buffer_dist = 126,
                           grid_dim = c(50, 50),
                           name = "bird_hm") # optional
+
 ```
 
 ## Visualisation
@@ -113,7 +117,9 @@ bird_heatmap_20m <- system.file("extdata", "bird_heatmap_20m.tif",
   terra::rast()
 ```
 
-```{r plotting maps, include = FALSE}
+To visualise the heatmap(s) produced, the `tmap` package will be used. 
+
+```{r plotting maps, eval=FALSE}
 # Plotting maps
 
 tmap_mode("view")
@@ -124,35 +130,17 @@ tmap_options(check.and.fix = TRUE, #turf, natveg and shrubs layers contain inval
 tm <- 
   tm_basemap(c("CartoDB.Positron", "CartoDB.DarkMatter", "OpenStreetMap")) +
 
-  #100m heatmap
-  tm_shape(bird_heatmap_100m, raster.downsample = FALSE) +
+  #50m heatmap
+  tm_shape(bird_hm, raster.downsample = FALSE) +
     tm_raster(title = "Bird SR",
                 group = paste0("Bird Heatmap Raster ", 100, "m"),
                 style = "pretty",
                 palette = "YlOrRd",
                 # labels = c(" "),
               #legend.show = FALSE,
-                alpha = 0.8) +
+                alpha = 0.8) 
   
-  #50m heatmap
-  tm_shape(bird_heatmap_50m, raster.downsample = FALSE) +
-    tm_raster(title = "Bird SR",
-                group = paste0("Bird Heatmap Raster ", 50, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) +
-  
-  #20m heatmap
-  tm_shape(bird_heatmap_20m, raster.downsample = FALSE) +
-    tm_raster(title = "Bird SR",
-                group = paste0("Bird Heatmap Raster ", 20, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8)
+
   
 ```
 
@@ -163,8 +151,8 @@ tm <-
 tm %>% 
   tmap_leaflet() %>%
   
-  leaflet::hideGroup("Bird Heatmap Raster 50m") %>% 
-  leaflet::hideGroup("Bird Heatmap Raster 20m")
+  leaflet::hideGroup("Bird Heatmap Raster 50m") 
+
   
 ```
 
