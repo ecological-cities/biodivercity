@@ -10,6 +10,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+Predictive models can be used to assess animal diversity across broader areas that were not previously sampled (i.e. where animal surveys were not conducted). The accuracy of these predictions may be tested, by comparing them against results from more surveys conducted at new sampling points. This article outlines the steps required to make such comparisons, based on the calculation of accuracy metrics.
+
 First, load the necessary packages to run the analysis:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
@@ -32,8 +34,6 @@ Load the models for each of the animal groups:
 filepath <- system.file("extdata", "models-manually-mapped.Rdata", package = "biodivercity")
 load(filepath)
 ```
-
-<br>
 
 Load the new data from animal surveys, which will be used to check the accuracy of the models. In this example, we focus on birds (the taxon 'Aves') in the example data `animal_observations` and `animal_surveys`. Subset the full data to our area/period/taxon of interest, and then tally the species richness (no. of species) of birds using the function `tally_observations()`:
 

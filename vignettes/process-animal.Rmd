@@ -10,6 +10,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+Animal observations from on-site surveys can be used to build predictive models of animal diversity, or summarised to directly compare animal diversity between different areas or time periods. This article outlines the ways to format, process and check the animal data.
+
 First, load the necessary packages to run the analysis:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
@@ -20,6 +22,8 @@ library("dplyr") # data processing
 ```{r load biodivercity while in dev, include = FALSE}
 devtools::load_all()
 ```
+
+<br>
 
 ## Data format
 

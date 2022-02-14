@@ -10,8 +10,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Survey data for each animal (taxon) group can be summarised at multiple levels (e.g. area, period). For a particular animal group of interest, finer-grained summaries can also be generated—at the level of individual species.
-
+Survey data for each animal (taxon) group can be summarised at multiple levels (e.g. area, period). For a particular animal group of interest, finer-grained summaries can also be generated—at the level of individual species. This article outlines how such summaries may be generated, using bird surveys conducted in Singapore as an example.
 
 First, load the necessary packages to run the analysis:
 

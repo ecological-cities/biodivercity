@@ -12,7 +12,7 @@ vignette: >
 
 Despite best efforts to ensure consistency in sampling, there may be situations where surveys are missed. For example, animal surveys could not be performed due to movement restrictions when the COVID-19 pandemic hit Singapore.
 
-Simulations can be performed to observe the loss in species richness (number of species) if surveys are missed. The following vignette shows an example if `15` surveys conducted within the Punggol (`PG`) area are randomly excluded from Survey Cycle `5`, during Survey Period `1` (March – April 2017). This corresponds to the same time-of-year in Survey Period `2` (March – April 2020) when 15 bird surveys were missed at Punggol, due to COVID-19 movement restrictions.
+Simulations can be performed to observe the loss in species richness (number of species) if surveys are missed. The following article shows an example if `15` surveys conducted within the Punggol (`PG`) area are randomly excluded from Survey Cycle `5`, during Survey Period `1` (March – April 2017). This corresponds to the same time-of-year in Survey Period `2` (March – April 2020) when 15 bird surveys were missed at Punggol, due to COVID-19 movement restrictions.
 
 First, load the necessary packages to run the analysis:
 
