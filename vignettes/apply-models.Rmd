@@ -15,20 +15,20 @@ vignette: >
 
 By following this vignette, users will be able to predict (using a user-provided model object) animal species richness across a target landscape, and eventually visualise the predictions in the form of a heatmap. Begin by loading the required libraries and data files:
 
-```{r load required libraries, eval = FALSE}
+```{r load required libraries, eval = FALSE, warning = FALSE, message = FALSE}
 library("biodivercity")
 library("tmap")
 library("leaflet")
 ```
 
-```{r load libraries while in dev, eval = FALSE}
+```{r load libraries while in dev, echo = FALSE, warning = FALSE, message = FALSE}
 devtools::load_all() 
 
 library("tmap")
 library("leaflet")
 ```
 
-```{r load bound geojson, eval=FALSE}
+```{r load bound geojson, echo=FALSE}
 filepath <- system.file("extdata", "pg_layers.Rdata", package = "biodivercity")
 load(filepath)
 
@@ -47,7 +47,7 @@ To make predictions across a large area, the target landscape is first broken up
 
 This function is a wrapper for the `st_make_grid` function with `what == "centers"`, from the package `sf`. The output is an object of class `sfc` that comprises points around which landscape variables are extracted within their respective distance buffers. 
 
-```{r create grid for each UGS town, eval = FALSE}
+```{r create grid for each UGS town}
 # subset to regions where predictions can be made: >126m inwards from boundaries
 bound_grid <- geom_to_grid(geom = bound,
                            buffer_dist = 126,
@@ -57,7 +57,7 @@ bound_grid <- geom_to_grid(geom = bound,
 
 Next, a final raster of species richness predictions for one taxon is made using the `heatmap_raster` function. Two important required arguments for `heatmap_raster` are `mods`, an averaged model object with which the user wants to make predictions, and `landscape`, a summary of the landscape variables around each of the points in `bound_grid`. A model object, `models_birds`, has already been loaded earlier. A suitable `landscape` object can be obtained from the various landscape vector layers (e.g. `natveg`, `turf`, etc.) using the `summarise_landscape_perpt` function:
 
-```{r grid landscape, eval = FALSE}
+```{r grid landscape}
 
 natveg <- st_make_valid(natveg) # to make sure polygons are valid 
 
@@ -83,7 +83,7 @@ For interested readers, a breakdown of the `heatmap_raster` function is as follo
 3. The grid template and prediction values are combined with `rasterize` from the `terra` package.
 
 
-```{r heatmap_raster, eval = FALSE}
+```{r heatmap_raster}
 # Minor edits to the env_df had to be made
 # bird_env <- birds %>% 
 #   dplyr::select(where(is.numeric) & !sprich) %>% 
@@ -119,7 +119,7 @@ bird_heatmap_20m <- system.file("extdata", "bird_heatmap_20m.tif",
 
 To visualise the heatmap(s) produced, the `tmap` package will be used. 
 
-```{r plotting maps, eval=FALSE}
+```{r plotting maps, message = FALSE}
 # Plotting maps
 
 tmap_mode("view")
@@ -145,7 +145,7 @@ tm <-
 ```
 
 
-```{r leaflet, echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, cache = FALSE}
+```{r leaflet, echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
 # Pipe the tmap object into tmap_leaflet() to create a leaflet widget,
 # so that we can use leaflet::hideGroup().
 tm %>% 
