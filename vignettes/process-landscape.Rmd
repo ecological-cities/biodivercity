@@ -10,27 +10,59 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+This article details several methods used to retrieve open access landscape data to build predictive models of animal diversity. Here, landscape data refers to data derived from both freely-available satellite imagery and open-source maps that are processed and summarised across a range of dates and spatial areas. The following outline covers the processes of downloading, processing and summarising the landscape data to complement animal observation data in later articles. 
+
+First, load the necessary packages to run the analysis:
+
+```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
+library("biodivercity")
+library("sf")
+library("dplyr")
+```
+
+```{r load biodivercity while in dev, include = FALSE}
+devtools::load_all()
+library("sf")
+library("dplyr")
+```
+
+<br>
+
 ## Download open-source landscape data
 
 ### OpenStreetMap 
 
-Urban landscape elements can be retrieved from the freely-available OpenStreetMap (OSM) database. Building polygons and road lines are extracted from a set geographical boundary with the functions `get_buildings_osm` and `get_roads_osm`. 
+Urban landscape elements can be retrieved from the freely-available OpenStreetMap (OSM) database. Building polygons and road lines are extracted from a set geographical boundary with the functions `get_buildings_osm` and `get_roads_osm`. To better organise the raw data and processed outputs that will be created in this article, it will be useful to define an output directory for the following analyses.
+
+```{r define output directories, warning = FALSE, message = FALSE}
+output_dir <- "/insert/output/directory"
+```
+
+In the following example, a single `polygon` feature from an example dataset is provided to the `get_buildings_osm` and `get_roads_osm` functions to serve as the spatial boundary. This informs the functions of the area from which the building `polygon` and road `line` feature data would be retrieved. A date range must also be provided for the function to successfully query the online OSM database, and will be useful for retrieving data from previous years.
 
 ```{r download urban elements, eval = FALSE}
-osm_boundaries <- data(boundaries) %>% 
-  # st_union() %>% # merge all subzones
-  st_as_sf() %>%
-  st_make_valid()
+data(sampling_areas)
 
-buildings <- get_buildings_osm(osm_boundaries,
-                               date = as.Date(c("2019-07-01", "2021-06-30")),
-                               dir_raw = your_dir_raw,
-                               filename = "osm_buildings.geojson"))
-              
+sampling_areas <- sampling_areas %>%
+   filter(area == "PG") %>%
+   st_zm(what = "ZM") %>% 
+   st_as_sf() %>%
+   st_make_valid()
+
+osm_date <- as.Date(c("2021-01-01", "2021-06-30"))
+
+for(i in seq_along(osm_dates)){
+buildings <- get_buildings_osm(place = sampling_areas,
+                               date = osm_date[i],
+                               dir_raw = paste0(output_dir, "/osm"),
+                               filename = "osm_buildings.geojson")
+
 roads <- get_roads_osm(osm_boundaries,
-                       date = as.Date(c("2019-07-01", "2021-06-30")),
-                       dir_raw = your_dir_raw,
-                       filename = "osm_roads.geojson"
+                       date = osm_date[i],
+                       dir_raw = paste0(output_dir, "/osm"),
+                       filename = "osm_roads.geojson")
+}
+
 ```
 
 ---
@@ -43,24 +75,38 @@ sen2r_version <- packageVersion("sen2R")
 ```
 
 ```{r intro para, results = 'asis', echo = FALSE}
-cat(paste0("Landscape information is retrieved from the publicly available Sentinel-2 database using the `sen2r` package. As this is an external package unrelated to `biodivercity`, please also refer to the official repository for updated instructions. The package version used to generate this article is `sen2r_", sen2r_version, "`."))
+cat(paste0("Landscape information is retrieved from the publicly available Sentinel-2 database using the `sen2r` package. As this is an external package unrelated to `biodivercity`, please also refer to the official repository for updated instructions on [installation and use](http://sen2r.ranghetti.info/articles/installation.html). The package version used to generate this article is `sen2r_", sen2r_version, "`."))
 ```
 
-To model for fauna species richness across the six towns from 2016 to 2019, the spatio-temporal selections can be set accordingly to download all available Sentinel-2 images with the `sen2r()` function. The same parameters can be customised with a GUI interface by running `sen2r()` with no arguments, if preferred.  
+```{r detach sen2r, include = FALSE}
+detach("package:sen2r", unload = TRUE)
+```
 
-```{r sen2r setup, eval = FALSE}
-# http://sen2r.ranghetti.info/articles/installation.html
-install.packages("sen2r")
+To download Sentinel-2 images of a specific area and range of dates, the spatio-temporal selections have to defined accordingly with the `sen2r()` function. This can be performed with a GUI provided by the `sen2r` package when running the `sen2r()` function with no arguments.  
+
+```{r sen2r gui, eval = FALSE}
 library(sen2r)
 
-# run this after every successful download if there are still files in LTA not yet online, then subsequently check with provided safe_is_online() and sen2r():
+sen2r()
+```
+
+![**Figure**: A screenshot of the `sen2r` graphical user interface (GUI) accessible by running `sen2r()`.](sen2r-gui.png)
+
+Alternatively, the same parameters can be customised with arguments when running `sen2r()`, allowing for the use of objects defined in the local R environment. A parameter list can also be loaded from a JSON file that was saved with previous processing parameters. 
+
+```{r sen2r setup, eval = FALSE}
+sen2r_params <- system.file("extdata", "sen2r-parameters.json", package="biodivercity")
+sen2r_dates <- as.Date(c("2021-01-01", "2021-06-30"))
+```
+
+```{r sen2r, eval = FALSE}
 out_paths <- sen2r(
-  param_list = params$sen2r_params,
-  timewindow = c(as.Date(params$sen2r_date_range[1]), as.Date(params$sen2r_date_range[2])),
-  path_l2a = params$sen2r_dir_rawdata, # level-2A SAFE products
-  path_l1c = params$sen2r_dir_rawdata, # level-1C SAFE products
-  path_out = your_out_dir,
-  path_indices = your_out_dir,
+  param_list = sen2r_params,
+  timewindow = c(sen2r_dates[1], sen2r_dates[2]),
+  path_l2a = paste0(output_dir, "/sen2r/raw"), 
+  path_l1c = paste0(output_dir, "/sen2r/raw"),
+  path_out = paste0(output_dir, "/sen2r"),
+  path_indices = paste0(output_dir, "/sen2r"),
   extent_as_mask = TRUE,
   list_rgb = "RGB432B" # output RGB image
   # max_mask = 15,
@@ -70,95 +116,108 @@ out_paths <- sen2r(
 
 ---
 
-## Mosaic rasters
+## Mosaic and summarise
 
 Raster files downloaded across multiple dates can be combined to create mosaics to account for cloud cover. Using the `mosaic_sen2r()` function, this can be easily done with the file directory created by `sen2r()`, as specified in the `path_out` argument.
 
 ```{r mosaic generation, eval = FALSE}
- mosaic_sen2r(parent_dir = out_dir,
+mosaic_sen2r(parent_dir = paste0(output_dir, "/sen2r"),
               exclude = NULL,
               rm_outlier = TRUE)
 ```
 
-Downloaded rasters and the resulting mosaics contain raw information for specified indices. To account for noise and classify pixel values, Otsu's thresholding (see article) can be used to define threshold values, where values above the threshold are regarded as a presence of the landscape type measured by an index.
+Downloaded rasters and the resulting mosaics contain raw information for specified indices. To account for noise and classify pixel values, Otsu's thresholding (see `threshold_otsu()`) can be used to define threshold values, where values above the threshold are regarded as a presence of the landscape type measured by an index. Here, we are classifying values above the threshold as "Present" with the value of `1` and values below the threshold as "Absent" with `0`.
 
-```{r mosaic classification, eval = FALSE}
-classify_image_binary(image = "out_dir/index/mosaic.tif",
+```{r mosaic classification, warning = FALSE, message = FALSE}
+ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity") %>% 
+  terra::rast()
+
+veg_classified <- classify_image_binary(image = ndvi_mosaic,
                       threshold = "otsu")
 ```
 
-With the classified mosaics, landscape metrics can then be extracted at the defined buffer distances around fauna sampling points. The sample datasets `data(points)`, `data(NDVI)` and `data(NDWI2)` contains the survey points and the classified mosaics for NDVI and NDWI2. 
+To visualise the raster, several packages such as `ggplot2`, `tmap`, and `raster` can be used. Here, `tmap` is used to briefly examine the raster after classification.
 
-```{r lsm_perpoint, eval = FALSE}
-data(points)
-veg_classified <- data(NDVI)
-water_classified <- data(NDWI2)
+```{r visualise raster, warning = FALSE, message = FALSE}
+library("tmap")
 
-circles <- lsm_perpoint(raster = veg_classified, 
-                        points = points, 
-                        buffer_sizes = c(50, 100, 126, 200, 400, 600, 800, 1000),
-                        class_names = c("veg"),
-                        class_values = c(1),
-                        landscape_name = "veg",
-                        level = c("class")) 
-
-circles2 <- lsm_perpoint(raster = water_classified, 
-                         points = points,
-                         buffer_sizes = c(50, 100, 126, 200, 400, 600, 800, 1000),
-                         class_names = c("water"),
-                         class_values = c(1),
-                         landscape_name = "water",
-                         level = c("class")) 
-
-for(i in 1:length(circles)){ # append to circles2 info to circles
-  circles[[i]] <- circles[[i]] %>%
-    full_join(circles2[[i]] %>% 
-                 mutate(across(.cols = starts_with("lsm_"), 
-                  ~ifelse(percentage_inside < 90, NA, .))) %>%
-                dplyr::select(-percentage_inside), 
-              by = c("point_id", "round"))
-}
+tmap_mode("view")
+tm_shape(veg_classified) +
+  tm_raster(title = "veg_classified",
+            style = "cat",
+            palette = c("grey", "darkgreen"))
 ```
 
-Alternatively, certain desired landscape metrics can be specified for calculation via the `lsm_perpoint_specified` function instead of summarising the full suite of metrics. For example, to calculate the `pland` metric for the classified vegetation raster at multiple buffer distances:
+With the classified mosaics, landscape metrics can then be extracted at the defined buffer distances around fauna sampling points. The sample dataset `data(sampling_points)` can be loaded for survey points at which landscape metrics from the classified mosaic `veg_classified` will be summarised to. In this example, `sampling_points` is subset to match the same spatial area of the mosaic. 
 
-```{r lsm_perpoint_specified, eval = FALSE}
+```{r lsm_perpoint data, eval = FALSE}
+data(sampling_points)
+sampling_points <- sampling_points %>% 
+  dplyr::filter(area == "PG")
+```
+
+Next, several arguments have to be defined for the `lsm_perpoint()` function and more information on the input formats can be found on the function page. For example, `buffer_sizes` refer to the buffer radius values (in meters) around the sampling point where the raster data is summarised from.
+
+```{r lsm_perpoint, eval = FALSE}
+veg_landscape_metrics <- lsm_perpoint(raster = veg_classified,
+                                      points = sampling_points,
+                                      buffer_sizes = c(50, 100),
+                                      class_names = c("veg"),
+                                      class_values = c(1),
+                                      landscape_name = "veg",
+                                      level = c("class")) 
+```
+
+Alternatively, certain desired landscape metrics can be specified for calculation via the `lsm_perpoint_specified()` function instead of summarising the full suite of metrics. For example, to calculate the `pland` metric for the classified vegetation mosaic at multiple buffer distances (50m, 100m), the metrics must first be defined:
+
+```{r lsm_perpoint_specified data, warning = FALSE, messages = FALSE}
 predictors_lsm <- vector()
-dist <- c(50, 100, 126, 200, 400, 600, 800, 1000)
+dist <- c(50, 100)
+
+raster_list <- list()
+raster_list[[1]] <- veg_classified
 
 for(i in seq_along(dist)){
-  predictors_lsm[i] <- paste0("r", dist[i], "m_lsm_pland")
+  predictors_lsm[i] <- paste0("r", dist[i], "m_lsm_veg_pland")
 }
 
-rm(i, dist)
+predictors_lsm
+```
 
-pland <- lsm_perpoint_specified(raster_list = veg_classified,
+The function can then be run without the need for providing buffer sizes:
+
+```{r lsm_perpoint_specified, eval = FALSE}
+pland <- lsm_perpoint_specified(raster_list = raster_list,
                                 predictors_lsm = predictors_lsm,
                                 class_names = c("veg"),
                                 class_values =  c(1),
-                                points = points,
+                                points = sampling_points,
                                 point_id = "point_id",
                                 period = "period"
                                 )
 ```
 
-The same can be also be performed for the downloaded OSM dataset.
+Similarly, the function `osm_perpoint_specified()` can be be used to summarise data from the downloaded OSM dataset.
 
-```{r osm_perpoint, eval = FALSE}
+```{r osm_perpoint data, warning = FALSE, message = FALSE}
 predictors_osm <- vector()
-dist <- c(50, 100, 126, 200, 400, 600, 800, 1000)
+dist <- c(50, 100)
 
 for(i in seq_along(dist)){
   predictors_osm[i] <- paste0("r", dist[i], "m_osm_buildingFA_ratio")
 }
 
+predictors_osm
+```
+
+```{r osm_perpoint, eval = FALSE}
 buildingFA_ratio <- osm_perpoint_specified(buildings,
                                            predictors_osm,
                                            building_ndsm = NULL,
                                            building_height = "height",
                                            building_levels = "levels",
                                            road_lanes = "lanes",
-                                           points,
+                                           sampling_points,
                                            point_id = "point_id",
                                            period = "period"
                                            )

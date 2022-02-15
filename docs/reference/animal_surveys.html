@@ -124,16 +124,16 @@ All surveys took place between the years 2016 to 2022.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">animal_surveys</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 x 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   survey_id     point_id  area  period cycle taxon resampled start_time         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1 QTNa14a_P … QTNa14a_P QT         1     1 Odon… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 1 QTNb1a_P 1… QTNb1a_P  QT         1     1 Odon… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:44:00</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 1 QTNa14a_P … QTNa14a_P QT         1     1 Amph… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">19:55:00</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 1 QTNb1a_P 1… QTNb1a_P  QT         1     1 Amph… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">20:40:00</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 1 PGT15 1 Av… PGT15     PG         1     1 Aves  <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:00:00</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> 1 PGT14 1 Av… PGT14     PG         1     1 Aves  <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:33:00</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 1 more variable: notes &lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1 QTNa14a_P ~ QTNa14a_P QT         1     1 Odon~ <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 1 QTNb1a_P 1~ QTNb1a_P  QT         1     1 Odon~ <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:44:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 1 QTNa14a_P ~ QTNa14a_P QT         1     1 Amph~ <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">19:55:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 1 QTNb1a_P 1~ QTNb1a_P  QT         1     1 Amph~ <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">20:40:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 1 PGT15 1 Av~ PGT15     PG         1     1 Aves  <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:00:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> 1 PGT14 1 Av~ PGT14     PG         1     1 Aves  <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:33:00</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 1 more variable: notes &lt;chr&gt;</span></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>
