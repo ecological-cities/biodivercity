@@ -87,9 +87,9 @@
   <span class="va">raster</span>,
   <span class="va">points</span>,
   <span class="va">buffer_sizes</span>,
-  <span class="va">class_names</span>,
-  <span class="va">class_values</span>,
-  <span class="va">landscape_name</span>,
+  class_names <span class="op">=</span> <span class="cn">NULL</span>,
+  class_values <span class="op">=</span> <span class="cn">NULL</span>,
+  landscape_name <span class="op">=</span> <span class="cn">NULL</span>,
   point_id <span class="op">=</span> <span class="st">"point_id"</span>,
   period <span class="op">=</span> <span class="st">"period"</span>,
   what <span class="op">=</span> <span class="cn">NULL</span>,
@@ -101,7 +101,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>raster</dt>
-<dd><p>Classified land cover raster object to be analysed.
+<dd><p>SpatRaster object (<code><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">terra::rast()</a></code>). Classified land cover raster object to be analysed.
 The number of layers should correspond to the number of survey periods present in <code>points</code>.</p></dd>
 <dt>points</dt>
 <dd><p>Sampling points (sf object) for the calculation of landscape metrics.</p></dd>

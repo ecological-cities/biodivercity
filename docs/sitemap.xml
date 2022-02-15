@@ -85,10 +85,16 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/filter_observations.html</loc>
   </url>
   <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/geom_to_grid.html</loc>
+  </url>
+  <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/get_buildings_osm.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/get_roads_osm.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/heatmap_raster.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/index.html</loc>
