@@ -1,3 +1,4 @@
+
 #'Creates heatmap with specified resolution from a provided geometry object and site-env data.
 #'
 #'@param geom sf geometry object, typically one or more multipolygons.

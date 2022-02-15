@@ -28,6 +28,7 @@ library("tmap")
 library("leaflet")
 ```
 
+
 ```{r load bound geojson, eval=FALSE}
 filepath <- system.file("extdata", "pg_layers.Rdata", package = "biodivercity")
 load(filepath)
@@ -40,6 +41,7 @@ load(attr_filepath)
 
 data(points_landscape)
 ```
+
 
 ## Spatial predictions
 
@@ -76,7 +78,7 @@ grid_landscape <-
   dplyr::select(!contains("sites")) %>% dplyr::select(!contains("shannon")&!contains("simpson"))
 ```
 
-For interested readers, a breakdown of the `heatmap_raster` function is as follows (half a mind to remove this part):
+For interested readers, a breakdown of the `heatmap_raster` function is as follows:
 
 1. Species richness is predicted at each point provided in the `geom` argument with the objects specified in `mods`, `env_df` and `landscape`.
 2. A second grid is created using `st_make_grid` with `what == "polygons"` as a template for the final raster.
