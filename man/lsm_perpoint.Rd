@@ -8,9 +8,9 @@ lsm_perpoint(
   raster,
   points,
   buffer_sizes,
-  class_names,
-  class_values,
-  landscape_name,
+  class_names = NULL,
+  class_values = NULL,
+  landscape_name = NULL,
   point_id = "point_id",
   period = "period",
   what = NULL,
@@ -19,7 +19,7 @@ lsm_perpoint(
 )
 }
 \arguments{
-\item{raster}{Classified land cover raster object to be analysed.
+\item{raster}{SpatRaster object (\code{terra::rast()}). Classified land cover raster object to be analysed.
 The number of layers should correspond to the number of survey periods present in \code{points}.}
 
 \item{points}{Sampling points (sf object) for the calculation of landscape metrics.}

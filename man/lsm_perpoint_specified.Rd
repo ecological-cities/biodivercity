@@ -19,7 +19,7 @@ lsm_perpoint_specified(
 and its sequence (number) should correspond to the survey periods (an integer) present in \code{points}.}
 
 \item{predictors_lsm}{Vector (character) of predictor variables to be calculated from the raster(s).
-Naming format is formatted as \verb{<radius in metres>_lsm_<metric>} (e.g. \code{r50m_lsm_pland}).
+Naming format is formatted as \verb{<radius in metres>_lsm_<class>_<metric>} (e.g. \code{r50m_lsm_veg_pland}).
 Refer to \code{landscapemetrics::list_lsm()} for the full list of metrics.}
 
 \item{class_names}{Vector (character) of land cover class names to be used to identify the corresponding integer values in \code{class_values}.}
