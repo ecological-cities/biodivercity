@@ -9,26 +9,26 @@
 #'@return The dataframe `bound_grid` with three columns. The third column contains S3 point objects which are the grid cell centres.
 #'
 #'@import dplyr
-#'@import tibble
 #'@import sf
+#'@importFrom rlang .data
 #'
 #'@export
-geom_to_grid <- function(geom,buffer_dist,grid_dim){
-  bound_diff <- st_buffer(geom, dist = -buffer_dist)
+geom_to_grid <- function(geom, buffer_dist, grid_dim){
+  bound_diff <- sf::st_buffer(geom, dist = -buffer_dist)
 
   bound_grid <- bound_diff %>%
-    st_make_grid(cellsize = grid_dim, # regular grid across entire region
+    sf::st_make_grid(cellsize = grid_dim, # regular grid across entire region
                  what = "centers", square = T,
-                 crs = st_crs(geom)) %>%
-    st_intersection(bound_diff) %>% # subset to only within regions of interest
-    st_as_sf() %>%
-    st_join(bound_diff) # add back col info
+                 crs = sf::st_crs(geom)) %>%
+    sf::st_intersection(bound_diff) %>% # subset to only within regions of interest
+    sf::st_as_sf() %>%
+    sf::st_join(bound_diff) # add back col info
 
   bound_grid <- bound_grid %>%
-    group_by(sites) %>%
-    mutate(id = row_number()) %>%
-    mutate(site_id = paste0(sites, id)) %>%
-    dplyr::select(sites, site_id, geometry) %>%
-    ungroup()
+    dplyr::group_by(.data$sites) %>%
+    dplyr::mutate(id = row_number()) %>%
+    dplyr::mutate(site_id = paste0(.data$sites, .data$id)) %>%
+    dplyr::select(.data$sites, .data$site_id) %>%
+    dplyr::ungroup()
   return(bound_grid)
 }
