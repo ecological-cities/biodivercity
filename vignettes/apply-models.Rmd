@@ -28,7 +28,6 @@ library("tmap")
 library("leaflet")
 ```
 
-
 ```{r load bound geojson, eval=FALSE}
 filepath <- system.file("extdata", "pg_layers.Rdata", package = "biodivercity")
 load(filepath)
@@ -41,7 +40,6 @@ load(attr_filepath)
 
 data(points_landscape)
 ```
-
 
 ## Spatial predictions
 
