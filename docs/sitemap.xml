@@ -4,6 +4,15 @@
     <loc>https://ecological-cities.github.io/biodivercity/404.html</loc>
   </url>
   <url>
+    <loc>https://ecological-cities.github.io/biodivercity/CONTRIBUTING.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/SUPPORT.html</loc>
+  </url>
+  <url>
     <loc>https://ecological-cities.github.io/biodivercity/articles/apply-models.html</loc>
   </url>
   <url>
@@ -46,13 +55,7 @@
     <loc>https://ecological-cities.github.io/biodivercity/authors.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/CONTRIBUTING.html</loc>
-  </url>
-  <url>
     <loc>https://ecological-cities.github.io/biodivercity/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/LICENSE.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/news/index.html</loc>
@@ -82,16 +85,13 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/filter_observations.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/geom_to_grid.html</loc>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/generate_grid.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/get_buildings_osm.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/get_roads_osm.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/heatmap_raster.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/index.html</loc>
@@ -113,6 +113,9 @@
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/points_landscape.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/predict_heatmap.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/random_pt_gen.html</loc>
@@ -140,8 +143,5 @@
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/validate_newdata.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/SUPPORT.html</loc>
   </url>
 </urlset>

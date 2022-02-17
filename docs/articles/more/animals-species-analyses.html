@@ -105,7 +105,7 @@
       <img src="../../logo.png" class="logo" alt=""><h1>Animals: Species-level Analyses</h1>
                         <h4 data-toc-skip class="author">Author</h4>
             
-            <h4 data-toc-skip class="date">2022-02-15</h4>
+            <h4 data-toc-skip class="date">2022-02-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/more/animals-species-analyses.Rmd" class="external-link"><code>vignettes/more/animals-species-analyses.Rmd</code></a></small>
       <div class="d-none name"><code>animals-species-analyses.Rmd</code></div>
@@ -130,7 +130,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">remove</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/check_taxongrps.html">check_taxongrps</a></span><span class="op">(</span><span class="va">animal_observations</span>, level <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span>
 <span class="va">remove</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 7,199 x 4</span></span>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 7,199 × 4</span></span>
 <span class="co">## <span style="color: #949494;"># Groups:   point_id, period [279]</span></span>
 <span class="co">##    point_id period name                 n</span>
 <span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
@@ -144,7 +144,7 @@
 <span class="co">## <span style="color: #BCBCBC;"> 8</span> BSa11a_P      1 Butorides spp.       1</span>
 <span class="co">## <span style="color: #BCBCBC;"> 9</span> BSa11a_P      1 Cephrenes spp.       1</span>
 <span class="co">## <span style="color: #BCBCBC;">10</span> BSa11a_P      1 Cinnyris spp.        1</span>
-<span class="co">## <span style="color: #949494;"># ... with 7,189 more rows</span></span></code></pre>
+<span class="co">## <span style="color: #949494;"># … with 7,189 more rows</span></span></code></pre>
 <p><br></p>
 </div>
 <div class="section level2">
@@ -158,7 +158,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">area</span>, <span class="co"># re-arrange factors</span>
                        levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PG"</span>, <span class="st">"QT"</span>, <span class="st">"TP"</span>,<span class="st">"JW"</span>, <span class="st">"BS"</span>, <span class="st">"WL"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">plot_fauna</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 1,664 x 5</span></span>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 1,664 × 5</span></span>
 <span class="co">## <span style="color: #949494;"># Groups:   species, area, period [1,664]</span></span>
 <span class="co">##    species               area  period taxon   count</span>
 <span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -172,7 +172,7 @@
 <span class="co">## <span style="color: #BCBCBC;"> 8</span> Accipitriformes       TP         1 Aves        1</span>
 <span class="co">## <span style="color: #BCBCBC;"> 9</span> Acisoma panorpoides   BS         1 Odonata     1</span>
 <span class="co">## <span style="color: #BCBCBC;">10</span> Acisoma panorpoides   JW         2 Odonata    11</span>
-<span class="co">## <span style="color: #949494;"># ... with 1,654 more rows</span></span></code></pre>
+<span class="co">## <span style="color: #949494;"># … with 1,654 more rows</span></span></code></pre>
 <p>The results can be visualised, for example, for bird species at the six areas (towns) in Singapore, across two survey periods:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># get the (descending) order of species to be plot</span>

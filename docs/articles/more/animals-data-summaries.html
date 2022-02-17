@@ -106,7 +106,7 @@
             <h3 data-toc-skip class="subtitle">Compare local diversity between sampled areas</h3>
                         <h4 data-toc-skip class="author">Song, Xiao Ping</h4>
             
-            <h4 data-toc-skip class="date">2022-02-15</h4>
+            <h4 data-toc-skip class="date">2022-02-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/more/animals-data-summaries.Rmd" class="external-link"><code>vignettes/more/animals-data-summaries.Rmd</code></a></small>
       <div class="d-none name"><code>animals-data-summaries.Rmd</code></div>
@@ -135,7 +135,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>
 
 <span class="va">unique</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 40 x 3</span></span>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 40 × 3</span></span>
 <span class="co">##    area  period taxon      </span>
 <span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
 <span class="co">## <span style="color: #BCBCBC;"> 1</span> BS         1 Odonata    </span>
@@ -148,7 +148,7 @@
 <span class="co">## <span style="color: #BCBCBC;"> 8</span> JW         1 Amphibia   </span>
 <span class="co">## <span style="color: #BCBCBC;"> 9</span> JW         2 Aves       </span>
 <span class="co">## <span style="color: #BCBCBC;">10</span> JW         2 Lepidoptera</span>
-<span class="co">## <span style="color: #949494;"># ... with 30 more rows</span></span></code></pre>
+<span class="co">## <span style="color: #949494;"># … with 30 more rows</span></span></code></pre>
 <p>For each of these (rows of) unique combinations, calculate the species accumulation curve using the function <code><a href="../../reference/calculate_sac.html">calculate_sac()</a></code>. Species accumulation curves provide useful information on how much sampling effort is required to be reasonably certain of the total number of species (‘gamma’ diversity) within a given sampling unit. In this example, they allow the number of species between different animal groups, areas and survey periods to be compared at the same amount of sampling effort, i.e., same point along the curves.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plot_sac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>
@@ -195,7 +195,7 @@
 <p>The resulting dataframe <code>n_refer</code> allows direct comparisons to be made between the different areas/periods, based on the estimated number of species (column <code>richness</code>):</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">n_refer</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 40 x 6</span></span>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 40 × 6</span></span>
 <span class="co">##    taxon sites area  period richness    sd</span>
 <span class="co">##    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="co">## <span style="color: #BCBCBC;"> 1</span> Aves     84 BS         1     62    2.66</span>
@@ -208,7 +208,7 @@
 <span class="co">## <span style="color: #BCBCBC;"> 8</span> Aves     84 TP         1     68.6  4.24</span>
 <span class="co">## <span style="color: #BCBCBC;"> 9</span> Aves     84 TP         2     63.9  4.87</span>
 <span class="co">## <span style="color: #BCBCBC;">10</span> Aves     84 WL         1     62.6  4.70</span>
-<span class="co">## <span style="color: #949494;"># ... with 30 more rows</span></span></code></pre>
+<span class="co">## <span style="color: #949494;"># … with 30 more rows</span></span></code></pre>
 <p>Finally, the species accumulation curves (<code>plot_sac</code>) and comparisons based on similar sampling efforts (<code>n_refer</code>) can be visualised:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plot_sac</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>
