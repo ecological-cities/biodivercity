@@ -1,7 +1,7 @@
 ---
 title: "Apply Models"
 subtitle: "Generate spatial predictions across a landscape"
-author: "Author"
+author: "Hong Jhun Sim"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -10,153 +10,221 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
-## Overview
-
-By following this vignette, users will be able to predict (using a user-provided model object) animal species richness across a target landscape, and eventually visualise the predictions in the form of a heatmap. Begin by loading the required libraries and data files:
+This article outlines the steps to predict the number of species (species richness) for a particular animal group, across a target landscape. The pixel-based predictions are then visualised in the form of a spatial heatmap. Begin by loading the required packages to run the analysis:
 
 ```{r load required libraries, eval = FALSE, warning = FALSE, message = FALSE}
 library("biodivercity")
-library("tmap")
-library("leaflet")
+library("tmap") # visualisation
 ```
 
-```{r load libraries while in dev, echo = FALSE, warning = FALSE, message = FALSE}
+```{r load libraries while in dev, include = FALSE}
 devtools::load_all() 
-
 library("tmap")
-library("leaflet")
 ```
 
-```{r load bound geojson, echo=FALSE}
+The `biodivercity` package contains predictive models (`lme4::glmer()`) and data pre-processing workflow 'recipes' (`recipes::recipe()`) that were built for each of four animal groups surveyed in Singapore. Refer to `vignette("build-models")` for more details on these models, which were built using the example data in this package. In this article, the model used to predict the number of bird species will be used as an example. Alternatively, the user may provide their own model/recipe for the analysis. 
+
+Load the model/recipe objects built exclusively from manually-mapped landscape data:
+
+```{r load model objects}
+filepath <- system.file("extdata", "models-manually-mapped.Rdata", package = "biodivercity")
+load(filepath) # model and recipe objects
+```
+
+Next, load the landscape data within the target area of interest, which will be used to make spatial predictions. These data are the same format (vectors) as those used to build the models, and may be summarised as follows:
+
+- Natural vegetation (polygons)
+
+    - Percentage landscape area (`natveg_pland`)
+    
+- Trees (points) with species name (per point)
+
+    - Species richness (`tree_sprich`)
+    
+- Shrubs (polygons) with species name (per polygon)
+
+    - Percentage landscape area (`shrub_pland`)
+    - Species richness (`shrub_sprich`)
+    
+- Turf (polygons)
+
+    - Percentage landscape area (`turf_pland`)
+    
+- Water (polygons)
+
+    - Percentage landscape area (`water_pland`)
+    
+- Buildings (polygons) with the number of levels/storeys (per polygon)
+
+    - Floor area ratio (`buildingFA_ratio`)    
+    - Average number of levels (`buildingAvgLvl`)
+
+- Roads (lines) with the number of lanes (per line)
+
+    - Lane density (`laneDensity`)
+
+These landscape data will be summarised later, according to the predictor variables present in the models. For example, predictor variables in the bird model can be extracted as follows. Note that the prefix `_man_` denotes that the variables were generated from manually mapped vectors, while the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within.
+
+```{r}
+predictors_birds <- models_birds %>% # a list object
+ lapply(function(x) names(x@frame)) %>% # extract variable names in model
+  unlist() %>%
+  unique() %>% 
+  stringr::str_subset("(?<=^r)\\d+.*") # predictor variables start with the "r<value>m_"
+
+predictors_birds
+```
+
+
+The package contains example vector data from within the Punggol (PG) area (town) in Singapore (Chong et al., 2014, 2019), visualised in the interactive map below.
+
+```{r load landscape data}
+
 filepath <- system.file("extdata", "pg_layers.Rdata", package = "biodivercity")
 load(filepath)
 
-mod_filepath <- system.file("extdata", "models-manually-mapped.Rdata", package = "biodivercity")
-load(mod_filepath)
-
-attr_filepath <- system.file("extdata", "mean-sd.Rdata", package = "biodivercity")
-load(attr_filepath)
-
-data(points_landscape)
 ```
+
+```{r plot interative map for landscape data, echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
+
+tmap_mode("view")
+tmap_options(check.and.fix = TRUE)
+
+tm_basemap(c("CartoDB.Positron")) +
+  tm_shape(bound) +
+    tm_borders() +
+  tm_shape(trees %>% relocate(species)) +
+    tm_dots(title = "Trees",
+            group = "trees",
+            col = "brown",
+            size = 0.001,
+            border.col = "transparent") +
+  tm_shape(shrubs %>% st_make_valid() %>% relocate(species)) +
+    tm_polygons(title = "Shrubs",
+                group = "shrubs",
+                col = "#ffd92f",
+                alpha = 0.6,
+                border.col = "transparent") +
+  tm_shape(turf) +
+    tm_polygons(title = "Turf",
+                group = "turf",
+                col = "#a6d854",
+                alpha = 0.6,
+                border.col = "transparent") +
+  tm_shape(natveg) +
+    tm_polygons(title = "Natural vegetation",
+                group = "natveg",
+                col = "darkgreen",
+                alpha = 0.6,
+                border.col = "transparent") +
+  # tm_shape(water) +
+  #   tm_polygons(title = "Water",
+  #               group = "water",
+  #               col = "blue",
+  #               alpha = 0.6,
+  #               border.col = "transparent") +
+  tm_shape(buildings) +
+    tm_polygons(title = "Building levels",
+                group = "buildings",
+                col = "building_l",
+                palette = viridis::magma(5),
+                style = "jenks",
+                border.col = "transparent") + 
+  tm_shape(roads) +
+    tm_lines(title.col = "Road lanes",
+             group = "roads",
+             col = "lanes",
+             palette = viridis::magma(5),
+             style = "fixed",
+             breaks = c(2, 4, 6, 8))
+```
+
+<br>
 
 ## Spatial predictions
 
-To make predictions across a large area, the target landscape is first broken up into many smaller points.`geom_to_grid` is first used to overlay a grid (see Fig. 1 for example) over a target area, demarcated by polygon object `bound`, where species richness predictions are desired. Grid dimensions are variable and can be specified with `grid_dim`. `buffer_dist` is an optional argument for situations where landscape data is limited to the target area or smaller. The distance value for this argument should correspond to the largest buffer present in the variables, so as to not include areas with no landscape data. 
+To make spatial predictions, the target area is broken up into many smaller points (pixels), where landscape data will be summarised and predictions will be made. First, the function `generate_grid()` will be used to generate a grid (see Figure below) over the target area. The pixel resolution of the grid can be specified with the argument `grid_dim`. 
 
-This function is a wrapper for the `st_make_grid` function with `what == "centers"`, from the package `sf`. The output is an object of class `sfc` that comprises points around which landscape variables are extracted within their respective distance buffers. 
+![Figure: Visualisation of the `generate_grid()` function.](geom-to-grid.png){#id .class width=60% height=60%}
+
+An optional argument `innerbuffer_m` is also provided. This limits output predictions to a smaller area within the target landscape. This is useful, for example, when the model requires broad-scale landscape data to make predictions, but landscape data that is available do not extend beyond the target area. Hence, to avoid inaccurate predictions that result from areas without landscape data, the distance value for this argument should correspond to the largest buffer radius present in the model variables. In this example, the largest radius for variables within the bird models is `126` metres:
+
+```{r}
+
+# get the max radius among all predictor variables
+max_radius <- predictors_birds %>% 
+  stringr::str_extract("(?<=^r)\\d+") %>%  # extract values for buffer radii
+  as.numeric() %>% 
+  max(na.rm = TRUE)
+  
+max_radius
+```
+
+With the `max_radius` defined, run the function `generate_grid()`. The output is a dataframe of points (blue points in above figure), where landscape variables will be summarised within their respective distance buffers.
 
 ```{r create grid for each UGS town}
-# subset to regions where predictions can be made: >126m inwards from boundaries
-bound_grid <- geom_to_grid(geom = bound,
-                           buffer_dist = 126,
-                           grid_dim = c(50, 50))
+grid_points <- generate_grid(target_areas = bound, # target area
+                             innerbuffer_m = max_radius, # exclude areas < 126 m from boundaries
+                             pixelsize_m = 50) # pixel resolution
+
+grid_points # geometry column has been added
 ```
-![Fig. 1: Visualisation of the `geom_to_grid` function.](geom-to-grid.png){#id .class width=60% height=60%}
 
-Next, a final raster of species richness predictions for one taxon is made using the `heatmap_raster` function. Two important required arguments for `heatmap_raster` are `mods`, an averaged model object with which the user wants to make predictions, and `landscape`, a summary of the landscape variables around each of the points in `bound_grid`. A model object, `models_birds`, has already been loaded earlier. A suitable `landscape` object can be obtained from the various landscape vector layers (e.g. `natveg`, `turf`, etc.) using the `summarise_landscape_perpt` function:
+Next, using the function `summarise_landscape_perpt()` to summarise the landscape data around each of the points in `grid_points`. For each of the landscape components (argument `layer_<component>`), the buffer radii values (argument `radii_<component>`) are manually specified depending on the predictor variables present in the model. For example, to use the bird models, we summarise the landscape data as follows. The predictor variables will be appended to the `grid_points` dataframe as new columns, corresponding to those present in  `predictors_birds`.
 
-```{r grid landscape}
-
-natveg <- st_make_valid(natveg) # to make sure polygons are valid 
-
+```{r grid landscape, warning = FALSE, message = FALSE}
 grid_landscape <-
   summarise_landscape_perpt(
-    points = bound_grid,
-    uid_column = "site_id",
+    points = grid_points,
     species = "species",
     layer_trees = trees, radii_trees = 50,
     layer_shrubs = shrubs, radii_shrubs = 50,
     layer_turf = turf, radii_turf = 50,
-    layer_natveg = natveg, radii_natveg = c(50, 126),
+    layer_natveg = natveg, radii_natveg = 126,
     layer_water = water, radii_water = 50,
     layer_buildings = buildings, radii_buildings = 50, buildings_levels = "building_l",
-    layer_roads = roads, radii_roads = c(50, 126), roads_lanes = "lanes") %>% 
-  dplyr::select(!contains("sites")) %>% dplyr::select(!contains("shannon")&!contains("simpson"))
+    layer_roads = roads, radii_roads = 50, roads_lanes = "lanes") 
+
+grid_landscape
 ```
 
-For interested readers, a breakdown of the `heatmap_raster` function is as follows:
 
-1. Species richness is predicted at each point provided in the `geom` argument with the objects specified in `mods`, `env_df` and `landscape`.
-2. A second grid is created using `st_make_grid` with `what == "polygons"` as a template for the final raster.
-3. The grid template and prediction values are combined with `rasterize` from the `terra` package.
-
+Finally, use the function `heatmap_raster()` to predict the number of bird species (species richness) across the generated grid of spatial points, based on the predictor variables summarised in `grid_landscape`. The model object `models_birds` (suite of 'best' models) and `recipe_birds` (data pre-processing workflow) will be used to make the predictions at each point. Ensure that the argument `pixelsize_m` is similar to the value used in `generate_grid()`.
 
 ```{r heatmap_raster}
-# Minor edits to the env_df had to be made
-# bird_env <- birds %>% 
-#   dplyr::select(where(is.numeric) & !sprich) %>% 
-#   dplyr::select(!r50m_man_GnPR) # non-GnPR dataset
-
-bird_hm <- heatmap_raster(means=mean_vec, sds=sd_vec,
-                          mods = models_birds,
-                          landscape = grid_landscape,
-                          geom = bound,
-                          buffer_dist = 126,
-                          grid_dim = c(50, 50),
-                          name = "bird_hm") # optional
-
+bird_heatmap <- predict_heatmap(models = models_birds, 
+                                recipe_data = recipe_birds,
+                                points_topredict = grid_landscape, 
+                                pixelsize_m = 50)
 ```
+
+<br>
 
 ## Visualisation
 
-```{r load data, include = FALSE}
-# data(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m)
+To visualise the heatmap(s) produced, the `tmap` package can be used:
 
-bird_heatmap_100m <- system.file("extdata", "bird_heatmap_100m.tif",
-                              package="biodivercity") %>% 
-  terra::rast()
-
-bird_heatmap_50m <- system.file("extdata", "bird_heatmap_50m.tif",
-                              package="biodivercity") %>% 
-  terra::rast()
-
-bird_heatmap_20m <- system.file("extdata", "bird_heatmap_20m.tif",
-                              package="biodivercity") %>% 
-  terra::rast()
-```
-
-To visualise the heatmap(s) produced, the `tmap` package will be used. 
-
-```{r plotting maps, message = FALSE}
+```{r plot heatmap, message = FALSE, warning = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
 # Plotting maps
 
 tmap_mode("view")
-# tmap_mode("plot")
-tmap_options(check.and.fix = TRUE, #turf, natveg and shrubs layers contain invalid polygons
-             max.raster = c(plot = 1e7, view = 1e8)) # increase max raster resolution 
+tmap_options(max.raster = c(view = 1e8)) # increase max resolution to be visualised
 
-tm <- 
-  tm_basemap(c("CartoDB.Positron", "CartoDB.DarkMatter", "OpenStreetMap")) +
-
-  #50m heatmap
-  tm_shape(bird_hm, raster.downsample = FALSE) +
-    tm_raster(title = "Bird SR",
-                group = paste0("Bird Heatmap Raster ", 100, "m"),
-                style = "pretty",
-                palette = "YlOrRd",
-                # labels = c(" "),
-              #legend.show = FALSE,
-                alpha = 0.8) 
-  
-
+tm_basemap(c("CartoDB.Positron", "OpenStreetMap")) +
+  tm_shape(bird_heatmap, raster.downsample = FALSE) +
+  tm_raster(title = "Number of bird species",
+            style = "pretty",
+            palette = "YlOrRd",
+            alpha = 0.6) 
   
 ```
 
+<br>
 
-```{r leaflet, echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
-# Pipe the tmap object into tmap_leaflet() to create a leaflet widget,
-# so that we can use leaflet::hideGroup().
-tm %>% 
-  tmap_leaflet() %>%
-  
-  leaflet::hideGroup("Bird Heatmap Raster 50m") 
+---
 
-  
-```
+## References
 
-```{r rm obj, include = FALSE}
-rm(bird_heatmap_100m, bird_heatmap_20m, bird_heatmap_50m)
-```
+Chong KY, Teo S, Kurukulasuriya B, Chung YF, Giam X & Tan HTW (2019) The effects of landscape scale on greenery and traffic relationships with urban birds and butterflies. _Urban Ecosystems_, _22_(5): 917–926.
 
+Chong KY, Teo S, Kurukulasuriya B, Chung YF, Rajathurai S & Tan HTW (2014) Not all green is as good: Different effects of the natural and cultivated components of urban vegetation on bird and butterfly diversity. _Biological Conservation_, _171_: 299–309.

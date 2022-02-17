@@ -136,7 +136,7 @@ reference:
 - title: "Models"
   desc: "**_Predict and validate animal diversity_**"
 - contents:
-  - geom_to_grid
+  - generate_grid
   - summarise_landscape_perpt
-  - heatmap_raster
+  - predict_heatmap
   - validate_newdata

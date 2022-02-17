@@ -19,7 +19,7 @@
 #'
 #'@import checkmate
 #'@importFrom dplyr select mutate
-#'@importFrom tidyselect all_of starts_with
+#'@importFrom tidyselect all_of any_of
 #'@importFrom recipes bake
 #'@importFrom lme4 ranef
 #'@importFrom AICcmodavg modavgPred

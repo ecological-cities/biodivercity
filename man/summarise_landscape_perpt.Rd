@@ -6,7 +6,6 @@
 \usage{
 summarise_landscape_perpt(
   points,
-  uid_column = "id",
   layer_trees = NULL,
   radii_trees = 50,
   layer_shrubs = NULL,
@@ -28,9 +27,6 @@ summarise_landscape_perpt(
 }
 \arguments{
 \item{points}{Sampling points (sf object) with a projected coordinate reference system.}
-
-\item{uid_column}{character. Specify unique identifier column name in \code{points}.
-Defaults to \code{'uid'}. Column data should be of type character.}
 
 \item{layer_trees}{Geo-location of trees (sf points) to be summarised.
 Coordinate reference system should be similar to \code{points}.}

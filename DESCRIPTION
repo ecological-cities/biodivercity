@@ -43,7 +43,8 @@ Suggests:
     leaflet (>= 2.0.4.1),
     tmap (>= 3.3.2),
     ggplot2 (>= 3.3.5),
-    treemapify
+    treemapify,
+    viridis
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
