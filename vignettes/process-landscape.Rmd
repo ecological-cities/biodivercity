@@ -28,7 +28,7 @@ library("dplyr")
 library("tmap")
 ```
 
-The Punggol (`PG`) area (town) from the example data `sampling_areas` will be used to demonstrate the steps in this article, shown in the interactive map below.
+The Punggol (`PG`) area (town) in Singapore from the example data `sampling_areas` will be used to demonstrate the steps in this article, shown in the interactive map below.
 
 ```{r plot punggol area, warning = FALSE, message = FALSE, fig.height = 1.0, dpi = 300, out.width="50%"}
 
@@ -57,7 +57,7 @@ Built elements of the landscape can be retrieved from the OpenStreetMap (OSM) da
 
 ```{r download urban elements, eval = FALSE}
 
-dir.create(paste0(output_dir, "/osm")) # create sub-directory
+dir.create(paste0(output_dir, "/osm")) # create sub-directory for raw data
 
 buildings <- get_buildings_osm(place = sampling_areas,
                                date = as.Date("2021-01-01"),
@@ -88,6 +88,8 @@ tm_basemap(c("CartoDB.Positron")) +
 
 <br>
 
+#### Summarise metrics
+
 We can summarise various metrics for the downloaded datasets, at specific point locations and buffer radii. In this example, we randomly generate three points within the `sampling_areas`.
 
 ```{r}
@@ -98,7 +100,7 @@ points <- st_sample(sampling_areas, 3) %>%
   mutate(point_id = row.names(.)) # unique identifier
 ```
 
-The following list are possible metrics that may be summarised from the OSM data that were downloaded:
+The following lists the possible metrics that may be summarised from the downloaded OSM data:
 
 - Buildings (polygons) each with the number of levels
     - Floor area ratio (`buildingFA_ratio`)    
@@ -109,18 +111,19 @@ The following list are possible metrics that may be summarised from the OSM data
     
 <br>
 
-The function `osm_perpoint_specified()` can be be used to generate the summaries. To do so, we need to supply a character vector of predictor names to the function argument `predictors_osm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_osm_` denotes that the variables were generated from OpenStreetMap data. For example, we can summarise the building floor area ratio at a radius of 50 m and 100 m around `points`–these variables are appended as new columns.
+The function `osm_perpoint_specified()` can be be used to generate the summaries. To do so, we need to supply a character vector of predictor names to the function argument `predictors_osm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_osm_` denotes that the variables are based on OpenStreetMap data. For example, we can summarise the building floor area ratio at a radius of 50 m and 100 m around `points`–these variables are appended as new columns.
 
 ```{r osm_perpoint, warning = FALSE, message = FALSE}
 
-predictors <- c("r50m_osm_buildingFA_ratio", "r100m_osm_buildingFA_ratio") # variables to summarise
+# variables to summarise
+predictors <- c("r50m_osm_buildingFA_ratio", "r100m_osm_buildingFA_ratio") 
 
-points_output <- osm_perpoint_specified(vector_osm = buildings,
-                                        building_levels = "levels",
-                                        predictors_osm = predictors,
-                                        points = points)
+points <- osm_perpoint_specified(vector_osm = buildings,
+                                 building_levels = "levels",
+                                 predictors_osm = predictors,
+                                 points = points) 
 
-points_output
+points
 ```
 
 <br>
@@ -129,7 +132,7 @@ points_output
 
 ## Sentinel-2 satellite data
 
-Land cover information can be derived from publicly available Sentinel-2 data, downloadable via the package [`sen2r`](http://sen2r.ranghetti.info/index.html). Numerous parameters can be defined, both programmatically and via a graphical user interface as follows. Refer to the website for more information on its [installation and use](http://sen2r.ranghetti.info/articles/installation.html).
+Land cover information can be derived from publicly available Sentinel-2 data, downloadable via the package [`sen2r`](http://sen2r.ranghetti.info/index.html). Numerous parameters can be defined, both programmatically and via a graphical user interface as follows. It also allows us to run pre-processing steps such as cloud masking, atmospheric correction and the calculation of spectral indices. Refer to the website for more information on its [installation and use](http://sen2r.ranghetti.info/articles/installation.html).
 
 ```{r sen2r gui, eval = FALSE}
 library(sen2r)
@@ -143,7 +146,7 @@ knitr::include_graphics("sen2r-gui.png", dpi = 300)
 
 <br>
 
-The same parameters can be defined as arguments within `sen2r()`, or loaded from a JSON file. In this example, we download raw data from 1 Jan to 30 Jun 2021, with not more than 15% cloud cover within `sampling_areas`. For each image, the spectral indices [`NDVI`](https://www.indexdatabase.de/db/i-single.php?id=58) and [`NDWI2`](https://www.indexdatabase.de/db/i-single.php?id=546) will also be processed; these will be used to map vegetation and water cover, respectively. Do note that you will need to enter your account credentials with the [ESA Sentinel Hub](https://scihub.copernicus.eu/dhus/#/home). Detailed steps and the use of other servers (e.g. Google Cloud) can be found on the [package website](http://sen2r.ranghetti.info/index.html).
+The same parameters can be specified as arguments within `sen2r()`, or loaded from a JSON file. In this example, we download data from 1 Jan to 30 Jun 2021, with not more than 15% cloud cover within `sampling_areas`. For each image, the spectral indices [`NDVI`](https://www.indexdatabase.de/db/i-single.php?id=58) and [`NDWI2`](https://www.indexdatabase.de/db/i-single.php?id=546) will also be processed; these will be used to map vegetation and water cover, respectively. Do note that you will need to enter your account credentials with the [ESA Sentinel Hub](https://scihub.copernicus.eu/dhus/#/home). Detailed steps and the use of other servers (e.g. Google Cloud) can be found on the [package website](http://sen2r.ranghetti.info/index.html).
 
 ```{r sen2r, eval = FALSE}
 
@@ -169,82 +172,113 @@ out_paths <- sen2r(
 
 <br>
 
-Raster files downloaded across multiple dates can be combined to create mosaics to account for cloud cover. Using the `mosaic_sen2r()` function, this can be easily done with the file directory created by `sen2r()`, as specified in the `path_out` argument.
+For each data type (e.g. spectral index), we can combine all raster images captured within the specified date range by averaging the pixel values across files, thus forming an image mosaic. This allows us to avoid relying on any one image for our analysis, and to deal with missing data (e.g. due to high cloud cover) during the period of interest. The function `mosaic_sen2r()` creates the mosaic by averaging the pixel values across the multiple rasters. It is a convenience function that processes the images based on the output folder structure of `sen2r()`; ensure that the function argument `parent_dir` in `mosaic_sen2r()` is similar to the function argument `path_out` in `sen2r()`.
 
 ```{r mosaic generation, eval = FALSE}
-mosaic_sen2r(parent_dir = paste0(output_dir, "/sen2r"),
-              exclude = NULL,
-              rm_outlier = TRUE)
+mosaic_sen2r(parent_dir = paste0(output_dir, "/sen2r"))
 ```
 
-Downloaded rasters and the resulting mosaics contain raw information for specified indices. To account for noise and classify pixel values, Otsu's thresholding (see `threshold_otsu()`) can be used to define threshold values, where values above the threshold are regarded as a presence of the landscape type measured by an index. Here, we are classifying values above the threshold as "Present" with the value of `1` and values below the threshold as "Absent" with `0`.
+<br>
 
-```{r mosaic classification, warning = FALSE, message = FALSE}
-ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity") %>% 
+At this point, we have a single image mosaic (continuous raster) for each spectral index. While the continuous values from these rasters may be used directly in analyses, there may be instances were we want to work with discrete classes of land cover. One method is to separate pixels into one of two classes (e.g. vegetated or non-vegetated; water or non-water), based on an adaptively derived threshold value. For example, we can use Otsu's thresholding ([Otsu, 1979](https://cw.fel.cvut.cz/wiki/_media/courses/a6m33bio/otsu.pdf)), which tends to outperform other techniques in terms of stability of results and processing speed, even with the presence of > 2 peaks in the histogram of pixel values ([Bouhennache et al., 2019](https://www.tandfonline.com/doi/abs/10.1080/10106049.2018.1497094)). This may be implemented using the function `threshold_otsu()`. As an example, let's load the NDVI raster for the Punggol area in Singapore for subsequent classification. The NDVI is a measure of healthy green vegetation, based on the tendency of plants to reflect NIR & absorb red light. It ranges from -1 (non-vegetated) to 1 (densely vegetated). The figure below shows the histogram of NDVI values in Punggol, as well as the adaptively derived threshold value (vertical line).
+
+```{r}
+ndvi_mosaic <- 
+  system.file("extdata", "ndvi_mosaic.tif", package="biodivercity") %>% 
   terra::rast()
 
-veg_classified <- classify_image_binary(image = ndvi_mosaic,
-                      threshold = "otsu")
+# get Otsu's threshold
+threshold <- threshold_otsu(ndvi_mosaic)
+threshold
+```
+```{r include = FALSE}
+histogram <- terra::hist(ndvi_mosaic, breaks = 70, yaxt = 'n')
 ```
 
-To visualise the raster, several packages such as `ggplot2`, `tmap`, and `raster` can be used. Here, `tmap` is used to briefly examine the raster after classification.
+```{r echo = FALSE, fig.align='center', fig.height=4, fig.width = 5, warning = FALSE, message = FALSE, dpi = 300, out.width="70%", fig.cap="**Figure: Distribution of NDVI values across the Punggol area in Singapore, based on a mosaic of images collected from 2019-07-01 to 2021-06-30.**"}
+plot(histogram, 
+     xlab = "NDVI", xlim = c(-1, 1), main = "", yaxt = 'n',
+      col = rgb(178/255,223/255,138/255, 0.5))
+abline(v = threshold, col="black", lwd=2, lty = 2)
+```
 
-```{r visualise raster, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
-library("tmap")
+<br>
 
-tmap_mode("view")
+Note that the wrapper function `classify_image_binary()` directly classifies a continuous raster. It uses `threshold_otsu()` internally to define the threshold value. Run the function and visualise both the original NDVI and classified rasters (toggle the map layers to view each one separately).
+
+```{r mosaic classification, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
+veg_classified <- classify_image_binary(ndvi_mosaic, threshold = "otsu")
+
+tm_shape(ndvi_mosaic) +
+  tm_raster(palette = c("Greens")) +
 tm_shape(veg_classified) +
-  tm_raster(title = "veg_classified",
-            style = "cat",
+  tm_raster(style = "cat",
             palette = c("grey", "darkgreen"))
 ```
 
-With the classified mosaics, landscape metrics can then be extracted at the defined buffer distances around fauna sampling points. The sample dataset `data(sampling_points)` can be loaded for survey points at which landscape metrics from the classified mosaic `veg_classified` will be summarised to. In this example, `sampling_points` is subset to match the same spatial area of the mosaic. 
+<br>
 
-```{r lsm_perpoint data, eval = FALSE}
-data(sampling_points)
-sampling_points <- sampling_points %>% 
-  dplyr::filter(area == "PG")
+#### Summarise metrics
+
+Landscape patterns (i.e., landscape metrics) can be quantified for each of land cover class within classified rasters, summarised at specific point locations and buffer radii. Landscape metrics can be calculated at various 'levels', or unit of analysis — _patch_, _class_, and _landscape_ (in order of widening spatial scale). Refer to the package [landscapemetrics](https://r-spatialecology.github.io/landscapemetrics/index.html) for more information.
+
+```{r info on landscape metrics, echo = FALSE}
+
+lsm <- landscapemetrics::list_lsm() %>%
+  dplyr::select(-function_name) %>%
+  filter(level != "patch") %>%
+  pivot_wider(names_from = "level", values_from = "name") %>%
+  filter(metric != "ta", # remove unnecessary metrics
+         #metric != "pr",
+         #metric != "prd",
+         metric != "rpr") %>% 
+  mutate(name = coalesce(class, landscape)) %>% # new col for name
+  relocate(name, .after = metric) %>%
+  mutate(across(.cols = c("class", "landscape"), # simplify to Yes/NA 
+                ~ifelse(is.na(.), NA, "Yes"))) %>%
+  mutate(name = case_when( # add details to name
+    grepl("_cv", metric) ~ paste(name, "(coef. of variation)"), 
+    grepl("_mn", metric) ~ paste(name, "(mean)"),
+    grepl("_sd", metric) ~ paste(name, "(st. dev.)"),
+    TRUE ~ name
+  )) %>%
+  arrange(class, landscape, metric, type) %>%
+  mutate(class = ifelse(is.na(class), "No", paste0("[", class, "](https://r-spatialecology.github.io/landscapemetrics/reference/lsm_c_", metric, ".html)"))) %>% 
+  mutate(landscape = ifelse(is.na(landscape), "No", paste0("[", landscape, "](https://r-spatialecology.github.io/landscapemetrics/reference/lsm_l_", metric, ".html)"))) 
+
+
+knitr::kable(lsm, format = "html", caption = "**Table: Examples of landscape metrics and their corresponding level(s) they may be calculated at (_class_/_landscape_)**. Details in hyperlinked text.") %>%
+  kableExtra::kable_styling(full_width = T, position = "left")  %>%
+    kableExtra::kable_styling("striped") %>% kableExtra::scroll_box(width = "100%", height = "600px")
+
+rm(lsm)
 ```
 
-Next, several arguments have to be defined for the `lsm_perpoint()` function and more information on the input formats can be found on the function page. For example, `buffer_sizes` refer to the buffer radius values (in meters) around the sampling point where the raster data is summarised from.
+<br>
 
-```{r lsm_perpoint, eval = FALSE}
-veg_landscape_metrics <- lsm_perpoint(raster = veg_classified,
-                                      points = sampling_points,
-                                      buffer_sizes = c(50, 100),
+Similar to the OSM data, we will use the `points` dataset, which were randomly generated within the `sampling_areas` earlier on. A wide variety of metrics may be summarised using the function `lsm_perpoint()`. The following example summarises all 'class-level' metrics for vegetation cover (`veg_classified`), at a buffer radii of 50 m and 100 m around `points`.
+
+```{r lsm_perpoint, eval = FALSE, warning = FALSE, message = FALSE}
+points <- lsm_perpoint(raster = veg_classified,
+                                      points = points,
+                                      buffer_sizes = c(50, 100), # in metres
+                                      level = c("class"),
                                       class_names = c("veg"),
-                                      class_values = c(1),
-                                      landscape_name = "veg",
-                                      level = c("class")) 
+                                      class_values = c(1)) # pixel value of class
 ```
 
-Alternatively, certain desired landscape metrics can be specified for calculation via the `lsm_perpoint_specified()` function instead of summarising the full suite of metrics. For example, to calculate the `pland` metric for the classified vegetation mosaic at multiple buffer distances (50m, 100m), the metrics must first be defined:
+Alternatively, the function `lsm_perpoint_specified()` can be used to generate the metrics specified by their name. Similar to `osm_perpoint_specified()`, we need to supply a character vector of predictor names to the function argument `predictors_lsm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_lsm_` denotes that the variables are landscape metrics. For example, we can summarise the percentage of vegetated landscape (`pland` metric) at a radius of 50 m and 100 m around `points`–these variables are appended as new columns.
 
-```{r lsm_perpoint_specified data, warning = FALSE, messages = FALSE}
-predictors_lsm <- vector()
-dist <- c(50, 100)
+```{r lsm_perpoint_specified, warning = FALSE, message = FALSE}
 
-raster_list <- list()
-raster_list[[1]] <- veg_classified
+predictors <- c("r50m_lsm_veg_pland", "r100m_lsm_veg_pland") # variables to summarise
 
-for(i in seq_along(dist)){
-  predictors_lsm[i] <- paste0("r", dist[i], "m_lsm_veg_pland")
-}
+points <- lsm_perpoint_specified(raster = veg_classified,
+                                 predictors_lsm = predictors,
+                                 class_names = c("veg"),
+                                 class_values =  c(1),
+                                 points = points)
 
-predictors_lsm
-```
-
-The function can then be run without the need for providing buffer sizes:
-
-```{r lsm_perpoint_specified, eval = FALSE}
-pland <- lsm_perpoint_specified(raster_list = raster_list,
-                                predictors_lsm = predictors_lsm,
-                                class_names = c("veg"),
-                                class_values =  c(1),
-                                points = sampling_points,
-                                point_id = "point_id",
-                                period = "period"
-                                )
+points
 ```
 
