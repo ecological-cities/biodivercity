@@ -1,6 +1,6 @@
 ---
 title: "Process Landscape Data"
-subtitle: "Download and process satellite and OpenStreetMap data"
+subtitle: "Download and process OpenStreetMap and satellite data"
 author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -10,113 +10,165 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This article details several methods used to retrieve open access landscape data to build predictive models of animal diversity. Here, landscape data refers to data derived from both freely-available satellite imagery and open-source maps that are processed and summarised across a range of dates and spatial areas. The following outline covers the processes of downloading, processing and summarising the landscape data to complement animal observation data in later articles. 
+This article details various ways to download and process publicly available landscape data to build predictive models of animal diversity. Here, landscape data refers to data derived from both open-source maps and freely-available satellite data. The following outline includes methods to download, process and summarise the landscape data for a specified date range and spatial areas.
 
 First, load the necessary packages to run the analysis:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
 library("biodivercity")
-library("sf")
-library("dplyr")
+library("dplyr") # to process/wrangle data
+library("sf") # to process vector data
+library("tmap") # for visualisation
 ```
 
 ```{r load biodivercity while in dev, include = FALSE}
 devtools::load_all()
 library("sf")
 library("dplyr")
+library("tmap")
+```
+
+The Punggol (`PG`) area (town) from the example data `sampling_areas` will be used to demonstrate the steps in this article, shown in the interactive map below.
+
+```{r plot punggol area, warning = FALSE, message = FALSE, fig.height = 1.0, dpi = 300, out.width="50%"}
+
+data(sampling_areas)
+
+sampling_areas <- sampling_areas %>%
+   filter(area == "PG")
+
+tmap_mode("view")
+tm_basemap(c("CartoDB.Positron")) +
+  tm_shape(sampling_areas) + tm_borders(lwd = 2.0)
+```
+<br>
+
+Finally, since this analysis involves the downloading of datasets, define an output directory for raw and processed data to be exported to:
+
+```{r define output directories, warning = FALSE, message = FALSE, eval = FALSE}
+output_dir <- "</FILEPATH/TO/DIRECTORY>"
 ```
 
 <br>
 
-## Download open-source landscape data
+## OpenStreetMap (OSM) data
 
-### OpenStreetMap 
-
-Urban landscape elements can be retrieved from the freely-available OpenStreetMap (OSM) database. Building polygons and road lines are extracted from a set geographical boundary with the functions `get_buildings_osm` and `get_roads_osm`. To better organise the raw data and processed outputs that will be created in this article, it will be useful to define an output directory for the following analyses.
-
-```{r define output directories, warning = FALSE, message = FALSE}
-output_dir <- "/insert/output/directory"
-```
-
-In the following example, a single `polygon` feature from an example dataset is provided to the `get_buildings_osm` and `get_roads_osm` functions to serve as the spatial boundary. This informs the functions of the area from which the building `polygon` and road `line` feature data would be retrieved. A date range must also be provided for the function to successfully query the online OSM database, and will be useful for retrieving data from previous years.
+Built elements of the landscape can be retrieved from the OpenStreetMap (OSM) database. Building polygons and road lines will be extracted from `sampling_areas` using the functions `get_buildings_osm()` and `get_roads_osm()` respectively. The `date` argument, if specified, must be a snapshot date present within the [Geofabrik database](https://download.geofabrik.de). If not, the latest data will be downloaded. In this example, we download these urban elements for the date 1 Jan 2021 and visualise them below:
 
 ```{r download urban elements, eval = FALSE}
-data(sampling_areas)
 
-sampling_areas <- sampling_areas %>%
-   filter(area == "PG") %>%
-   st_zm(what = "ZM") %>% 
-   st_as_sf() %>%
-   st_make_valid()
+dir.create(paste0(output_dir, "/osm")) # create sub-directory
 
-osm_date <- as.Date(c("2021-01-01", "2021-06-30"))
-
-for(i in seq_along(osm_dates)){
 buildings <- get_buildings_osm(place = sampling_areas,
-                               date = osm_date[i],
-                               dir_raw = paste0(output_dir, "/osm"),
-                               filename = "osm_buildings.geojson")
+                               date = as.Date("2021-01-01"),
+                               dir_raw = paste0(output_dir, "/osm"))
 
-roads <- get_roads_osm(osm_boundaries,
-                       date = osm_date[i],
-                       dir_raw = paste0(output_dir, "/osm"),
-                       filename = "osm_roads.geojson")
-}
+roads <- get_roads_osm(sampling_areas,
+                       date = as.Date("2021-01-01"),
+                       dir_raw = paste0(output_dir, "/osm"))
 
+tmap_mode("view")
+tm_basemap(c("CartoDB.Positron")) +
+  tm_shape(sampling_areas) + tm_borders() +
+  tm_shape(buildings) + tm_polygons(col = "levels") +
+  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")
 ```
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
+
+filepath <- system.file("extdata", "osm_data.Rdata", package = "biodivercity")
+load(filepath)
+
+tmap_mode("view")
+tm_basemap(c("CartoDB.Positron")) +
+  tm_shape(sampling_areas) + tm_borders() +
+  tm_shape(buildings) + tm_polygons(col = "levels") +
+  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")
+```
+
+<br>
+
+We can summarise various metrics for the downloaded datasets, at specific point locations and buffer radii. In this example, we randomly generate three points within the `sampling_areas`.
+
+```{r}
+set.seed(123)
+
+points <- st_sample(sampling_areas, 3) %>% 
+  st_as_sf() %>% 
+  mutate(point_id = row.names(.)) %>% # unique identifier
+  mutate(period = 1)
+```
+
+The following list are possible metrics that may be summarised from the OSM data that were downloaded:
+
+- Buildings (polygons) each with the number of levels
+    - Floor area ratio (`buildingFA_ratio`)    
+    - Average number of levels (`buildingAvgLvl`)
+
+- Roads (lines) each with the number of lanes 
+    - Lane density (`laneDensity`)
+    
+<br>
+
+The function `osm_perpoint_specified()` can be be used to generate the summaries. To do so, we need to supply a character vector of predictor names to the function argument `predictors_osm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_osm_` denotes that the variables were generated from OpenStreetMap data. For example, we can summarise the building floor area ratio at a radius of 50 m and 100 m around `points`–these variables are appended as new columns.
+
+```{r osm_perpoint, warning = FALSE, message = FALSE}
+
+predictors <- c("r50m_osm_buildingFA_ratio", "r100m_osm_buildingFA_ratio") # variables to summarise
+
+points_output <- osm_perpoint_specified(vector_list = list(buildings),
+                                        building_levels = "levels",
+                                        predictors_osm = predictors,
+                                        points = points) %>% bind_rows()
+
+points_output
+```
+
+<br>
 
 ---
 
-### Sentinel-2 satellite images
+## Sentinel-2 satellite data
 
-```{r get sen2r version, include = FALSE}
-library(sen2r)
-sen2r_version <- packageVersion("sen2R")
-```
-
-```{r intro para, results = 'asis', echo = FALSE}
-cat(paste0("Landscape information is retrieved from the publicly available Sentinel-2 database using the `sen2r` package. As this is an external package unrelated to `biodivercity`, please also refer to the official repository for updated instructions on [installation and use](http://sen2r.ranghetti.info/articles/installation.html). The package version used to generate this article is `sen2r_", sen2r_version, "`."))
-```
-
-```{r detach sen2r, include = FALSE}
-detach("package:sen2r", unload = TRUE)
-```
-
-To download Sentinel-2 images of a specific area and range of dates, the spatio-temporal selections have to defined accordingly with the `sen2r()` function. This can be performed with a GUI provided by the `sen2r` package when running the `sen2r()` function with no arguments.  
+Land cover information can be derived from publicly available Sentinel-2 data, downloadable via the package [`sen2r`](http://sen2r.ranghetti.info/index.html). Numerous parameters can be defined, both programmatically and via a graphical user interface as follows. Refer to the website for more information on its [installation and use](http://sen2r.ranghetti.info/articles/installation.html).
 
 ```{r sen2r gui, eval = FALSE}
 library(sen2r)
-
 sen2r()
 ```
 
-![**Figure**: A screenshot of the `sen2r` graphical user interface (GUI) accessible by running `sen2r()`.](sen2r-gui.png)
 
-Alternatively, the same parameters can be customised with arguments when running `sen2r()`, allowing for the use of objects defined in the local R environment. A parameter list can also be loaded from a JSON file that was saved with previous processing parameters. 
-
-```{r sen2r setup, eval = FALSE}
-sen2r_params <- system.file("extdata", "sen2r-parameters.json", package="biodivercity")
-sen2r_dates <- as.Date(c("2021-01-01", "2021-06-30"))
+```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure: A screenshot of the `sen2r` graphical user interface accessible by running `sen2r::sen2r()`.**"}
+knitr::include_graphics("sen2r-gui.png", dpi = 300)
 ```
 
+<br>
+
+The same parameters can be defined as arguments within `sen2r()`, or loaded from a JSON file. In this example, we download raw data from 1 Jan to 30 Jun 2021, with not more than 15% cloud cover within `sampling_areas`. For each image, the spectral indices [`NDVI`](https://www.indexdatabase.de/db/i-single.php?id=58) and [`NDWI2`](https://www.indexdatabase.de/db/i-single.php?id=546) will also be processed; these will be used to map vegetation and water cover, respectively. Do note that you will need to enter your account credentials with the [ESA Sentinel Hub](https://scihub.copernicus.eu/dhus/#/home). Detailed steps and the use of other servers (e.g. Google Cloud) can be found on the [package website](http://sen2r.ranghetti.info/index.html).
+
 ```{r sen2r, eval = FALSE}
+
+# create sub-directories
+dir.create(paste0(output_dir, "/sen2r")) 
+dir.create(paste0(output_dir, "/sen2r/raw"))
+
 out_paths <- sen2r(
   param_list = sen2r_params,
-  timewindow = c(sen2r_dates[1], sen2r_dates[2]),
+  timewindow = as.Date(c("2021-01-01", "2021-06-30")),
+  max_cloud_safe = 15, # max 15% cloud cover in raw tile
+  max_mask = 15, # max 15% cloud cover over sampling_areas
+  extent = geojsonsf::sf_geojson(sampling_areas) # needs geojson as input
+  extent_as_mask = TRUE, # pixel values outside are set to NA
+  clip_on_extent = TRUE,
+  list_indices = c("NDVI", "NDWI2") # to map vegetation and water
+  list_rgb = "RGB432B", # output an RGB image as well
   path_l2a = paste0(output_dir, "/sen2r/raw"), 
   path_l1c = paste0(output_dir, "/sen2r/raw"),
   path_out = paste0(output_dir, "/sen2r"),
-  path_indices = paste0(output_dir, "/sen2r"),
-  extent_as_mask = TRUE,
-  list_rgb = "RGB432B" # output RGB image
-  # max_mask = 15,
-  # list_indices = c("NDVI", "ARI")
-  )
+  path_indices = paste0(output_dir, "/sen2r"))
 ```
 
----
-
-## Mosaic and summarise
+<br>
 
 Raster files downloaded across multiple dates can be combined to create mosaics to account for cloud cover. Using the `mosaic_sen2r()` function, this can be easily done with the file directory created by `sen2r()`, as specified in the `path_out` argument.
 
@@ -138,7 +190,7 @@ veg_classified <- classify_image_binary(image = ndvi_mosaic,
 
 To visualise the raster, several packages such as `ggplot2`, `tmap`, and `raster` can be used. Here, `tmap` is used to briefly examine the raster after classification.
 
-```{r visualise raster, warning = FALSE, message = FALSE}
+```{r visualise raster, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
 library("tmap")
 
 tmap_mode("view")
@@ -197,30 +249,3 @@ pland <- lsm_perpoint_specified(raster_list = raster_list,
                                 )
 ```
 
-Similarly, the function `osm_perpoint_specified()` can be be used to summarise data from the downloaded OSM dataset.
-
-```{r osm_perpoint data, warning = FALSE, message = FALSE}
-predictors_osm <- vector()
-dist <- c(50, 100)
-
-for(i in seq_along(dist)){
-  predictors_osm[i] <- paste0("r", dist[i], "m_osm_buildingFA_ratio")
-}
-
-predictors_osm
-```
-
-```{r osm_perpoint, eval = FALSE}
-buildingFA_ratio <- osm_perpoint_specified(buildings,
-                                           predictors_osm,
-                                           building_ndsm = NULL,
-                                           building_height = "height",
-                                           building_levels = "levels",
-                                           road_lanes = "lanes",
-                                           sampling_points,
-                                           point_id = "point_id",
-                                           period = "period"
-                                           )
-```
-
----
