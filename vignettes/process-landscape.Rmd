@@ -95,8 +95,7 @@ set.seed(123)
 
 points <- st_sample(sampling_areas, 3) %>% 
   st_as_sf() %>% 
-  mutate(point_id = row.names(.)) %>% # unique identifier
-  mutate(period = 1)
+  mutate(point_id = row.names(.)) # unique identifier
 ```
 
 The following list are possible metrics that may be summarised from the OSM data that were downloaded:
@@ -116,10 +115,10 @@ The function `osm_perpoint_specified()` can be be used to generate the summaries
 
 predictors <- c("r50m_osm_buildingFA_ratio", "r100m_osm_buildingFA_ratio") # variables to summarise
 
-points_output <- osm_perpoint_specified(vector_list = list(buildings),
+points_output <- osm_perpoint_specified(vector_osm = buildings,
                                         building_levels = "levels",
                                         predictors_osm = predictors,
-                                        points = points) %>% bind_rows()
+                                        points = points)
 
 points_output
 ```
