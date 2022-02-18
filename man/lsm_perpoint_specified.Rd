@@ -5,42 +5,34 @@
 \title{Calculate landscape metrics at sampling points specified by name}
 \usage{
 lsm_perpoint_specified(
-  raster_list,
-  predictors_lsm,
+  raster,
   class_names,
   class_values,
+  predictors_lsm,
   points,
-  point_id = "point_id",
-  period = "period"
+  point_id = "point_id"
 )
 }
 \arguments{
-\item{raster_list}{List of SpatRaster objects (\code{terra::rast()}). Each element is a classified land cover raster object to be analysed,
-and its sequence (number) should correspond to the survey periods (an integer) present in \code{points}.}
-
-\item{predictors_lsm}{Vector (character) of predictor variables to be calculated from the raster(s).
-Naming format is formatted as \verb{<radius in metres>_lsm_<class>_<metric>} (e.g. \code{r50m_lsm_veg_pland}).
-Refer to \code{landscapemetrics::list_lsm()} for the full list of metrics.}
+\item{raster}{A classified SpatRaster object (\code{terra::rast()}). Pixels have integer values.}
 
 \item{class_names}{Vector (character) of land cover class names to be used to identify the corresponding integer values in \code{class_values}.}
 
-\item{class_values}{Vector of (integer) values of interest within the classified rasters in \code{raster_list}. Should not include the value \code{0}.}
+\item{class_values}{Vector of (integer) values of interest within the classified rasters in \code{raster}. Should not include the value \code{0}.}
+
+\item{predictors_lsm}{Vector (character) of predictor variables to be calculated from the raster(s).
+The naming format is \verb{<radius in metres>_lsm_<class>_<metric>} (e.g. \code{r50m_lsm_veg_pland}).
+Refer to \code{landscapemetrics::list_lsm()} for the full list of metrics.}
 
 \item{points}{Sampling points (sf object) representing the locations to calculate the metrics.}
 
 \item{point_id}{Column name of the sampling point id within the \code{points} sf. Defaults to \code{"point_id"}.}
-
-\item{period}{Column name of the survey period (integers) within the \code{points} sf. Defaults to \code{"period"}.
-The column should contain integers that correspond to the number of elements in \code{raster_list}.}
 }
 \value{
-A list containing the specified landscape metrics summarised at the sampling points provided.
-Each element of the list contains results for a survey \code{period} (represented as integers in \code{points}).
+The \code{points} object including new columns for the variables specified in \code{predictors_osm}.
 }
 \description{
-Summarise specified landscape metrics at sampling points, for classified raster object(s).
-Multiple (list of) rasters may be classified, each corresponding
-to a survey period (integer values) in the dataset \code{points}. Calls the function \code{lsm_perpoint()} internally.
+Summarise specified landscape metrics at sampling points, for classified raster object. Calls the function \code{lsm_perpoint()} internally.
 The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 Refer to \code{landscapemetrics::list_lsm()} for the full list of metric names and abbreviations.
 }

@@ -14,11 +14,13 @@ This article outlines the steps to predict the number of species (species richne
 
 ```{r load required libraries, eval = FALSE, warning = FALSE, message = FALSE}
 library("biodivercity")
+library("dplyr") # to process/wrangle data
 library("tmap") # for visualisation
 ```
 
 ```{r load libraries while in dev, include = FALSE}
 devtools::load_all() 
+library("dplyr") 
 library("tmap")
 ```
 

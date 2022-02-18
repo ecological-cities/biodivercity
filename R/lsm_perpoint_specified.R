@@ -1,25 +1,19 @@
 #'Calculate landscape metrics at sampling points specified by name
 #'
-#'Summarise specified landscape metrics at sampling points, for classified raster object(s).
-#'Multiple (list of) rasters may be classified, each corresponding
-#'to a survey period (integer values) in the dataset `points`. Calls the function `lsm_perpoint()` internally.
+#'Summarise specified landscape metrics at sampling points, for classified raster object. Calls the function `lsm_perpoint()` internally.
 #'The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 #'Refer to `landscapemetrics::list_lsm()` for the full list of metric names and abbreviations.
 #'
-#'@param raster_list List of SpatRaster objects (`terra::rast()`). Each element is a classified land cover raster object to be analysed,
-#'and its sequence (number) should correspond to the survey periods (an integer) present in `points`.
+#'@param raster A classified SpatRaster object (`terra::rast()`). Pixels have integer values.
 #'@param predictors_lsm Vector (character) of predictor variables to be calculated from the raster(s).
-#'Naming format is formatted as `<radius in metres>_lsm_<class>_<metric>` (e.g. `r50m_lsm_veg_pland`).
+#'The naming format is `<radius in metres>_lsm_<class>_<metric>` (e.g. `r50m_lsm_veg_pland`).
 #'Refer to `landscapemetrics::list_lsm()` for the full list of metrics.
 #'@param class_names Vector (character) of land cover class names to be used to identify the corresponding integer values in `class_values`.
-#'@param class_values Vector of (integer) values of interest within the classified rasters in `raster_list`. Should not include the value `0`.
+#'@param class_values Vector of (integer) values of interest within the classified rasters in `raster`. Should not include the value `0`.
 #'@param points Sampling points (sf object) representing the locations to calculate the metrics.
 #'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.
-#'@param period Column name of the survey period (integers) within the `points` sf. Defaults to `"period"`.
-#'The column should contain integers that correspond to the number of elements in `raster_list`.
 #'
-#'@return A list containing the specified landscape metrics summarised at the sampling points provided.
-#'Each element of the list contains results for a survey `period` (represented as integers in `points`).
+#'@return The `points` object including new columns for the variables specified in `predictors_osm`.
 #'
 #'@import checkmate
 #'@import dplyr
@@ -32,17 +26,16 @@
 #'@importFrom tidyselect matches
 #'
 #'@export
-lsm_perpoint_specified <- function(raster_list, predictors_lsm,
+lsm_perpoint_specified <- function(raster,
                                    class_names, class_values,
+                                   predictors_lsm,
                                    points,
-                                   point_id = "point_id",
-                                   period = "period"){
+                                   point_id = "point_id"){
 
   # Error checking ------------------
   coll <- checkmate::makeAssertCollection()
 
   checkmate::assert_character(predictors_lsm, min.chars = 1, any.missing = FALSE, all.missing = FALSE, null.ok = FALSE, unique = TRUE, add = coll)
-  checkmate::assert_list(raster_list, any.missing = FALSE, all.missing = FALSE, min.len = 1)
 
   checkmate::reportAssertions(coll)
 
@@ -62,80 +55,48 @@ lsm_perpoint_specified <- function(raster_list, predictors_lsm,
     dplyr::arrange(.data$class, .data$metric)
 
 
-  # parallel processing
-  # cl <- parallel::makeCluster(parallel::detectCores()[1]-1, outfile = "") # not to overload your computer
-  # doParallel::registerDoParallel(cl)
+  for(i in seq_len(nrow(input))){ # per predictor
 
-  results_all <- list()
-  for(i in seq_along(raster_list)){ # per period
+    succeeded <- tryCatch({
 
-    # results <- foreach(j = seq_len(nrow(input)), # parallel loop - can't work
-    #                    .packages = c("tidyverse", "sf", "terra", "landscapemetrics", "checkmate")) %dopar% {
+      suppressMessages(result <-
+                         lsm_perpoint(raster = raster,
+                                      points = points,
+                                      buffer_sizes = as.numeric(input$radius[i]),
+                                      class_names = input$class[i],
+                                      class_values = input$value[i],
+                                      point_id = point_id,
+                                      what = paste0("lsm_c_", input$metric[i])))
 
-    results <- list()
-    for(j in seq_len(nrow(input))){ # per predictor
+      result <- purrr::map_dfr(result, ~as_tibble(., ), .id = "buffer") %>%
+        tidyr::pivot_wider(id_cols = c(.data[[point_id]]),
+                    names_from = "buffer",
+                    values_from = tidyselect::matches("lsm") | tidyselect::matches("osm"), # only pivot cols with these strings
+                    names_glue = "r{buffer}m_{.value}")
 
-      succeeded <- tryCatch({
-
-        suppressMessages(result <-
-                           lsm_perpoint(raster = raster_list[[i]],
-                                        points = points %>%
-                                          dplyr::filter(.data[[period]] == i),
-                                        buffer_sizes = as.numeric(input$radius[j]),
-                                        class_names = input$class[j],
-                                        class_values = input$value[j],
-                                        point_id = point_id,
-                                        period = period,
-                                        what = paste0("lsm_c_", input$metric[j])))
-
-        result <- purrr::map_dfr(result, ~as_tibble(., ), .id = "buffer") %>%
-          tidyr::pivot_wider(id_cols = c(.data[[period]], .data[[point_id]]),
-                      names_from = "buffer",
-                      values_from = tidyselect::matches("lsm") | tidyselect::matches("osm"), # only pivot cols with these strings
-                      names_glue = "r{buffer}m_{.value}")
-        result[[period]] <- as.numeric(result[[period]])   # edit col var type
-
-        message(paste0(Sys.time(), " Summarised at sampling points for ", j, "/", nrow(input), " predictor variables (period ", i,").\n"))
+      message(paste0(Sys.time(), " Summarised at sampling points for ", i, "/", nrow(input), " predictor variables.\n"))
 
 
-        # return(result)
-        results[[j]] <- result
-        rm(result)
+      points <- points %>%
+        left_join(result, by = point_id)
+      rm(result)
 
-        succeeded <- "success"
+      succeeded <- "success"
 
-      }, error = function(e){
+    }, error = function(e){
 
-        warning(paste0(Sys.time(), " Error in summarising predictor variable ", j, "/", nrow(input), " - Returning NAs. Original warning message:"), sep = "\n")
-        warning(e)
-        return("error")
-      })
-      if(succeeded == "error"){
+      warning(paste0(Sys.time(), " Error in summarising predictor variable ", i, "/", nrow(input), " - Returning NAs. Original warning message:"), sep = "\n")
+      warning(e)
+      return("error")
+    })
+    if(succeeded == "error"){
 
-        # append to list NAs
-        results[[j]] <- points %>%
-             dplyr::filter(.data[[period]] == i) %>%
-             dplyr::select(.data[[period]], .data[[point_id]]) %>%
-             sf::st_set_geometry(NULL) %>%
-             dplyr::mutate("r{input$radius[j]}m_lsm_{input$class[j]}_{input$metric[j]}" := NA)
-      }
-      rm(succeeded, j)
+      # append NAs
+      points <- points %>%
+           dplyr::mutate("r{input$radius[i]}m_lsm_{input$class[i]}_{input$metric[i]}" := NA)
     }
-
-    # combine list into df (by cols)
-    if(!(rlang::is_empty(results) | all(sapply(results, is_empty)))){
-      results <- results[lengths(results) > 1] %>% # remove empty elements
-        purrr::reduce(dplyr::full_join, by = c(point_id, period))
-      results_all[[i]] <- results
-
-      message(paste0(Sys.time(), " Landscape predictors summarised for period ", i, "/", length(raster_list), "."))
-    } else {
-      warning(paste0(Sys.time(), " Landscape predictors not summarised for period ", i,"/", length(raster_list), "."))
-    }
+    rm(succeeded, i)
   }
 
-  # parallel::stopCluster(cl)
-  # rm(cl)
-
-  return(results_all)
+  return(points)
 }

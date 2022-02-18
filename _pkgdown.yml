@@ -125,11 +125,11 @@ reference:
 - title: "Landscapes"
   desc: "**_Get, process and summarise landscape data at survey locations_**"
 - contents:
+  - get_buildings_osm
+  - get_roads_osm
   - mosaic_sen2r
   - classify_image_binary
   - threshold_otsu
-  - get_roads_osm
-  - get_buildings_osm
   - lsm_perpoint
   - lsm_perpoint_specified
   - osm_perpoint_specified
