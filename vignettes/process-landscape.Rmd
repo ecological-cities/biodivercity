@@ -30,7 +30,7 @@ library("tmap")
 
 The Punggol (`PG`) area (town) in Singapore from the example data `sampling_areas` will be used to demonstrate the steps in this article, shown in the interactive map below.
 
-```{r plot punggol area, warning = FALSE, message = FALSE, fig.height = 1.0, dpi = 300, out.width="50%"}
+```{r plot punggol area, warning = FALSE, message = FALSE, fig.height = 1.0, dpi = 300, out.width="50%", fig.align='center'}
 
 data(sampling_areas)
 
@@ -88,7 +88,7 @@ tm_basemap(c("CartoDB.Positron")) +
 
 <br>
 
-#### Summarise metrics
+### Summarise OSM metrics
 
 We can summarise various metrics for the downloaded datasets, at specific point locations and buffer radii. In this example, we randomly generate three points within the `sampling_areas`.
 
@@ -218,7 +218,7 @@ tm_shape(veg_classified) +
 
 <br>
 
-#### Summarise metrics
+### Summarise landscape metrics
 
 Landscape patterns (i.e., landscape metrics) can be quantified for each of land cover class within classified rasters, summarised at specific point locations and buffer radii. Landscape metrics can be calculated at various 'levels', or unit of analysis — _patch_, _class_, and _landscape_ (in order of widening spatial scale). Refer to the package [landscapemetrics](https://r-spatialecology.github.io/landscapemetrics/index.html) for more information.
 
