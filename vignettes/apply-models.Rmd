@@ -70,7 +70,7 @@ The following list describes the manually-generated landscape components used to
 
 <br>
 
-To demonstrate how spatial predictions may be generated, load the example landscape data from within the Punggol (PG) area in Singapore (Chong et al., 2014, 2019), visualised in the interactive map below:
+To demonstrate how spatial predictions may be generated, load the example landscape data from within the Punggol (PG) area in Singapore (Chong et al., 2014, 2019), visualised in the interactive map below. Note that there are no water bodies mapped in the target area.
 
 ```{r load landscape data}
 filepath <- system.file("extdata", "pg_layers.Rdata", package = "biodivercity")
@@ -97,7 +97,7 @@ tm_basemap(c("CartoDB.Positron")) +
             col = "brown",
             size = 0.001,
             border.col = "transparent") +
-  tm_shape(shrubs %>% st_make_valid() %>% relocate(species)) +
+  tm_shape(shrubs %>% relocate(species)) +
     tm_polygons(title = "Shrubs",
                 group = "shrubs",
                 col = "#ffd92f",
@@ -118,7 +118,7 @@ tm_basemap(c("CartoDB.Positron")) +
   tm_shape(buildings) +
     tm_polygons(title = "Building levels",
                 group = "buildings",
-                col = "building_l",
+                col = "levels",
                 palette = viridis::magma(5),
                 style = "jenks",
                 border.col = "transparent") + 
@@ -176,8 +176,8 @@ grid_landscape <-
     layer_shrubs = shrubs, radii_shrubs = 50,
     layer_turf = turf, radii_turf = 50,
     layer_natveg = natveg, radii_natveg = 126,
-    layer_water = water, radii_water = 50,
-    layer_buildings = buildings, radii_buildings = 50, buildings_levels = "building_l",
+    layer_water = water, radii_water = 50, # no water within the target area, 'water_pland' will be 0
+    layer_buildings = buildings, radii_buildings = 50, buildings_levels = "levels",
     layer_roads = roads, radii_roads = 50, roads_lanes = "lanes") 
 
 grid_landscape
