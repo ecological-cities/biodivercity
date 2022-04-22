@@ -98,13 +98,24 @@ lsm_perpoint <- function(raster, points, buffer_sizes,
 
          tidyr::separate(.data$plot_id, c(point_id, period), sep = "_period") %>% # separate cols
 
-         dplyr::filter(.data$layer == .data[[period]]) %>% # remove results for irrelevant period
+         # remove results for irrelevant period (if > 1 layer)
+         if(terra::nlyr(raster) > 1){
+           lsm <- lsm %>%
+             dplyr::filter(.data$layer == .data[[period]])
+         }
+
+       lsm <- lsm %>%
          dplyr::filter(!(level == "class" & class == 0) & !(level == "class" & is.na(class))) %>% # remove land cover class 0 or NA
 
          # remove useless metrics
          dplyr::filter(!.data$metric %in% c("pr", "prd", "rpr")) %>%
          dplyr::filter(!((.data$metric %in% c("ta")) & (level == "landscape"))) %>% # total landscape area
          dplyr::filter(!((.data$metric %in% c("lpi")) & (level == "landscape"))) %>% # largest patch in landscape
+
+         # amend erroneous values
+         dplyr::mutate(value = dplyr::case_when((.data$metric == "clumpy" & .data$value > 1) ~ 1,
+                                                (.data$metric == "clumpy" & .data$value < -1 ~ -1),
+                                                TRUE ~ .data$value)) %>%
 
          # new col for levels
          dplyr::mutate(levels = dplyr::case_when(!is.na(class) ~ tibble::deframe(tibble(class_values, class_names))[class], # class-lvl
@@ -201,6 +212,8 @@ lsm_perpoint <- function(raster, points, buffer_sizes,
                     " buffer sizes (", buffer_sizes[i], "m)"))
 
      circles[[i]] <- lsm
+
+     gc()
 
    }
 
