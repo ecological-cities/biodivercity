@@ -10,6 +10,7 @@ lsm_perpoint_specified(
   class_values,
   predictors_lsm,
   points,
+  na_threshold = 90,
   point_id = "point_id",
   ...
 )
@@ -27,6 +28,9 @@ Refer to \code{landscapemetrics::list_lsm()} for the full list of metrics.}
 
 \item{points}{Sampling points (sf object) representing the locations to calculate the metrics.}
 
+\item{na_threshold}{Value for calculated predictor will be \code{NA} if the percentage of raster data
+within the respective point buffer areas is less than this value (\code{0} to \code{100}).}
+
 \item{point_id}{Column name of the sampling point id within the \code{points} sf. Defaults to \code{"point_id"}.}
 
 \item{...}{Arguments passed on to \code{lsm_perpoint()}}
@@ -38,4 +42,6 @@ The \code{points} object including new columns for the variables specified in \c
 Summarise specified landscape metrics at sampling points, for classified raster object. Calls the function \code{lsm_perpoint()} internally.
 The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 Refer to \code{landscapemetrics::list_lsm()} for the full list of metric names and abbreviations.
+#'Note that output metric will be \code{NA} if the percentage of pixel values within the respective
+buffer area is less than 90\%.
 }
