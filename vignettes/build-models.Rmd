@@ -20,6 +20,8 @@ library("sf") # to process landscape data
 
 ```{r load biodivercity while in dev, include = FALSE}
 devtools::load_all()
+library("dplyr") 
+library("sf") 
 ```
 
 <br>
@@ -28,7 +30,7 @@ devtools::load_all()
 
 ### Landscape
 
-```{r show landscape data used in analyses, echo = FALSE}
+```{r show landscape data used in analyses, echo = FALSE, eval = FALSE}
 
 # e.g. load landscape data at sampling points
 points <- st_read(glue::glue("{dir_cleandata}/points_landscape-info.geojson"), quiet = TRUE) %>% 
@@ -44,7 +46,7 @@ knitr::kable(head(points), caption = "**`points_landscape-info.geojson`: Manuall
 
 ### Load and filter fauna data
 
-```{r remove points with few surveys, include = FALSE, cache = TRUE}
+```{r remove points with few surveys, include = FALSE, eval = FALSE}
 
 ## Filtered data
 # no. of sampling points with < 6 surveys
@@ -62,15 +64,15 @@ points_tally6 <- points_tally %>% # remove sampling points
 
 Sampling points with __< 6 surveys__ removed (per survey round per taxon):  
 
-- **`r length(unique(removed$point_id))`** sampling points were removed (`r nrow(removed[removed$priority == "Aves",])` Aves; `r nrow(removed[removed$priority == "Lepidoptera",])` Lepidoptera; `r nrow(removed[removed$priority == "Odonata",])` Odonata; `r nrow(removed[removed$priority == "Amphibia",])` Amphibia)   
+- **`length(unique(removed$point_id))`** sampling points were removed (`nrow(removed[removed$priority == "Aves",])` Aves; `nrow(removed[removed$priority == "Lepidoptera",])` Lepidoptera; `nrow(removed[removed$priority == "Odonata",])` Odonata; `nrow(removed[removed$priority == "Amphibia",])` Amphibia)   
 
-- **`r length(unique(points_tally6$point_id))`** sampling points remained  (`r nrow(points_tally6[points_tally6$priority == "Aves",])` Aves; `r nrow(points_tally6[points_tally6$priority == "Lepidoptera",])` Lepidoptera; `r nrow(points_tally6[points_tally6$priority == "Odonata",])` Odonata; `r nrow(points_tally6[points_tally6$priority == "Amphibia",])` Amphibia) 
+- **`length(unique(points_tally6$point_id))`** sampling points remained  (`nrow(points_tally6[points_tally6$priority == "Aves",])` Aves; `nrow(points_tally6[points_tally6$priority == "Lepidoptera",])` Lepidoptera; `nrow(points_tally6[points_tally6$priority == "Odonata",])` Odonata; `nrow(points_tally6[points_tally6$priority == "Amphibia",])` Amphibia) 
 
-```{r include = FALSE}
+```{r include = FALSE, eval = FALSE}
 rm(removed)
 ```
 
-```{r}
+```{r eval = FALSE}
 # filter full data using points_tally6
 surveys_filtered <- surveys %>%
   semi_join(points_tally6, by = c("point_id", "round", "priority")) %>%
@@ -90,7 +92,7 @@ fauna_filtered <- fauna %>%
 
 - **`surveys_filtered.csv`**: Information on surveys performed at sampling points, located across six towns. Filtered for 6 cycles.
 
-```{r read filtered survey data, include = FALSE, eval = params$update_inputdata}
+```{r read filtered survey data, include = FALSE, eval = FALSE}
 surveys <- read_csv(glue::glue("{dir_dataoutput}/fauna/filtered/surveys_filtered.csv")) %>%
   mutate(town = factor(town, levels = c("PG", "QT", "TP","JW", "BS", "WL"))) %>%
   mutate(priority = factor(priority, levels = c("Aves", "Lepidoptera", "Odonata", "Amphibia"))) %>% 
@@ -99,7 +101,7 @@ surveys <- read_csv(glue::glue("{dir_dataoutput}/fauna/filtered/surveys_filtered
 
 - **`fauna_filtered.csv`** Counts (abundance) of each species observed during surveys, for four priority taxa. Includes repeated observations of the same species (different time/distance). _Note that the data includes genus- and family-level fauna observations._ Excludes sampling points with < 6 surveys.
 
-```{r calculate sp richnness for each animal group, include = FALSE, eval = params$update_inputdata}
+```{r calculate sp richnness for each animal group, include = FALSE, eval = FALSE}
 
 fauna <- read_csv(glue::glue("{dir_dataoutput}/fauna/filtered/fauna_filtered.csv")) %>%
   mutate(round = as.character(round)) # convert round to character for sptally_extractor()
@@ -145,7 +147,7 @@ rm(fauna, surveys)
 
 Landscape data were appended to the Fauna data. For each of the animal groups, rows that contained `NA` were removed.
 
-```{r append landscape data to each animal group & scale vars, include = FALSE, eval = params$update_inputdata}
+```{r append landscape data to each animal group & scale vars, include = FALSE, eval = FALSE}
 
 # overwrite vars
 birds <- birds %>% 
@@ -171,7 +173,7 @@ frogs <- frogs %>%
 rm(points)
 ```
 
-```{r to convert from long to wide format & remove NAs, include = FALSE, eval = params$update_inputdata}
+```{r to convert from long to wide format & remove NAs, include = FALSE, eval = FALSE}
 
 # there are repeated rows of same response var (pseudo-replication)
 # pivot to wide format (add radius info into colnames)
@@ -218,7 +220,7 @@ frogs <- frogs %>%
 
 ### Scale data
 
-```{r}
+```{r eval = FALSE}
 # filter the data? then scale/center. Overwrite vars
 birds <- birds %>% 
   {if(params$dredge_round1_only) filter(., round == "1") else .} %>%
@@ -273,7 +275,7 @@ landscape_vars <- birds %>%
 
 ### Create variable subset list
 
-```{r}
+```{r eval = FALSE}
 var.comb <- combn(landscape_vars, 2) %>% 
   t() %>% 
   as.data.frame() %>% 
@@ -328,7 +330,7 @@ rm(var.comb, subset.list)
 
 ### Run dredge
 
-```{r}
+```{r eval = FALSE}
 if(params$dredge_round1_only){
   
   #round 1 only
@@ -365,7 +367,7 @@ print(system.time(
 
 ### Show results
 
-```{r}
+```{r eval = FALSE}
 print(head(birdmods))
 
 bestmodels_info <- subset(birdmods, 
@@ -417,7 +419,7 @@ rm(bestmodels_info)
 
 ### Model average predict function
 
-```{r}
+```{r eval = FALSE}
 model_avgpred <- function(allmodels_info, 
                           data_raw, 
                           delta_threshold = 2,
@@ -568,7 +570,7 @@ model_avgpred <- function(allmodels_info,
 
 ### Plot function
 
-```{r}
+```{r eval = FALSE}
 plot_glmer <- function(allmodels_info, 
                        data_raw, 
                        delta_threshold = 2,
@@ -763,7 +765,7 @@ plot_glmer <- function(allmodels_info,
 }
 ```
 
-```{r}
+```{r eval = FALSE}
 plot_glmer(allmodels_info = birdmods,
            data_raw = birds,  
            delta_threshold = params$dredge_delta_threshold,
