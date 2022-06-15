@@ -186,7 +186,7 @@ grid_landscape
 ```
 
 
-Finally, use the function `heatmap_raster()` to predict the number of bird species (species richness) across the generated grid of spatial points, based on the predictor variables summarised in `grid_landscape`. The model object `models_birds` (suite of 'best' models) and `recipe_birds` (data pre-processing workflow) will be used to make the predictions at each point. Ensure that the argument `pixelsize_m` is similar to the value used in `generate_grid()`.
+Finally, use the function `predict_heatmap()` to predict the number of bird species (species richness) across the generated grid of spatial points, based on the predictor variables summarised in `grid_landscape`. The model object `models_birds` (suite of 'best' models) and `recipe_birds` (data pre-processing workflow) will be used to make the predictions at each point. Ensure that the argument `pixelsize_m` is similar to the value used in `generate_grid()`.
 
 ```{r heatmap_raster}
 bird_heatmap <- predict_heatmap(models = models_birds, 
