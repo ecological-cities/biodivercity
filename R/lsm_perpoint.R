@@ -53,7 +53,7 @@ lsm_perpoint <- function(raster, points, buffer_sizes,
   checkmate::assert_numeric(class_values, lower = 0, finite = TRUE, any.missing = FALSE, all.missing = FALSE, null.ok = TRUE, len = length(class_names), unique = TRUE, add = coll)
   checkmate::assert_numeric(buffer_sizes, lower = 0, finite = TRUE, any.missing = FALSE, add = coll)
   checkmate::assert_character(landscape_name, min.chars = 1, any.missing = FALSE, all.missing = FALSE, null.ok = TRUE, len = 1, add = coll)
-  checkmate::assert_subset(point_id, choices = colnames(points), empty.ok = FALSE, add = coll)
+  # checkmate::assert_subset(point_id, choices = colnames(points), empty.ok = FALSE, add = coll)
   # checkmate::assert_subset(period, choices = colnames(points), empty.ok = FALSE, add = coll)
   checkmate::assert_subset(level, choices = c("class", "landscape"), empty.ok = TRUE, add = coll)
 
