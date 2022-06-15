@@ -99,7 +99,7 @@ tm_basemap(c("CartoDB.Positron")) +
             col = "brown",
             size = 0.001,
             border.col = "transparent") +
-  tm_shape(shrubs %>% relocate(species)) +
+  tm_shape(shrubs %>% relocate(species) %>% st_make_valid()) +
     tm_polygons(title = "Shrubs",
                 group = "shrubs",
                 col = "#ffd92f",
