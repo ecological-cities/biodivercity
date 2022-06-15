@@ -10,7 +10,8 @@ lsm_perpoint_specified(
   class_values,
   predictors_lsm,
   points,
-  point_id = "point_id"
+  point_id = "point_id",
+  ...
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ Refer to \code{landscapemetrics::list_lsm()} for the full list of metrics.}
 \item{points}{Sampling points (sf object) representing the locations to calculate the metrics.}
 
 \item{point_id}{Column name of the sampling point id within the \code{points} sf. Defaults to \code{"point_id"}.}
+
+\item{...}{Arguments passed on to \code{lsm_perpoint()}}
 }
 \value{
 The \code{points} object including new columns for the variables specified in \code{predictors_osm}.

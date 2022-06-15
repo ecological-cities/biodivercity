@@ -3,6 +3,8 @@
 #'Summarise specified landscape metrics at sampling points, for classified raster object. Calls the function `lsm_perpoint()` internally.
 #'The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 #'Refer to `landscapemetrics::list_lsm()` for the full list of metric names and abbreviations.
+#'#'Note that output metric will be `NA` if the percentage of pixel values within the respective
+#'buffer area is less than 90%.
 #'
 #'@param raster A classified SpatRaster object (`terra::rast()`). Pixels have integer values.
 #'@param predictors_lsm Vector (character) of predictor variables to be calculated from the raster(s).
@@ -11,7 +13,10 @@
 #'@param class_names Vector (character) of land cover class names to be used to identify the corresponding integer values in `class_values`.
 #'@param class_values Vector of (integer) values of interest within the classified rasters in `raster`. Should not include the value `0`.
 #'@param points Sampling points (sf object) representing the locations to calculate the metrics.
+#'@param na_threshold Value for calculated predictor will be `NA` if the percentage of raster data
+#'within the respective point buffer areas is less than this value (`0` to `100`).
 #'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.
+#'@param ... Arguments passed on to `lsm_perpoint()`
 #'
 #'@return The `points` object including new columns for the variables specified in `predictors_osm`.
 #'
@@ -23,19 +28,21 @@
 #'@importFrom tidyr pivot_wider drop_na
 #'@importFrom tibble deframe tibble
 #'@importFrom purrr map_dfr reduce
-#'@importFrom tidyselect matches
+#'@importFrom tidyselect matches starts_with
 #'
 #'@export
 lsm_perpoint_specified <- function(raster,
                                    class_names, class_values,
                                    predictors_lsm,
                                    points,
-                                   point_id = "point_id"){
+                                   na_threshold = 90,
+                                   point_id = "point_id", ...){
 
   # Error checking ------------------
   coll <- checkmate::makeAssertCollection()
 
   checkmate::assert_character(predictors_lsm, min.chars = 1, any.missing = FALSE, all.missing = FALSE, null.ok = FALSE, unique = TRUE, add = coll)
+  checkmate::assert_numeric(na_threshold, lower = 0, upper = 100, min.len = 1, max.len = 1, any.missing = FALSE, null.ok = FALSE, add = coll)
 
   checkmate::reportAssertions(coll)
 
@@ -66,9 +73,15 @@ lsm_perpoint_specified <- function(raster,
                                       class_names = input$class[i],
                                       class_values = input$value[i],
                                       point_id = point_id,
-                                      what = paste0("lsm_c_", input$metric[i])))
+                                      what = paste0("lsm_c_", input$metric[i]), ...))
 
       result <- purrr::map_dfr(result, ~as_tibble(., ), .id = "buffer") %>%
+
+        # make NA if percentage_inside < specified amount
+        dplyr::mutate(dplyr::across(.cols = tidyselect::starts_with("lsm_"),
+                                    ~ifelse(percentage_inside < na_threshold, NA, .))) %>%
+        # dplyr::select(-percentage_inside) %>%
+
         tidyr::pivot_wider(id_cols = c(.data[[point_id]]),
                     names_from = "buffer",
                     values_from = tidyselect::matches("lsm") | tidyselect::matches("osm"), # only pivot cols with these strings
