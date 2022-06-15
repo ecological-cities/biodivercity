@@ -26,8 +26,7 @@
 predict_heatmap <- function(models,
                            recipe_data,
                            points_topredict,
-                           pixelsize_m,
-                           name = NULL){
+                           pixelsize_m){
 
   # convert grid points to grid squares
   grid_topredict <- sf::st_buffer(points_topredict,

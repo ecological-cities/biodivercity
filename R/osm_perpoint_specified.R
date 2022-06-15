@@ -38,8 +38,7 @@ osm_perpoint_specified <- function(vector_osm,
                                    road_lanes = "lanes",
                                    predictors_osm,
                                    points,
-                                   point_id = "point_id",
-                                   period = "period"){
+                                   point_id = "point_id"){
 
   # Error checking ------------------
   coll <- checkmate::makeAssertCollection()
