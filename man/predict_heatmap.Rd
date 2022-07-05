@@ -4,13 +4,7 @@
 \alias{predict_heatmap}
 \title{Generate continuous raster of spatial predictions}
 \usage{
-predict_heatmap(
-  models,
-  recipe_data,
-  points_topredict,
-  pixelsize_m,
-  name = NULL
-)
+predict_heatmap(models, recipe_data, points_topredict, pixelsize_m)
 }
 \arguments{
 \item{models}{Model objects for a specific animal (taxon) group to be used for predictions

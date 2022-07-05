@@ -12,8 +12,7 @@ osm_perpoint_specified(
   road_lanes = "lanes",
   predictors_osm,
   points,
-  point_id = "point_id",
-  period = "period"
+  point_id = "point_id"
 )
 }
 \arguments{
