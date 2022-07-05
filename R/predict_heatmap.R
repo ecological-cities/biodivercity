@@ -35,7 +35,7 @@ predict_heatmap <- function(models,
 
 
   # scale predictors based on original input data, unecessary columns will be removed
-  data_topredict <- recipe_data %>% recipes::bake(grid_topredict)
+  data_topredict <- recipe_data %>% recipes::bake(grid_topredict %>% as.data.frame())
 
 
   # extract predictors of interest from models
