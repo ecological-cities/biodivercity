@@ -1,11 +1,11 @@
 ---
-title: "Animals: Data summaries"
+title: "Animals: Data Summaries"
 subtitle: "Compare local diversity between sampled areas"
 author: "Song, Xiao Ping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Animals: Data summaries}
+  %\VignetteIndexEntry{Animals: Data Summaries}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

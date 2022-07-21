@@ -38,7 +38,7 @@ home:
     components:
       custom:
         title: Funding
-        text: The Singapore Ministry of National Development Research Fund funded the grant project (2016 to 2022) that contributed to the development of this package. The grant was awarded to the National University of Singapore, in partnership with the Singapore Housing Development Board.
+        text: The Singapore Ministry of National Development Research Fund funded the grant project (2016 to 2022) that contributed to the development of this package. The grant was awarded to the National University of Singapore, in partnership with the Singapore Housing & Development Board.
 
 footer:
   structure:

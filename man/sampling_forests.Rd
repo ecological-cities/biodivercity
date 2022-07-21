@@ -11,8 +11,8 @@ For each sampling \code{period} (column), all forests patches within each area (
 }
 \source{
 Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys.
-14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant, $1,286,979.79.
-Awarded to the National University of Singapore (host institution) and the Singapore Housing Development Board.
+14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant.
+Awarded to the National University of Singapore (host institution) and the Singapore Housing & Development Board.
 }
 \usage{
 data(sampling_forests)

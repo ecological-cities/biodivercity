@@ -1,11 +1,11 @@
 ---
-title: "Animals: Simulate missing surveys"
+title: "Animals: Simulate Missing Surveys"
 subtitle: "Visualise the reduction in number of animal species if surveys are missed"
 author: "Song, Xiao Ping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Animals: Simulate missing surveys}
+  %\VignetteIndexEntry{Animals: Simulate Missing Surveys}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
