@@ -73,7 +73,7 @@ navbar:
     more:
       text: More details
       menu:
-      - text: Animals - Survey Protocols
+      - text: Animals - Survey protocols
         href: articles/more/animals-survey-protocols.html
       - text: Animals - Data summaries
         href: articles/more/animals-data-summaries.html
@@ -81,15 +81,7 @@ navbar:
         href: articles/more/animals-species-analyses.html
       - text: Animals - Simulate missing surveys
         href: articles/more/animals-simulate-missing-surveys.html
-      - text: Landscapes - Land cover patterns
-        href:
-      - text: Landscapes - Urban density
-        href:
       - text: Landscapes - Monitoring vs. Planning
-        href:
-      - text: Models - Local diversity
-        href:
-      - text: Models - Community diversity
         href:
       - text: Models - Future updates
         href:
