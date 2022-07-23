@@ -1,0 +1,29 @@
+---
+title: "Landscape monitoring vs. Scenario planning"
+subtitle: "Data and model compatibility for different use cases"
+author: "Song, Xiao Ping"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Landscape monitoring vs. Scenario planning}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Landscape data from remotely sensed sources (e.g. satellite imagery) can be processed into input predictors within models, allowing changes in biodiversity to be predicted across time and over large areas for monitoring purposes. This provides a cost-efficient proxy of expected changes in biodiversity, alongside periodic animal surveys for the validation of model outputs. Other than monitoring changes in biodiversity, there is also a need to evaluate the effectiveness of actions aimed at biodiversity conservation, i.e., future scenario planning purposes. Data compatibility between these multiple use cases should be carefully considered when building and using the predictive models.
+
+Urban design and planning involves the consideration of multiple design scenarios. But since such landscapes do not exist, snapshots of remotely sensed data can not be used. Manually generated landscape elements (e.g., vector data for vegetation and water) may instead be produced from prospective designs, but the format and types of such data must be compatible with those used in the predictive models. For instance, when selecting landscape predictors used to build the models, land cover classification into discrete areas would be more compatible with data generated from scenario planning, compared to using continuous values from spectral indices (e.g., NDVI). Vegetation generated in design scenarios may then be rasterized into land cover-types (Fig. 1), and used to replace the remotely sensed data within regions of interest (Fig. 2). The resulting raster data may then be used to predict the occurrence of biodiversity for the particular scenario. 
+
+```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 1: Example showing how manually generated vector data can be converted to raster data used in the predictive models.**"}
+knitr::include_graphics("data-compatibility-rasterize.jpg", dpi = 300)
+```
+
+<br>
+
+```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 2: Example showing how a land cover raster of remotely sensed vegetation types can be amended with manually generated vector data (rasterised).**"}
+knitr::include_graphics("data-compatibility-amend.jpg", dpi = 300)
+```
+
+<br>
+
+While such data conversions may allow similar predictors (and hence models) to be used for different use cases, it should be noted that potential mismatches between different data sources may result in inaccurate predictions. Reducing the mismatch between remotely sensed and manually generated data is an important gap that should be addressed. For instance, the level of detail in design scenarios may not include the exact locations of planted trees, and their estimated canopy projection areas may vary greatly from reality after planting. Furthermore, the remotely sensed data represents a top-down view of the landscape, and the effect of multi-tiered planting is not accounted for within the landscape predictors. Collaboration between researchers and practitioners is needed to ensure that model workflows align with the data formats and outputs used in design practice, and that suitable methods are used to ensure that artificially generated datasets are both compatible and accurate to reality after implementation.
