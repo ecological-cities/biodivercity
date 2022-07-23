@@ -1,6 +1,6 @@
 ---
 title: "Animals: Species-level Analyses"
-subtitle: ""
+subtitle: "Song, Xiao Ping"
 author: "Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
