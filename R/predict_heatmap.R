@@ -72,7 +72,7 @@ predict_heatmap <- function(models,
   # rasterise the grid squares
   raster_template <- grid_topredict %>%
     stars::st_rasterize(stars::st_as_stars(sf::st_bbox(grid_topredict),
-                                           nx = pixelsize_m, ny = pixelsize_m, values = NA_real_))
+                                           dx = pixelsize_m, dy = pixelsize_m, values = NA_real_))
 
   output <- terra::rasterize(terra::vect(grid_topredict),
                               terra::rast(raster_template),
