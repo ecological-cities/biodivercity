@@ -5,7 +5,6 @@ articles:
   apply-models: apply-models.html
   biodivercity: biodivercity.html
   build-models: build-models.html
-  citywide-benchmarking: citywide-benchmarking.html
   animals-data-summaries: more/animals-data-summaries.html
   animals-simulate-missing-surveys: more/animals-simulate-missing-surveys.html
   animals-species-analyses: more/animals-species-analyses.html
@@ -13,11 +12,11 @@ articles:
   landscapes-landcover-patterns: more/landscapes-landcover-patterns.html
   landscapes-monitoring-workflow: more/landscapes-monitoring-workflow.html
   models-local-diversity: more/models-local-diversity.html
-  monitoring-vs-planning: more/monitoring-vs-planning.html
+  test-models: more/test-models.html
   process-animal: process-animal.html
   process-landscape: process-landscape.html
-  test-models: test-models.html
-last_built: 2022-07-25T06:39Z
+  use-cases: use-cases.html
+last_built: 2022-07-29T02:09Z
 urls:
   reference: https://ecological-cities.github.io/biodivercity/reference
   article: https://ecological-cities.github.io/biodivercity/articles

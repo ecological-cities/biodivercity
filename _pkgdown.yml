@@ -58,18 +58,16 @@ navbar:
     articles:
       text: Articles
       menu:
-      - text: 1. Process landscape data
-        href: articles/process-landscape.html
-      - text: 2. Process animal data
+      - text: 1. Process animal data
         href: articles/process-animal.html
+      - text: 2. Process landscape data
+        href: articles/process-landscape.html
       - text: 3. Build models
         href:
       - text: 4. Apply models
         href: articles/apply-models.html
-      - text: 5. Test models
-        href: articles/test-models.html
-      - text: 6. Citywide benchmarking
-        href: articles/citywide-benchmarking.html
+      - text: 5. Use cases
+        href: articles/use-cases.html
     more:
       text: More details
       menu:
@@ -81,8 +79,8 @@ navbar:
         href: articles/more/animals-species-analyses.html
       - text: Animals - Simulate missing surveys
         href: articles/more/animals-simulate-missing-surveys.html
-      - text: Landscapes - Monitoring vs. Planning
-        href: articles/more/monitoring-vs-planning.html
+      - text: Models - Test accuracy
+        href: articles/more/test-models.html
       - text: Models - Future updates
         href:
     reference:
