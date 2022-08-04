@@ -32,8 +32,8 @@ Multiple frameworks to assess urban biodiversity have been proposed in both rese
 
 <br>
 
-```{r out.width = "70%", fig.align='center', dpi = 300, echo = FALSE, fig.cap="**Figure: Broad overview of the data workflow for an animal group**"}
-knitr::include_graphics("framework.jpeg", dpi = 300)
+```{r out.width = "70%", fig.align='center', dpi = 300, echo = FALSE, fig.cap="**Figure: Broad overview of the data workflow for a chosen animal group**"}
+knitr::include_graphics("framework.png", dpi = 300)
 ```
 
 <br>
@@ -61,7 +61,7 @@ devtools::load_all() # to knit manually w latest changes (not built/installed ye
 
 ## Data sources
 
-Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys. 14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant, $1,286,979.79. Awarded to the National University of Singapore (host institution) and the Singapore Housing Development Board. 
+Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys. 14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant. Awarded to the National University of Singapore (host institution) and the Singapore Housing & Development Board. 
 
 <br>
 

@@ -22,18 +22,17 @@ demonstrations of how the package may be used.
 
 ## Overview
 
-Multiple frameworks to assess urban biodiversity have been proposed in
-both research and practice. Some conceptualise ‘biodiversity’ to include
-genetic variation, landscape structure and other human-centric
-dimensions such as climate regulation and ecosystem functioning. While
-these offer a more comprehensive view of ‘total biodiversity’, certain
-components may have shortcomings in terms of their (1) causal proximity
-(e.g. indirect effect of the landscape on the diversity of other
-species); (2) measurability at-scale (e.g. genetic diversity, plant
-species diversity); and (3) precision (e.g. estimating water or thermal
-regulation by vegetation). In decision-making, unnecessary complexity
-may also risk contributing to mistrust or ignorance of the overall
-assessment.
+Many frameworks to assess ‘biodiversity’ have been proposed in research
+and practice. Some offer a more holistic view, by including parts of the
+ecosystem (e.g., climate, soil, air, water, landscape structure, genetic
+variation) that may contribute to ‘total biodiversity’ within a given
+region. However, such a conceptualisation of ‘biodiversity’ may include
+components that lack (1) causal proximity (e.g. indirect effect of the
+landscape on the diversity of other species); (2) measurability at-scale
+(e.g. genetic diversity, plant species diversity); and (3) precision
+(e.g. estimating water or thermal regulation by vegetation). In
+decision-making, unnecessary complexity may also risk contributing to
+mistrust or ignorance of the overall assessment.
 
 `biodivercity` is an R package for assessing the diversity of animal
 species in urban areas. It provides a way to directly assess the
@@ -59,9 +58,10 @@ and amphibians are provided. The key features include:
 
 <br>
 
-<img src="man/figures/framework.jpeg" width="70%" style="display: block; margin: auto;" />
+<img src="man/figures/framework.png" width="70%" style="display: block; margin: auto;" />
 <center>
-<b> Figure: Broad overview of the data workflow for an animal group </b>
+<b> Figure: Broad overview of the data workflow for a chosen animal
+group </b>
 </center>
 
 <br>

@@ -58,9 +58,9 @@ tm_basemap(c("CartoDB.Positron")) +
 
 <br>
 
-The pixel values can be summarised per subzone, and the distribution of the summarised values can subsequently be used to compare the ‘performance’ of each subzone relative to others in Singapore, or to a set benchmark/target for the desired level of 'performance' of each planning unit. For example, towns could be scored based on their performance relative to the mean of the distribution, as shown below:
+The pixel values can be summarised per subzone, and the distribution of the summarised values can subsequently be used to compare the ‘performance’ of each subzone relative to others in Singapore, or to a set a benchmark/target for the desired level of 'performance' of each planning unit. For example, towns could be scored based on their performance relative to the mean of the distribution, as shown below:
 
-```{r out.width = "60%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure: Histograms showing the distribution of values for the mean number of odonate species per pixel within each of the 332 subzones in Singapore.** The pixel resolution used for predictions in this example is 1 km."}
+```{r out.width = "60%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure: Histogram showing the distribution of values for the mean number of odonate species per pixel within each of the 332 subzones in Singapore.** The pixel resolution used for predictions in this example is 1 km."}
 knitr::include_graphics("subzone-distribution-odonates.png", dpi = 300)
 ```
 
