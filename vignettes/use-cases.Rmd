@@ -91,7 +91,17 @@ knitr::include_graphics("data-compatibility-amend.jpg", dpi = 300)
 
 <br>
 
-While such data conversions may allow similar predictors (and hence models) to be used for different use cases, it should be noted that potential mismatches between different data sources may result in inaccurate predictions. Reducing the mismatch between remotely sensed and manually generated data is an important gap that should be addressed. For instance, the level of detail in design scenarios may not include the exact locations of planted trees, and their estimated canopy projection areas may vary greatly from reality after planting. Furthermore, the remotely sensed data represents a top-down view of the landscape, and the effect of multi-tiered planting is not accounted for within the landscape predictors. Collaboration between researchers and practitioners is needed to ensure that model workflows align with the data formats and outputs used in design practice, and that suitable methods are used to ensure that artificially generated datasets are both compatible and accurate to reality after implementation.
+
+While such data conversions may allow similar predictors (and hence models) to be used for different use cases, it should be noted that potential mismatches between different data sources may result in inaccurate predictions. Across the four animal groups assessed in our [research project](/project/birt), predictions of _Alpha_ diversity were generally lower than the actual number of species observed at survey points (Fig. 3) where manually mapped landscape data were used to replace the remotely sensed data (Fig. 2). The 95% confidence intervals for birds and amphibians did not center around zero (i.e., low accuracy), which suggests that future scenario planning based on the predictions of these two animal groups should be treated with caution. 
+
+
+```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "Figure 3: The accuracy of model predictions based on cross-validation (a) using the original dataset; and (b) using landscape data amended with rasterised vectors from manually mapped survey points (refer to Fig. 2). Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped iterations of a train-test split (75% / 25 %) in the dataset."}
+knitr::include_graphics("cross-validation.png", dpi = 300)
+```
+
+<br>
+
+Reducing the mismatch between remotely sensed and manually generated data is an important gap that should be addressed. For instance, the level of detail in design scenarios may not include the exact locations of planted trees, and their estimated canopy projection areas may vary greatly from reality after planting. Furthermore, the remotely sensed data represents a top-down view of the landscape, and the effect of multi-tiered planting is not accounted for within the landscape predictors. Collaboration between researchers and practitioners is needed to ensure that model workflows align with the data formats and outputs used in design practice, and that suitable methods are used to ensure that artificially generated datasets are both compatible and accurate to reality after implementation.
 
 <br>
 
