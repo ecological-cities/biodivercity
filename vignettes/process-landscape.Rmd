@@ -267,11 +267,11 @@ points <- lsm_perpoint(raster = veg_classified,
                                       class_values = c(1)) # pixel value of class
 ```
 
-Alternatively, the function `lsm_perpoint_specified()` can be used to generate the metrics specified by their name. Similar to `osm_perpoint_specified()`, we need to supply a character vector of predictor names to the function argument `predictors_lsm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_lsm_` denotes that the variables are landscape metrics. For example, we can summarise the percentage of vegetated landscape (`pland` metric) at a radius of 50 m and 100 m around `points`–these variables are appended as new columns.
+Alternatively, the function `lsm_perpoint_specified()` can be used to generate the metrics specified by their name. Similar to `osm_perpoint_specified()`, we need to supply a character vector of predictor names to the function argument `predictors_lsm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_lsm_` denotes that the variables are landscape metrics. For example, we can summarise the percentage of vegetated landscape (`pland` metric) at a radius of 100 m and 200 m around `points`–these variables are appended as new columns.
 
 ```{r lsm_perpoint_specified, warning = FALSE, message = FALSE}
 
-predictors <- c("r50m_lsm_veg_pland", "r100m_lsm_veg_pland") # variables to summarise
+predictors <- c("r100m_lsm_veg_pland", "r200m_lsm_veg_pland") # variables to summarise
 
 points <- lsm_perpoint_specified(raster = veg_classified,
                                  predictors_lsm = predictors,

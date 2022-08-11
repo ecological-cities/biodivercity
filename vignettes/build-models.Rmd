@@ -1,7 +1,7 @@
 ---
-title: "Build Models"
-subtitle: " "
-author: "Author"
+title: "Build models"
+subtitle: "Build and summarise GLMM models with processed animal and landscape data"
+author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -10,368 +10,244 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-First, load the necessary packages to run the analysis:
+Following the preparation of collected fauna and landscape data, this article outlines a workflow to build predictive models of animal diversity. Species density at sampling points were modelled against the summarised landscape metrics with generalised linear mixed-effects models (GLMMs) using the `MuMIn::dredge` function. However, owing to the large number of landscape predictors at multiple buffer radii generated from the remotely
+sensed and open data, variable selection has to be performed as there is a limit to the number of variables `MuMIn::dredge` is allowed to accept.
+
+## Combining fauna and landscape data
+
+To build the models, animal and landscape datasets as processed in the previous two articles have to be combined and prepared.
+
+First, load the required packages to run the analysis:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
 library("biodivercity")
-library("dplyr") # to process/wrangle data
+library("tidyverse") # to process/wrangle data
 library("sf") # to process landscape data
+library("tmap")
+library("kableExtra")
 ```
 
 ```{r load biodivercity while in dev, include = FALSE}
 devtools::load_all()
-library("dplyr") 
+library("tidyverse") 
 library("sf") 
+library("tmap")
+library("kableExtra")
 ```
 
-<br>
+In this short example, load the datasets and filter for `area == "PG"` and `period == 1` only.
+```{r}
+data(animal_observations)
+data(animal_surveys)
+data("sampling_points") 
 
-## Process data
 
-### Landscape
+observations <- animal_observations %>% 
+  dplyr::filter(area == "PG") %>% 
+  dplyr::filter(period == 1)
 
-```{r show landscape data used in analyses, echo = FALSE, eval = FALSE}
+surveys <- animal_surveys %>% 
+  dplyr::filter(area == "PG") %>% 
+  dplyr::filter(period == 1)
 
-# e.g. load landscape data at sampling points
-points <- st_read(glue::glue("{dir_cleandata}/points_landscape-info.geojson"), quiet = TRUE) %>% 
-  st_set_geometry(NULL) %>%
-  dplyr::select(-c(starts_with("lsm_") | starts_with("osm_"))) %>% 
-  select(-(matches("shannon$") | matches("invsimpson$") | # has NAs if sprich is 0
-             contains("turfsky") | contains("shrubsky"))) # remove skyrise-only greenery, cuz not mapped consistently 
-
-knitr::kable(head(points), caption = "**`points_landscape-info.geojson`: Manually-mapped landscape data at per sampling point and survey round, imported from _/data_**. First few rows of the dataset are shown.") %>%
-    kable_styling("striped") %>% scroll_box(width = "100%", height = "300px")
-
+points <- sampling_points %>% 
+  dplyr::filter(area == "PG") %>% 
+  dplyr::filter(period == 1)
 ```
 
-### Load and filter fauna data
+Animal observations are then tallied to retrieve species richness at each point. The `tally_observations` function can be used with the argument `level = "point"`.
 
-```{r remove points with few surveys, include = FALSE, eval = FALSE}
-
-## Filtered data
-# no. of sampling points with < 6 surveys
-removed <- points_tally %>%
-  dplyr::filter(survey_cycles < 6)
-points_tally6 <- points_tally %>% # remove sampling points
-  dplyr::filter(survey_cycles == 6)
-
-# # count no. of sampling points with < 6 surveys (or < 5 surveys during COVID)
-# # remove sampling points
-# points_tally <- points_tally %>%
-#   dplyr::filter(((town=="PG" | town=="QT") & year=="2019/20" & survey_cycles >= 5) |
-#             (!((town=="PG" | town=="QT") & year=="2019/20") & survey_cycles >= 6))
-```
-
-Sampling points with __< 6 surveys__ removed (per survey round per taxon):  
-
-- **`length(unique(removed$point_id))`** sampling points were removed (`nrow(removed[removed$priority == "Aves",])` Aves; `nrow(removed[removed$priority == "Lepidoptera",])` Lepidoptera; `nrow(removed[removed$priority == "Odonata",])` Odonata; `nrow(removed[removed$priority == "Amphibia",])` Amphibia)   
-
-- **`length(unique(points_tally6$point_id))`** sampling points remained  (`nrow(points_tally6[points_tally6$priority == "Aves",])` Aves; `nrow(points_tally6[points_tally6$priority == "Lepidoptera",])` Lepidoptera; `nrow(points_tally6[points_tally6$priority == "Odonata",])` Odonata; `nrow(points_tally6[points_tally6$priority == "Amphibia",])` Amphibia) 
-
-```{r include = FALSE, eval = FALSE}
-rm(removed)
-```
-
-```{r eval = FALSE}
-# filter full data using points_tally6
-surveys_filtered <- surveys %>%
-  semi_join(points_tally6, by = c("point_id", "round", "priority")) %>%
-  droplevels() # remove unnecessary factor levels
-rm(points_tally6)
-
-fauna_filtered <- fauna %>% 
-  semi_join(surveys_filtered, by = c("survey_id")) %>%
-  # re-factor (must account for 0 observations)!
-  mutate(survey_id = factor(survey_id, 
-                            levels = surveys_filtered$survey_id)) %>%
-  mutate(point_id = factor(point_id, 
-                           levels = unique(surveys_filtered$point_id))) 
-
-```
-
-
-- **`surveys_filtered.csv`**: Information on surveys performed at sampling points, located across six towns. Filtered for 6 cycles.
-
-```{r read filtered survey data, include = FALSE, eval = FALSE}
-surveys <- read_csv(glue::glue("{dir_dataoutput}/fauna/filtered/surveys_filtered.csv")) %>%
-  mutate(town = factor(town, levels = c("PG", "QT", "TP","JW", "BS", "WL"))) %>%
-  mutate(priority = factor(priority, levels = c("Aves", "Lepidoptera", "Odonata", "Amphibia"))) %>% 
-  mutate(across(c(round, survey_id, point_id), as.factor))
-```
-
-- **`fauna_filtered.csv`** Counts (abundance) of each species observed during surveys, for four priority taxa. Includes repeated observations of the same species (different time/distance). _Note that the data includes genus- and family-level fauna observations._ Excludes sampling points with < 6 surveys.
-
-```{r calculate sp richnness for each animal group, include = FALSE, eval = FALSE}
-
-fauna <- read_csv(glue::glue("{dir_dataoutput}/fauna/filtered/fauna_filtered.csv")) %>%
-  mutate(round = as.character(round)) # convert round to character for sptally_extractor()
-
-surveys <- surveys %>% 
-  mutate(round = as.character(round)) # convert round to character for sptally_extractor()
-
-
-# use sptally_extractor() to calculate SR
-# note: if all spp. within the genus/family level names are observed, the genus/family level observation was removed
-birds <-  sptally_extractor(fauna, survey_ref = surveys,
-                  specify_town = c("PG", "QT", "TP", "JW", "BS", "WL"),
-                  specify_round = c("1", "2"),
-                  specify_priority = "Aves",
-                  level = "point") %>%
+```{r}
+birds <- tally_observations(observations,
+                            surveys,
+                            specify_taxon = "Aves",
+                            specify_area = "PG",
+                            specify_period = 1,
+                            level = "point") %>%
   rename(sprich = n)
-
-butts <- sptally_extractor(fauna, survey_ref = surveys,
-                  specify_town = c("PG", "QT", "TP", "JW", "BS", "WL"),
-                  specify_round = c("1", "2"),
-                  specify_priority = "Lepidoptera",
-                  level = "point") %>%
-  rename(sprich = n)
-
-dragons <- sptally_extractor(fauna, survey_ref = surveys,
-                  specify_town = c("PG", "QT", "TP", "JW", "BS", "WL"),
-                  specify_round = c("1", "2"),
-                  specify_priority = "Odonata",
-                  level = "point") %>%
-  rename(sprich = n)
-
-frogs <- sptally_extractor(fauna, survey_ref = surveys,
-                  specify_town = c("PG", "QT", "TP", "JW", "BS", "WL"),
-                  specify_round = c("1", "2"),
-                  specify_priority = "Amphibia",
-                  level = "point") %>%
-  rename(sprich = n)
-
-rm(fauna, surveys)
 ```
 
-### Combine and format data sets
+Re-calculate the landscape metrics for the area of Punggol with the `ndvi_mosaic.tif` raster by first classifying for vegetation with `classify_image_binary()`. 
 
-Landscape data were appended to the Fauna data. For each of the animal groups, rows that contained `NA` were removed.
+```{r}
+ndvi_mosaic <- 
+  system.file("extdata", "ndvi_mosaic.tif", package="biodivercity") %>% 
+  terra::rast()
 
-```{r append landscape data to each animal group & scale vars, include = FALSE, eval = FALSE}
+veg_classified <- classify_image_binary(ndvi_mosaic, threshold = "otsu")
+```
 
-# overwrite vars
+```{r, include = FALSE}
+tmap_mode("view")
+tmap_options(check.and.fix = TRUE)
+
+tm_shape(ndvi_mosaic) +
+  tm_raster(palette = c("Greens")) +
+tm_shape(veg_classified) +
+  tm_raster(title = "veg_classified",
+            style = "cat",
+            palette = c("grey", "darkgreen")) +
+tm_shape(sampling_points) +
+  tm_dots(col = "yellow")
+```
+
+The classified raster `veg_classified` is then input into `lsm_perpoint()` as per the `Process landscape` article to retrieve relevant landscape metrics.
+
+```{r, eval = FALSE}
+points <- lsm_perpoint(raster = veg_classified,
+                                      points = points,
+                                      buffer_sizes = c(100, 200), # in metres
+                                      level = c("class"),
+                                      class_names = c("veg"),
+                                      class_values = c(1)) # pixel value of class
+```
+
+Finally, the two datasets will be combined with an `inner_join()`. An input dataset for model building will follow the same format.
+
+```{r, eval = FALSE}
 birds <- birds %>% 
   inner_join(points, 
-             by = c("town", "round", "point_id")) %>%
-  select(-c(landcover, isWater, waterType, isUGS, isConey)) # remove cols not used in modelling
+             by = c("town", "round", "point_id"))
 
-butts <- butts %>%
-  inner_join(points, 
-             by = c("town", "round", "point_id")) %>%
-  select(-c(landcover, isWater, waterType, isUGS, isConey))
-
-dragons <- dragons %>%
-  inner_join(points, 
-             by = c("town", "round", "point_id")) %>%
-  select(-c(landcover, isWater, waterType, isUGS, isConey)) 
-
-frogs <- frogs %>%
-  inner_join(points, 
-             by = c("town", "round", "point_id")) %>%
-  select(-c(landcover, isWater, waterType, isUGS, isConey)) 
-
-rm(points)
+head(birds)
 ```
 
-```{r to convert from long to wide format & remove NAs, include = FALSE, eval = FALSE}
+---
 
-# there are repeated rows of same response var (pseudo-replication)
-# pivot to wide format (add radius info into colnames)
+### If too many variables are present for `MuMIn::dredge`:
 
-birds <- birds %>% 
-  pivot_wider(names_from = "radius_m", 
-              values_from = starts_with("man") | 
-                starts_with("lsm") | 
-                starts_with("osm"),
-              names_glue = "r{radius_m}m_{.value}") %>%
-  select(where(~!all(is.na(.)))) %>% # remove cols with NA
-  drop_na() # remove rows with NA (complete cases only)
+For this collection of articles, random forest models were first used to select variables based on their relative importance in improving model performance, i.e., averaged variable importance (Arthur et al., 2010; Li et al., 2017). The random forest algorithm is a machine learning technique that can handle and reduce the effects of overfitting, as well as the collinearity and selection bias of predictors (Hothorn et al., 2006). In the following sections, the example variables were selected using the `randomForest` package.
 
-butts <- butts %>%
-  pivot_wider(names_from = "radius_m", 
-              values_from = starts_with("man") | 
-                starts_with("lsm") | 
-                starts_with("osm"),
-              names_glue = "r{radius_m}m_{.value}") %>%
-  select(where(~!all(is.na(.x)))) %>% 
-  drop_na() 
+## Building the GLM models
 
-dragons <- dragons %>%
-  pivot_wider(names_from = "radius_m", 
-              values_from = starts_with("man") | 
-                starts_with("lsm") | 
-                starts_with("osm"),
-              names_glue = "r{radius_m}m_{.value}") %>%
-  select(where(~!all(is.na(.x)))) %>% 
-  drop_na() 
+Now, load the necessary packages to run the model building:
 
-frogs <- frogs %>%
-  pivot_wider(names_from = "radius_m", 
-              values_from = starts_with("man") | 
-                starts_with("lsm") | 
-                starts_with("osm"),
-              names_glue = "r{radius_m}m_{.value}") %>%
-  select(where(~!all(is.na(.x)))) %>% 
-  drop_na() 
-
+```{r load more libraries, message = FALSE, warning = FALSE}
+library("lme4")
+library("MuMIn")
 ```
 
-## Dredge
+Bird species density and landscape data for sampling points across six areas (towns) in Singapore from the example data `model_data` will be used to demonstrate the model building process in this article. The variable selection output using random forest is also loaded from `model_variables` to inform `MuMIn::dredge`.
 
-### Scale data
-
-```{r eval = FALSE}
-# filter the data? then scale/center. Overwrite vars
-birds <- birds %>% 
-  {if(params$dredge_round1_only) filter(., round == "1") else .} %>%
-  # filter(!(town %in% c("BS", "WL"))) %>% 
-  mutate(across(.cols = where(is.numeric) & 
-                  !sprich, 
-                scale)) %>% 
-  mutate(across(.cols = is.character, as.factor)) # make explicit accurate model specs
-butts <- butts %>% 
-  {if(params$dredge_round1_only) filter(., round == "1") else .} %>%
-  # filter(!(town %in% c("BS", "WL"))) %>% 
-  mutate(across(.cols = where(is.numeric) & 
-                  !sprich, 
-                scale)) %>% 
-  mutate(across(.cols = is.character, as.factor))
-dragons <- dragons %>% 
-  {if(params$dredge_round1_only) filter(., round == "1") else .} %>%
-  # filter(!(town %in% c("BS", "WL"))) %>% 
-  mutate(across(.cols = where(is.numeric) & 
-                  !sprich, 
-                scale)) %>% 
-  mutate(across(.cols = is.character, as.factor))
-frogs <- frogs %>% 
-  {if(params$dredge_round1_only) filter(., round == "1") else .} %>%
-  # filter(!(town %in% c("BS", "WL"))) %>% 
-  mutate(across(.cols = where(is.numeric) & 
-                  !sprich, 
-                scale)) %>% 
-  mutate(across(.cols = is.character, as.factor))
-
-
-# example: how to backtransform
-# birds %>%
-#   mutate(across(.cols = starts_with("man") | 
-#                   starts_with("osm") | 
-#                   starts_with("lsm"),
-#          .fns = function(x) x * attr(x, 'scaled:scale') +
-#            attr(x, 'scaled:center')))
-
-
-# get manually mapped vars only
-landscape_vars <- birds %>%
-  bind_rows(butts) %>% 
-  bind_rows(dragons) %>% 
-  bind_rows(frogs) %>%
-  dplyr::select(matches("^[r]\\d+[m]_man")) %>% # colnames tt start w r<number>
-  # dplyr::select(matches("^r50m_man") | 
-  #                 matches("^r126m_man_natveg")) %>% # colnames for manually mapped only
-  dplyr::select(-r50m_man_GnPR) %>% # exclude frm normal analysis
-  colnames() %>% sort()
+```{r load example data, eval = FALSE}
+data(model_data)
+data(model_variables)
 ```
 
-### Create variable subset list
+Before running `MuMIn::dredge`, model constraints have to be considered to avoid combinations of variables that represented similar landscape characteristics. For example, for each land cover class, only one of each metric type could be present in the fitted model, and similar landscape predictors at different buffer radii were not allowed. To do so, `MuMIn::dredge` accepts expressions for the `subset` argument and such an object is automatically created from `model_variables` below.
 
-```{r eval = FALSE}
-var.comb <- combn(landscape_vars, 2) %>% 
+```{r subset remote vars, eval = FALSE}
+
+var_comb <- combn(model_variables$variable, 2) %>% # unique combinations of variables
   t() %>% 
   as.data.frame() %>% 
   arrange(V1) %>%
-  # filter(!grepl("ratio|laneDensity", V1)) %>% 
-  # filter(!grepl("ratio|laneDensity", V2)) %>% 
   mutate(subset = paste(V1, "&", V2))
   
-subset.list <- c()
-for (i in 1:nrow(var.comb)) {
-  if(grepl("r50m_man_GnPR", var.comb[i,1]) == TRUE){
-    if(grepl("shrub|tree|turf", var.comb[i,2]) == TRUE) {
-        subset.list <- c(subset.list, paste(var.comb[i,3]))
-        } 
-    } else
-      if(grepl("buil", var.comb[i,1]) == TRUE){
-        if(grepl("buil", var.comb[i,2]) == TRUE) {
-          subset.list <- c(subset.list, paste(var.comb[i,3]))
-          }
-        } else
-          if(grepl("lane", var.comb[i,1]) == TRUE){
-            if(grepl("lane", var.comb[i,2]) == TRUE) {
-              subset.list <- c(subset.list, paste(var.comb[i,3]))
-              }
-            } else 
-              if(grepl("natveg", var.comb[i,1]) == TRUE){
-                if(grepl("natveg", var.comb[i,2]) == TRUE) {
-                  subset.list <- c(subset.list, paste(var.comb[i,3]))
-                }
-              } else
-                if(grepl("tree", var.comb[i,1]) == TRUE){
-                  if(grepl("tree", var.comb[i,2]) == TRUE) {
-                    subset.list <- c(subset.list, paste(var.comb[i,3]))
-                    }
-                  } else
-                    if(grepl("shrub", var.comb[i,1]) == TRUE){
-                      if(grepl("shrub", var.comb[i,2]) == TRUE) {
-                        subset.list <- c(subset.list, paste(var.comb[i,3]))
-                      }
-                    }
-  rm(i)
+# unique combinations of landscape metrics by type
+lsm_comb <- landscapemetrics::list_lsm() %>% 
+  dplyr::select(metric, type) %>% 
+  unique() %>% 
+  mutate(metric = paste0("_", metric)) %>% 
+  # group_by(type) %>% 
+  pivot_wider(names_from = "type", values_from = "metric") %>% 
+  apply(MARGIN = 2, FUN = function(x) combn(x[[1]], 2)) %>% 
+  as.data.frame() %>% 
+  t() %>% 
+  as.data.frame()
+
+# get unique landscape classes
+lsm_classes <- 
+  str_extract(model_variables$predictor, "(?<=lsm_)([^_]*)_") %>% 
+  str_remove("_") %>% 
+  unique() %>% na.omit()
+  
+subset_vec <- c()
+for(i in 1:nrow(lsm_comb)){ # extract combinations in var_comb that match rows in lsm_comb
+
+  for(j in seq_along(lsm_classes)){
+
+    to_subset <-
+      with(var_comb,
+           var_comb[grepl(glue::glue("{lsm_classes[j]}{lsm_comb$V1[i]}"), V1) &
+                      grepl(glue::glue("{lsm_classes[j]}{lsm_comb$V2[i]}"), V2), ])
+
+    to_subset_inverted <- # if the combination is the other way round
+      with(var_comb,
+           var_comb[grepl(glue::glue("{lsm_classes[j]}{lsm_comb$V2[i]}"), V1) &
+                      grepl(glue::glue("{lsm_classes[j]}{lsm_comb$V1[i]}"), V2), ])
+
+    if(!is.null(to_subset)){
+      subset_vec <- c(subset_vec, paste(to_subset$subset))
+    }
+
+    if(!is.null(to_subset_inverted)){
+      subset_vec <- c(subset_vec, paste(to_subset_inverted$subset))
+    }
+
   }
-
-subset.list %>% 
-  sort()
-
-subset.exp <- parse(text = paste0("!(", paste(subset.list, collapse = ") & !("), ")"))
-# returns exp - subset doesn't accept paste
-
-rm(var.comb, subset.list)
-```
-
-### Run dredge
-
-```{r eval = FALSE}
-if(params$dredge_round1_only){
-  
-  #round 1 only
-  bird.global <- glmer(paste("sprich", "~", paste(landscape_vars, collapse = " + "), "+", "(1|town)"),
-                       family=poisson, data=birds,
-                       na.action = "na.fail")
-  bird.null <- glmer(sprich ~ 1 + (1|town),
-                     family = poisson, data = birds)
-} else {
-  
-  # round 1 & 2, w round:town + (1|point_id)
-  # https://www.muscardinus.be/2017/07/lme4-random-effects/
-# nesting is implicit, since no point_id will be the same between diff towns. Alternative notation (explicit nesting) for rand effects: 
-# (1| town) + (1|town:point_id) (order or rand effects does not matter)
-  bird.global <- glmer(paste("sprich", "~", paste(landscape_vars, collapse = " + "), "+", "round + round:town + (1|town) + (1|point_id)"),
-                       family=poisson, data=birds,
-                       na.action = "na.fail"
-                       #, control = lme4::glmerControl(optimizer = "bobyqa")
-                       )
-  bird.null <- glmer(sprich ~ 1 + (1|town) + (1|point_id),
-                     family = poisson, data = birds)
+  rm(to_subset, i, j)
 }
 
-print(system.time(
-  birdmods <- 
-    dredge(bird.global,
-           subset= subset.exp,
-           m.lim=c(NA,9),
-           rank="AICc",
-           extra = list(R2 = function(x) r.squaredGLMM(x, bird.null)["delta", ])
-    )
-))
+subset_exp <- parse(text = paste0("!(", paste(subset_vec, collapse = ") & !("), ")")) # returns exp - subset doesn't accept paste
 ```
 
-### Show results
+Model data should then be scaled before building the models.
 
-```{r eval = FALSE}
-print(head(birdmods))
+```{r scale model_data, eval = FALSE}
+# scale/center model_data
 
-bestmodels_info <- subset(birdmods, 
-                         delta < params$dredge_delta_threshold,
+model_data <- model_data %>% 
+  mutate(across(.cols = where(is.numeric) & 
+                  !sprich, 
+                scale))
+```
+
+For the `MuMIn::dredge` function, a global model has to be fitted as a primary input. A null model is also fitted for the `extra` argument to calculate a delta-AIC value for model selection.
+
+```{r example dredge - global and null, eval = FALSE}
+model_global <- glmer(paste("sprich", "~", paste(model_variables$variable, collapse = " + "), "+ (1|town) "),
+                      family = poisson,
+                      data = model_data,
+                      na.action = "na.fail",
+                      control = lme4::glmerControl(optimizer = "bobyqa"))
+
+model_null <- glmer(sprich ~ 1 + (1|town),
+                    family = poisson, data = model_data)
+```
+
+The `MuMIn::dredge` function is then run with `model_global`, `subset = subset_exp` and `m.lim=c(NA,9)` as model combination constraints. 
+
+```{r example dredge - dredge, eval = FALSE}
+model_glm <- dredge(model_global,
+                    subset= subset_exp,
+                    m.lim=c(NA,9), # max of 9 variables
+                    rank="AICc",
+                    extra = list(R2 = function(x) r.squaredGLMM(x, model_null)["delta", ]))
+
+# reduce size of huge object - subset only top models 
+model_glm <- subset(model_glm, 
+                   delta < 8,
+                   recalc.weights=TRUE)
+```
+
+```{r load dredge model object, include = FALSE}
+filepath <- system.file("extdata", "models-remote-post-rf_sample.Rdata", package = "biodivercity")
+load(filepath)
+
+data(model_data)
+
+model_data <- model_data %>% 
+  mutate(across(.cols = where(is.numeric) & 
+                  !sprich, 
+                scale)) 
+```
+
+The resulting `model_glm` object contains all of the top models with values of ΔAIC < 8. Here, a summary of the top models with values of ΔAIC < 2 can be viewed:
+
+```{r table of best models, echo = FALSE}
+bestmodels_info <- subset(model_glm, 
+                         delta < 2,
                          recalc.weights=FALSE)
 
 to_print <- bestmodels_info %>% 
@@ -380,21 +256,20 @@ to_print <- bestmodels_info %>%
   mutate(across(.cols = !df, ~round(., 3))) %>% 
   mutate(across(.cols = everything(), ~ifelse(is.na(.), "-", .)))
 
-knitr::kable(to_print, caption = glue::glue("**`birdMMI.csv`**: Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < {params$dredge_delta_threshold}). Exported to _/output/analysis/fauna-models-manual_.")) %>%
+knitr::kable(to_print, caption = glue::glue("**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < 2).**")) %>%
   kable_styling("striped") %>% scroll_box(width = "100%", height = "300px")
+```
 
-rm(to_print)
+Furthermore, to View the breakdown of variables in the top models, a plot of the top important variables and their sum of model weights across all models can be produced:
 
+```{r plot of coefs, message = FALSE}
 coef <- data.frame(coef(bestmodels_info)[,-1]) %>% 
   summarise(across(everything(), ~ mean(.x, na.rm = TRUE))) %>% 
   pivot_longer(everything(), names_to = "var") %>% 
   mutate(effect = ifelse(value > 0, "Positive", "Negative"))
-  
-knitr::kable(coef, caption = glue::glue("**Mean coefficient value for each predictor within the best models.**")) %>%
-  kable_styling("striped") %>% scroll_box(width = "100%", height = "300px")
 
-imp <- data.frame(MuMIn::importance(bestmodels_info)) %>% 
-  rename(imp = MuMIn..importance.bestmodels_info.) %>% 
+imp <- data.frame(MuMIn::sw(bestmodels_info)) %>% 
+  rename(imp = MuMIn..sw.bestmodels_info.) %>% 
   rownames_to_column("var") %>% 
   left_join(coef, by = "var") %>% 
   mutate(effect = ifelse(is.na(effect), "Mixed (factor)", effect)) %>%
@@ -407,377 +282,28 @@ ggplot(data=imp, aes(x = imp, y = reorder(var, imp),
   scale_fill_manual(values = c("#4daf4a", "#e41a1c", "#377eb8"),
                     name = "Effect")
 
-rm(coef, imp)
+knitr::kable(coef, caption = glue::glue("**Mean coefficient value for each predictor within the best models.**")) %>%
+  kable_styling("striped") %>% scroll_box(width = "100%", height = "300px")
 
-bestmodels <- MuMIn::get.models(bestmodels_info, subset = TRUE)
-performance::check_model(bestmodels[[1]])
+```
+
+```{r, include = FALSE}
+rm(filepath, to_print, coef, imp)
+
+# bestmodels <- MuMIn::get.models(bestmodels_info, subset = TRUE)
+# performance::check_model(bestmodels[[1]])
 
 rm(bestmodels_info)
 ```
 
-## Scatterplots
+<br>
 
-### Model average predict function
+---
 
-```{r eval = FALSE}
-model_avgpred <- function(allmodels_info, 
-                          data_raw, 
-                          delta_threshold = 2,
-                          seqlength = 20,
-                          exclude_point_id = FALSE
-                          # exclude_round = FALSE
-                          ) {
-  
-  best_models <- MuMIn::get.models(allmodels_info, 
-                                   delta < delta_threshold)
-  
-  
-  # get unique predictors (fixed & random effects) among the best models
-  fixedef_names <- lapply(best_models, function(x) names(x@frame)) %>% 
-    unlist() %>% unique()
-  fixedef_names <- fixedef_names[!grepl('^sprich$', fixedef_names)] # remove response var
-  
-  randef <- lapply(best_models, ranef)
-  randef_names <- lapply(randef, names) %>% 
-    unlist() %>% unname() %>% unique()
-  rm(randef)
-  # if(exclude_point_id == TRUE){
-  #   fixedef_names <- fixedef_names[!grepl("point_id", fixedef_names)]
-  #   randef_names <- randef_names[!grepl("point_id", randef_names)]
-  # }
-  
-  # get mean values of each numeric var
-  pred_numeric_medians <- data_raw %>%
-    dplyr::select(contains(fixedef_names) & where(is.numeric)) %>% 
-    mutate(across(everything(), as.vector)) %>% # prevent auto un-scaling!!
-    summarise(across(everything(), median, na.rm = TRUE))
-  
-  
-  # get unique combi of non-numeric variables, including random effects
-  pred_non_numeric <- data_raw %>%
-    dplyr::select(all_of(randef_names), 
-                  !where(is.numeric) & contains(fixedef_names)) %>%
-    unique() # unique combinations
-  if(!is.null(pred_non_numeric[["point_id"]]) & exclude_point_id == TRUE & any(fixedef_names %in% "round")){
-    
-    pred_non_numeric <- pred_non_numeric %>%
-      group_by(town, round) %>% 
-      summarise(point_id = first(point_id)) # set to 1 point_id
-    
-  }else if(!is.null(pred_non_numeric[["point_id"]]) & exclude_point_id == TRUE & !any(fixedef_names %in% "round")){
-    
-    pred_non_numeric <- pred_non_numeric %>%
-      group_by(town) %>% # no round 
-      summarise(point_id = first(point_id)) 
-  }
-  # if(exclude_round == TRUE){
-  #   pred_non_numeric <- pred_non_numeric %>%
-  #     dplyr::select(-matches("^round$")) %>% unique()
-  # }
-  
-  
-  # create output var_list for only numeric predictors
-  var_list <- setNames(vector("list", ncol(pred_numeric_medians)), 
-                       colnames(pred_numeric_medians))
-    
-  
-  # FOR EACH PREDICTOR
-  # create list of all predictors, including random effects
-  for (i in seq_along(var_list)) {
-    
-    # provide sequence of values to predict
-    predictor <- data.frame(seq(min(data_raw[names(var_list)[i]]),
-                             max(data_raw[names(var_list)[i]]), 
-                             length.out = seqlength))
-    names(predictor)[1] <- names(var_list)[i]
+## References
 
-    # combine dfs, make unique combinations of non-numeric predictors
-    newvar_df <- predictor %>%
-      bind_cols(pred_numeric_medians %>% # rm col of predictor of interest
-                  dplyr::select(-all_of(names(var_list)[i]))) %>%
-      merge(pred_non_numeric) %>% # all unique combinations
-      mutate(across(is.character, as.factor))
-    
-    
-    # make predictions
-    newvar_df_output <- tryCatch({
-      
-        avgpred <- modavgPred(best_models, 
-                              newdata = newvar_df, 
-                              type = "response")
-    
-        # add details from predictions
-        newvar_df %>%
-          mutate(prediction = avgpred$mod.avg.pred, # best fit pt/lines
-                 prediction.se = avgpred$uncond.se) # to calc confidence intervals
+Arthur AD, Li J, Henry S & Cunningham SA (2010) Influence of woody vegetation on pollinator densities in oilseed Brassica fields in an Australian temperate landscape. _Basic and Applied Ecology_, _11_(5): 406–414.
 
-    
-    # bug in function predictSE() within modavgPred, such that getting attributes of mod@frame returns no factor (character instead), resulting in for() code not being run.
-      }, error = function(e){
-        message(paste("\nError in modavgPred:  ", e, "\nUsing alternative method using MuMIn::predict()"))
-        
-        newvar_df_output <- data.frame()
-        return(newvar_df_output)
-        
-      })
-    
-    # if got error, do normal predict 
-    if(nrow(newvar_df_output) == 0){
-        
-      best_models2 <- MuMIn::model.avg(best_models)
-      
-      avgpred <- predict(best_models2, 
-                         newdata = newvar_df, type = "response"
-                         # se.fit = TRUE # se.fit doesn't work
-                         ) 
-      # predict(best_models[[1]], # for single model object only 
-      #         newdata = newvar_df, type = "response")
-      
-      se <- predict(best_models2, newdata = newvar_df) # this is not SE! must figure out how to get SE
-      
-      newvar_df_output <- newvar_df %>%
-          mutate(prediction = avgpred, # best fit pt/lines
-                 prediction.se = se) # to calc confidence intervals
-      
-      rm(avgpred)
-    }
-    
-    
-    # process output df
-    # predictor variable of interest: unscale (backtransform)
-    newvar_df_output[, names(var_list)[i]] <- 
-      newvar_df_output[, names(var_list)[i]] * attr(data_raw[[names(var_list)[i]]],
-                                              'scaled:scale') +
-      attr(data_raw[[names(var_list)[i]]], 
-           'scaled:center')
-    
-    newvar_df_output <- newvar_df_output %>% 
-      rename(predictor = names(var_list)[i]) # rename to common name
-    
+Hothorn T, Hornik K & Zeileis A (2006) Unbiased recursive partitioning: A conditional inference framework. _Journal of Computational and Graphical Statistics_, _15_(3): 651–674.
 
-   # append to output list
-    var_list[[i]] <- newvar_df_output
-  
-    rm(newvar_df, newvar_df_output, predictor)
-  }
-  
-  rm(fixedef_names, randef_names,
-     pred_numeric_medians, pred_non_numeric)
-  
-  return(var_list)
-}
-```
-
-### Plot function
-
-```{r eval = FALSE}
-plot_glmer <- function(allmodels_info, 
-                       data_raw, 
-                       delta_threshold = 2,
-                       seqlength = 20,
-                       exclude_point_id = TRUE){
-  
-  # make predictions
-  data_predicted <- model_avgpred(allmodels_info, data_raw,
-                                  delta_threshold = delta_threshold,
-                                  seqlength = seqlength,
-                                  exclude_point_id = exclude_point_id)
-  
-  
-  # get sequence of importance for landscape vars
-  bestmodels_info <- subset(allmodels_info, 
-                            delta < delta_threshold,
-                            recalc.weights=FALSE)
-  imp <- names(MuMIn::importance(bestmodels_info))
-  rm(allmodels_info, bestmodels_info)
-  
-  
-  # process raw data for plotting
-  data_processed <- data_raw %>%
-    dplyr::select(town, round, sprich, any_of(names(data_predicted))) %>%
-    mutate(across(.cols = matches("^[r]\\d+[m]_") & where(is.numeric), # backtransform
-            .fns = function(x) x * attr(x, 'scaled:scale') +
-             attr(x, 'scaled:center'))) %>%
-    pivot_longer(names(data_predicted), 
-                 names_to = "variable", values_to = "predictor") %>%
-    
-    # arrange factor levels
-    mutate(town = factor(town, levels = c("PG", "QT", "TP","JW", "BS", "WL"))) %>%
-    mutate(variable = factor(variable, levels = imp))
-    
-  # convert to readable var names
-  levels(data_processed$variable) <- gsub("^([r]\\d+[m])_(.+)", "\\2 (\\1)",
-                                    levels(data_processed$variable)) # move radius to end of string
-  levels(data_processed$variable) <- gsub("\\(r", "\\(", # remove the "r"
-                                    levels(data_processed$variable)) 
-  levels(data_processed$variable) <- gsub("man_", "", # remove "man_"
-                                    levels(data_processed$variable)) 
-  levels(data_processed$variable) <- gsub("(.+)_pland(.+)", "\\1 area\\2", # area - move to back
-                                    levels(data_processed$variable)) 
-  levels(data_processed$variable) <- gsub("area \\(", "area \\(\\%; ", # add % units
-                                    levels(data_processed$variable))  
-  levels(data_processed$variable) <- gsub("_sprich \\(", " species richness \\(count; ",
-                                    levels(data_processed$variable))
-  levels(data_processed$variable) <- gsub("_shannon", " shannon diversity",
-                                    levels(data_processed$variable))
-  levels(data_processed$variable) <- gsub("FA_ratio", " floor area ratio",
-                                    levels(data_processed$variable))
-  levels(data_processed$variable) <- gsub("buildingAvgLvl", "average building level",
-                                  levels(data_processed$variable))
-  levels(data_processed$variable) <- gsub("laneDensity", "Road lane density",
-                                    levels(data_processed$variable)) 
-  levels(data_processed$variable) <- gsub("natveg", "Natural vegetation",
-                                    levels(data_processed$variable)) 
-  levels(data_processed$variable) <- str_to_sentence(levels(data_processed$variable), locale = "en") # convert to sentence case
-  
-  rm(data_raw)
-  
-  
-  # plot
-  plot_results <- data_predicted %>%
-    bind_rows(.id = "variable") %>%
-    
-    dplyr::select(variable, predictor, prediction, prediction.se, 
-                  any_of(gsub("round:town", "town", imp)), ) # REMOVE FACTORS (e.g. town/round) if they are not within most important variables (based on sum of weights)
-  rm(imp)
-  
-  if(any(colnames(plot_results) %in% "town")){ # if town present
-    plot_results <- plot_results %>% 
-      mutate(town = factor(town, levels = c("PG", "QT", "TP","JW", "BS", "WL"))) 
-  }
-    
-  plot_results <- plot_results %>%
-    # convert to readable var names
-    # radius
-    mutate(variable = gsub("^([r]\\d+[m])_(.+)", "\\2 (\\1)", .data$variable)) %>% # move radius to end of string
-    mutate(variable = gsub("\\(r", "\\(", .data$variable)) %>% # remove the "r"
-    
-    # remove type of variable prefix
-    mutate(variable = gsub("man_", "", .data$variable)) %>% # remove "man_"
-    
-    # % area
-    mutate(variable = gsub("(.+)_pland(.+)", "\\1 area\\2", .data$variable)) %>%
-    mutate(variable = gsub("area \\(", "area \\(\\%; ", .data$variable)) %>%  # add % units
-    
-    # other vars
-    mutate(variable = gsub("_sprich \\(", " species richness \\(count; ", .data$variable)) %>%
-    mutate(variable = gsub("_shannon", " shannon diversity", .data$variable)) %>%
-    mutate(variable = gsub("FA_ratio", " floor area ratio", .data$variable)) %>%
-    mutate(variable = gsub("buildingAvgLvl", "average building level", .data$variable)) %>%
-    mutate(variable = gsub("laneDensity", "Road lane density", .data$variable)) %>% 
-    mutate(variable = gsub("natveg", "Natural vegetation", .data$variable)) %>% 
-    
-    mutate(variable = str_to_sentence(.data$variable, # convert to sentence case
-                                      locale = "en")) %>%
-    
-    mutate(variable = factor(variable, # re-level factors for variable (order)
-                             levels = levels(data_processed$variable)))
-  
-   
-  # if town col is present in results
-  if(any(colnames(plot_results) %in% "town")){
-    
-  plot_output <- 
-    plot_results %>%  
-      ggplot() +
-        facet_wrap(~ variable + round, scales = "free_x",
-                   strip.position = "bottom") + # move facet labels to axes
-      
-        geom_point(data = data_processed,
-                   aes(x = predictor, y = sprich,
-                       col = town, shape = town),
-                   size = 1.0, alpha = 0.9) +
-      
-        geom_ribbon(aes(x = predictor,
-                        ymin = (prediction - (1.96 * prediction.se)),
-                        ymax = (prediction + (1.96 * prediction.se)),
-                        fill = town,
-                        linetype = round),
-                      alpha = 0.2) +
-        geom_line(aes(x = predictor, y = prediction,
-                      color = town, linetype = round
-                      ),
-                  size = 0.8, alpha = 0.7) +
-      
-        scale_fill_brewer(type = "qual",
-                          palette = "Paired",
-                          aesthetics = c("color", "fill"),
-                          name = "Town") +
-      
-        scale_shape_manual(values = c(16, 16, 24, 24, 4, 4), name = "Town") +
-        scale_linetype(name = "Survey Round") +
-        
-        
-        ylab("Species density") + 
-        xlab("") +
-        theme_bw() + 
-        theme(panel.grid.major.x = element_blank(),
-              panel.grid.minor.x = element_blank(),
-              strip.background = element_blank(), # facet strips
-              strip.placement = "outside",
-              legend.position="bottom",
-              legend.box = "horizontal") 
-  
-    }else{ # 'town' is not present in results
-    
-    plot_output <- 
-      plot_results %>%  
-        ggplot() +
-          facet_wrap(~ variable, scales = "free_x",
-                     strip.position = "bottom") + # move facet labels to axes
-        
-          geom_point(data = data_processed,
-                     aes(x = predictor, y = sprich,
-                         col = town, shape = town),
-                     size = 1.0, alpha = 0.9) +
-        
-          geom_ribbon(aes(x = predictor,
-                            ymin = (prediction - (1.96 * prediction.se)),
-                            ymax = (prediction + (1.96 * prediction.se)),
-                            #fill = town
-                          ),
-                        alpha = 0.2) +
-          geom_line(aes(x = predictor, y = prediction,
-                        #color = town
-                        ),
-                    size = 0.8, alpha = 0.7) +
-        
-          scale_fill_brewer(type = "qual",
-                            palette = "Paired",
-                            aesthetics = c("color", "fill"),
-                            name = "Town") +
-        
-          scale_shape_manual(values = c(16, 16, 24, 24, 4, 4), name = "Town") +
-          
-          
-          ylab("Species density") + 
-          xlab("") +
-          theme_bw() + 
-          theme(panel.grid.major.x = element_blank(),
-                panel.grid.minor.x = element_blank(),
-                strip.background = element_blank(), # facet strips
-                strip.placement = "outside",
-                legend.position="bottom",
-                legend.box = "horizontal") 
-  }
-  
-  return(plot_output)
-}
-```
-
-```{r eval = FALSE}
-plot_glmer(allmodels_info = birdmods,
-           data_raw = birds,  
-           delta_threshold = params$dredge_delta_threshold,
-           seqlength = params$plots_seqlength)
-
-rm(birds, birdmods)
-```
-
-
-## Cross-validation
-
-```{r}
-
-```
-
+Li J, Alvarez B, Siwabessy J, Tran M, Huang Z, Przeslawski R, Radke L, Howard F & Nichol S (2017) Application of random forest and generalised linear model and their hybrid methods with geostatistical techniques to count data: Predicting sponge species richness. _Environmental Modelling and Software_, _97_: 112–129.
