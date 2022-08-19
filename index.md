@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Biodiversity indices for city landscapes
+# Spatial predictions of biodiversity across urban landscapes
 
 <!-- badges: start -->
 

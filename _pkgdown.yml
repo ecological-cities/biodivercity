@@ -63,7 +63,7 @@ navbar:
       - text: 2. Process landscape data
         href: articles/process-landscape.html
       - text: 3. Build models
-        href:
+        href: articles/build-models.html
       - text: 4. Apply models
         href: articles/apply-models.html
       - text: 5. Use cases

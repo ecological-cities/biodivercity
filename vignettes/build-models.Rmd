@@ -1,5 +1,5 @@
 ---
-title: "Build models"
+title: "Build Models"
 subtitle: "Build and summarise GLMM models with processed animal and landscape data"
 author: "Edwin Tan"
 date: "`r Sys.Date()`"
