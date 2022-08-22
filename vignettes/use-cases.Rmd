@@ -1,6 +1,6 @@
 ---
 title: "Model Use Cases"
-subtitle: "Compare animal diversity across space and time"
+subtitle: "Quantitative comparisons of animal diversity across space and time"
 author: "Song, Xiao Ping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -20,11 +20,11 @@ library("tmap")
 
 ## 1. Citywide monitoring 
 
-Pixel-based spatial predictions of animal diversity from the predictive models enable fine-grained assessments of the landscape, by providing continuous values at a specified spatial resolution. Pixel values can also be summarised within the zones used in city planning, to allow comparisons to be made between these planning units. This enables animal diversity to be assessed alongside other indices also summarised at the level of these planning units, providing a more comprehensive view when performing citywide benchmarking of components related to biodiversity and beyond.  
+Models that are built using remotely sensed data can be used to predict the diversity of an animal group across time and geographical space. Landscape data (e.g. satellite imagery) processed as input predictors can be used to monitor biodiversity in the past and present.  
 
-For example, the availability of citywide landscape data allow us to predict the local diversity of odonates across all [subzones](https://data.gov.sg/dataset/master-plan-2019-subzone-boundary-no-sea) in Singapore: 
+For example, the interactive map below shows the _Alpha_ (local) diversity of odonates predicted across all [subzones](https://data.gov.sg/dataset/master-plan-2019-subzone-boundary-no-sea) in Singapore during the year 2020, at a coarse pixel resolution of 100 hectares. Depending on the level of detail required, the pixel resolution can be adjusted accordingly (e.g., 0.1 hectares).
 
-```{r echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%", fig.cap = "**Map: Spatial predictions of odonate diversity across subzones in Singapore.** The pixel resolution used for predictions in this example is 1 km; subzones that are too small for this pixel resolution do not have predicted values."}
+```{r echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%", fig.cap = "**Map: Spatial predictions of local (_Alpha_) diversity of odonates across subzones in Singapore.** The pixel resolution used for predictions in this example is 100 ha; subzones that are too small for this pixel resolution do not have predicted values."}
 
 sg_subzones <- 
   system.file("extdata", "sg_subzones.geojson", package="biodivercity") %>% 
@@ -53,46 +53,48 @@ tm_basemap(c("CartoDB.Positron")) +
 ```
 
 <center>
-**Map: Spatial predictions of odonate diversity within subzones in Singapore.** The pixel resolution used for predictions in this example is 1 km; subzones were analysed separately, and those with an area too small for this pixel resolution do not have predicted values.
+**Map: Spatial predictions of local (_Alpha_) diversity of odonates across subzones in Singapore.** The pixel resolution used for predictions in this example is 100 ha; subzones that are too small for this pixel resolution do not have predicted values.
 </center>
 
 <br>
 
-The pixel values can be summarised per subzone, and the distribution of the summarised values can subsequently be used to compare the ‘performance’ of each subzone relative to others in Singapore, or to a set a benchmark/target for the desired level of 'performance' of each planning unit. For example, towns could be scored based on their performance relative to the mean of the distribution, as shown below:
+Pixel values within the zones used in city planning can be summarised, to allow comparisons to be made between these planning units. The resulting distribution of the summarised values can subsequently be used to compare the ‘performance’ of each planning unit relative to others in the city, or to a set a benchmark/target for the desired level of 'performance' (Fig. 1). For example, subzones in Singapore could be benchmarked against the mean of the distribution, as shown below:
 
-```{r out.width = "60%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure: Histogram showing the distribution of values for the mean number of odonate species per pixel within each of the 332 subzones in Singapore.** The pixel resolution used for predictions in this example is 1 km."}
+
+```{r out.width = "60%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 1: Histogram showing the distribution of values for the mean number of odonate species per pixel within each of the 332 subzones in Singapore.** Subzones were assigned an arbitrary score of 0-4 based on standard deviations from the mean (i.e., performance of the 'average' subzone)."}
 knitr::include_graphics("subzone-distribution-odonates.png", dpi = 300)
 ```
 
 <br>
 
-In the above example, each subzone was assigned an arbitrary score of 0-4, based on standard deviations from the mean (i.e., performance of the 'average' subzone). If predictions were made for multiple snapshots in time, scoring could be based on whether the mean pixel value for a particular subzone increases or decreases between two time periods; subzones could then be assigned a negative or positive score, for instance, based on a target of 'no net loss' over time.
+If spatial predictions were made for multiple snapshots in time, benchmarking could be based on whether the average pixel value for a particular planning unit increases or decreases between two time periods. For example, if 'no net loss' in biodiversity is set as a target, a negative score could be assigned if the average pixel value is reduced, while a positive score could be assigned if the average pixel value increases.
 
+Finally, it is worth noting that our package allows full customisation of both the pixel size and boundaries within which to summarise the pixel values. This provides flexibility according to the level of analysis (e.g., geographical scale) required by the user. By summarising pixel values within zones used in city planning, animal diversity may be assessed alongside other indices also summarised at the level of these planning units, thus providing a more comprehensive view of components related to biodiversity and beyond.  
 
 <br>
 
 ---
 
-## 2. Future scenario planning
+## 2. Biodiversity in the future
 
-Landscape data from remotely sensed sources (e.g. satellite imagery) can be processed into input predictors within models, allowing changes in biodiversity to be predicted across time and over large areas for monitoring purposes. This provides a cost-efficient proxy of expected changes in biodiversity, alongside periodic animal surveys for the validation of model outputs. Other than monitoring changes in biodiversity, there is also a need to evaluate the effectiveness of actions aimed at biodiversity conservation, i.e., future scenario planning purposes. Data compatibility between these multiple use cases should be carefully considered when building and using the predictive models.
+Other than monitoring changes in biodiversity, there is also a need to assess future urban developments, for instance, to see if proposed designs can effectively mitigate the loss of biodiversity. But since such landscapes do not exist, snapshots of remotely sensed data can not be used. It is therefore important to carefully consider data compatibility between these different use cases when building and using the predictive models.
 
-Urban design and planning involves the consideration of multiple design scenarios. But since such landscapes do not exist, snapshots of remotely sensed data can not be used. Manually generated landscape elements (e.g., vector data for vegetation and water) may instead be produced from prospective designs, but the format and types of such data must be compatible with those used in the predictive models. For instance, when selecting landscape predictors used to build the models, land cover classification into discrete areas would be more compatible with data generated from scenario planning, compared to using continuous values from spectral indices (e.g., NDVI). Vegetation generated in design scenarios may then be rasterized into land cover-types (Fig. 1), and used to replace the remotely sensed data within regions of interest (Fig. 2). The resulting raster data may then be used to predict the occurrence of biodiversity for the particular scenario. 
+Urban design and planning involves the consideration of multiple design scenarios. Manually generated landscape elements (e.g., vector data for vegetation and water) may be produced from prospective designs, but the format and types of such data must be compatible with those used in the predictive models. For instance, when selecting landscape predictors to build the models, land cover classification as discrete rasters would be more compatible with manually generated data, compared to continuous rasters that cannot be feasibly calculated (e.g., spectral indices such as NDVI). Vegetation generated in design scenarios can be rasterized into discrete land cover-types (Fig. 2), and used to replace the remotely sensed data within regions of interest (Fig. 3). Such amendments to landscape data can be made across a site slated for urban development, and then used to make spatial predictions for that particular design scenario.
 
-```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 1: Example showing how manually generated vector data can be converted to raster data used in the predictive models.**"}
+```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 2: Example showing how manually generated vector data of vegetation can be converted into a classified raster of vegetation types used in the predictive models.**"}
 knitr::include_graphics("data-compatibility-rasterize.png", dpi = 300)
 ```
 
 <br>
 
-```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 2: Example showing how a land cover raster of remotely sensed vegetation types can be amended with manually generated vector data (rasterised).**"}
-knitr::include_graphics("data-compatibility-amend.jpg", dpi = 300)
+```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 3: Example showing how a classified raster of remotely sensed vegetation can be amended with the manually generated vector data (rasterised).**"}
+knitr::include_graphics("data-compatibility-amend.png", dpi = 300)
 ```
 
 <br>
 
 
-While such data conversions may allow similar predictors (and hence models) to be used for different use cases, it should be noted that potential mismatches between different data sources may result in inaccurate predictions. Across the four animal groups assessed in our [research project](/project/birt), predictions of _Alpha_ diversity were generally lower than the actual number of species observed at survey points (Fig. 3) where manually mapped landscape data were used to replace the remotely sensed data (Fig. 2). The 95% confidence intervals for birds and amphibians did not center around zero (i.e., low accuracy), which suggests that future scenario planning based on the predictions of these two animal groups should be treated with caution. 
+While such data conversions may allow similar predictors (and hence models) to be used for different use cases, it should be noted that potential mismatches between different data sources may result in inaccurate predictions. Across the four animal groups assessed in our [research project](/project/birt), predictions of _Alpha_ diversity were generally lower than the actual number of species observed at survey points (Fig. 3) where manually mapped landscape data were used to replace the remotely sensed data (Fig. 2). The 95% confidence intervals for birds and amphibians did not center around zero (i.e., low accuracy), which suggests that future scenarios based on the predictions of these two animal groups should be treated with caution. 
 
 
 ```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "Figure 3: The accuracy of model predictions based on cross-validation (a) using the original dataset; and (b) using landscape data amended with rasterised vectors from manually mapped survey points (refer to Fig. 2). Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped iterations of a train-test split (75% / 25 %) in the dataset."}
