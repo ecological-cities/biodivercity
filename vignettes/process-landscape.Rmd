@@ -111,17 +111,17 @@ The following lists the possible metrics that may be summarised from the downloa
     
 <br>
 
-The function `osm_perpoint_specified()` can be be used to generate the summaries. To do so, we need to supply a character vector of predictor names to the function argument `predictors_osm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_osm_` denotes that the variables are based on OpenStreetMap data. For example, we can summarise the building floor area ratio at a radius of 50 m and 100 m around `points`–these variables are appended as new columns.
+The function `genfeatures_osm_specified()` can be be used to generate the summaries. To do so, we need to supply a character vector of predictor names to the function argument `predictors_osm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_osm_` denotes that the variables are based on OpenStreetMap data. For example, we can summarise the building floor area ratio at a radius of 50 m and 100 m around `points`–these variables are appended as new columns.
 
-```{r osm_perpoint, warning = FALSE, message = FALSE}
+```{r genfeatures_osm, warning = FALSE, message = FALSE}
 
 # variables to summarise
 predictors <- c("r50m_osm_buildingFA_ratio", "r100m_osm_buildingFA_ratio") 
 
-points <- osm_perpoint_specified(vector_osm = buildings,
-                                 building_levels = "levels",
-                                 predictors_osm = predictors,
-                                 points = points) 
+points <- genfeatures_osm_specified(vector_osm = buildings,
+                                    building_levels = "levels",
+                                    predictors_osm = predictors,
+                                    points = points) 
 
 points
 ```
@@ -256,28 +256,28 @@ rm(lsm)
 
 <br>
 
-Similar to the OSM data, we will use the `points` dataset, which were randomly generated within the `sampling_areas` earlier on. A wide variety of metrics may be summarised using the function `lsm_perpoint()`. The following example summarises all 'class-level' metrics for vegetation cover (`veg_classified`), at a buffer radii of 50 m and 100 m around `points`.
+Similar to the OSM data, we will use the `points` dataset, which were randomly generated within the `sampling_areas` earlier on. A wide variety of metrics may be summarised using the function `genfeatures_lsm()`. The following example summarises all 'class-level' metrics for vegetation cover (`veg_classified`), at a buffer radii of 50 m and 100 m around `points`.
 
-```{r lsm_perpoint, eval = FALSE, warning = FALSE, message = FALSE}
-points <- lsm_perpoint(raster = veg_classified,
-                                      points = points,
-                                      buffer_sizes = c(50, 100), # in metres
-                                      level = c("class"),
-                                      class_names = c("veg"),
-                                      class_values = c(1)) # pixel value of class
+```{r genfeatures_lsm, eval = FALSE, warning = FALSE, message = FALSE}
+points <- genfeatures_lsm(raster = veg_classified,
+                          points = points,
+                          buffer_sizes = c(50, 100), # in metres
+                          level = c("class"),
+                          class_names = c("veg"),
+                          class_values = c(1)) # pixel value of class
 ```
 
-Alternatively, the function `lsm_perpoint_specified()` can be used to generate the metrics specified by their name. Similar to `osm_perpoint_specified()`, we need to supply a character vector of predictor names to the function argument `predictors_lsm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_lsm_` denotes that the variables are landscape metrics. For example, we can summarise the percentage of vegetated landscape (`pland` metric) at a radius of 100 m and 200 m around `points`–these variables are appended as new columns.
+Alternatively, the function `genfeatures_lsm_specified()` can be used to generate the metrics specified by their name. Similar to `genfeatures_osm_specified()`, we need to supply a character vector of predictor names to the function argument `predictors_lsm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_lsm_` denotes that the variables are landscape metrics. For example, we can summarise the percentage of vegetated landscape (`pland` metric) at a radius of 100 m and 200 m around `points`–these variables are appended as new columns.
 
-```{r lsm_perpoint_specified, warning = FALSE, message = FALSE}
+```{r genfeatures_lsm_specified, warning = FALSE, message = FALSE}
 
 predictors <- c("r100m_lsm_veg_pland", "r200m_lsm_veg_pland") # variables to summarise
 
-points <- lsm_perpoint_specified(raster = veg_classified,
-                                 predictors_lsm = predictors,
-                                 class_names = c("veg"),
-                                 class_values =  c(1),
-                                 points = points)
+points <- genfeatures_lsm_specified(raster = veg_classified,
+                                    predictors_lsm = predictors,
+                                    class_names = c("veg"),
+                                    class_values =  c(1),
+                                    points = points)
 
 points
 ```

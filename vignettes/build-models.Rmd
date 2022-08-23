@@ -91,15 +91,15 @@ tm_shape(sampling_points) +
   tm_dots(col = "yellow")
 ```
 
-The classified raster `veg_classified` is then input into `lsm_perpoint()` as per the `Process landscape` article to retrieve relevant landscape metrics.
+The classified raster `veg_classified` is then input into `genfeatures_lsm()` as per the `Process landscape` article to retrieve relevant landscape metrics.
 
 ```{r, eval = FALSE}
-points <- lsm_perpoint(raster = veg_classified,
-                                      points = points,
-                                      buffer_sizes = c(100, 200), # in metres
-                                      level = c("class"),
-                                      class_names = c("veg"),
-                                      class_values = c(1)) # pixel value of class
+points <- genfeatures_lsm(raster = veg_classified,
+                          points = points,
+                          buffer_sizes = c(100, 200), # in metres
+                          level = c("class"),
+                          class_names = c("veg"),
+                          class_values = c(1)) # pixel value of class
 ```
 
 Finally, the two datasets will be combined with an `inner_join()`. An input dataset for model building will follow the same format.

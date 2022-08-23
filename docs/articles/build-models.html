@@ -104,7 +104,7 @@
             <h3 data-toc-skip class="subtitle">Build and summarise GLMM models with processed animal and landscape data</h3>
                         <h4 data-toc-skip class="author">Edwin Tan</h4>
             
-            <h4 data-toc-skip class="date">2022-08-19</h4>
+            <h4 data-toc-skip class="date">2022-08-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/build-models.Rmd" class="external-link"><code>vignettes/build-models.Rmd</code></a></small>
       <div class="d-none name"><code>build-models.Rmd</code></div>
@@ -159,14 +159,14 @@
   <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">veg_classified</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_image_binary.html">classify_image_binary</a></span><span class="op">(</span><span class="va">ndvi_mosaic</span>, threshold <span class="op">=</span> <span class="st">"otsu"</span><span class="op">)</span></code></pre></div>
-<p>The classified raster <code>veg_classified</code> is then input into <code><a href="../reference/lsm_perpoint.html">lsm_perpoint()</a></code> as per the <code>Process landscape</code> article to retrieve relevant landscape metrics.</p>
+<p>The classified raster <code>veg_classified</code> is then input into <code><a href="../reference/genfeatures_lsm.html">genfeatures_lsm()</a></code> as per the <code>Process landscape</code> article to retrieve relevant landscape metrics.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lsm_perpoint.html">lsm_perpoint</a></span><span class="op">(</span>raster <span class="op">=</span> <span class="va">veg_classified</span>,
-                                      points <span class="op">=</span> <span class="va">points</span>,
-                                      buffer_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>, <span class="co"># in metres</span>
-                                      level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"class"</span><span class="op">)</span>,
-                                      class_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"veg"</span><span class="op">)</span>,
-                                      class_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># pixel value of class</span></code></pre></div>
+<code class="sourceCode R"><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genfeatures_lsm.html">genfeatures_lsm</a></span><span class="op">(</span>raster <span class="op">=</span> <span class="va">veg_classified</span>,
+                          points <span class="op">=</span> <span class="va">points</span>,
+                          buffer_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>, <span class="co"># in metres</span>
+                          level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"class"</span><span class="op">)</span>,
+                          class_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"veg"</span><span class="op">)</span>,
+                          class_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># pixel value of class</span></code></pre></div>
 <p>Finally, the two datasets will be combined with an <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join()</a></code>. An input dataset for model building will follow the same format.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">birds</span> <span class="op">&lt;-</span> <span class="va">birds</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
