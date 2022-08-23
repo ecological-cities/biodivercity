@@ -104,7 +104,7 @@ reference:
   - animal_observations
   - points_landscape
 - title: "Animal surveys"
-  desc: "**_Get, process and summarise data from animal surveys_**"
+  desc: "**_Get, process and summarise data from animal surveys at point locations_**"
 - contents:
   - random_pt_gen
   - filter_observations
@@ -120,8 +120,9 @@ reference:
   - mosaic_sen2r
   - classify_image_binary
   - threshold_otsu
-  - genfeatures_vect
+  - genfeatures_manual
   - genfeatures_lsm
+  - genfeatures_osm
   - genfeatures_lsm_specified
   - genfeatures_osm_specified
 - title: "Models"

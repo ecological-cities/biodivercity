@@ -1,6 +1,6 @@
-#'Calculate specified landscape metrics at point locations
+#'Generate specified landscape metrics at point locations
 #'
-#'Summarise specified landscape metrics at point locations, for classified raster object. Calls the function `genfeatures_lsm()` internally.
+#'Generate specified landscape metrics at point locations, for classified raster object. Calls the function `genfeatures_lsm()` internally.
 #'The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 #'Refer to `landscapemetrics::list_lsm()` for the full list of metric names and abbreviations.
 #'
@@ -10,7 +10,7 @@
 #'Refer to `landscapemetrics::list_lsm()` for the full list of metrics.
 #'@param class_names Vector (character) of land cover class names to be used to identify the corresponding integer values in `class_values`.
 #'@param class_values Vector of (integer) values of interest within the classified rasters in `raster`. Should not include the value `0`.
-#'@param points Sampling points (sf object) representing the locations to calculate the metrics.
+#'@param points Points locations (sf object) to calculate the metrics.
 #'@param na_threshold Value for calculated predictor will be `NA` if the percentage of raster data
 #'within the respective point buffer areas is less than this value (`0` to `100`).
 #'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.

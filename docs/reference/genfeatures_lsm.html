@@ -102,10 +102,10 @@ at specific point locations and buffer radii.</p>
 <dd><p>SpatRaster object (<code><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">terra::rast()</a></code>). Classified land cover raster object to be analysed.
 The number of layers should correspond to the number of survey periods present in <code>points</code>.</p></dd>
 <dt>points</dt>
-<dd><p>Sampling points (sf object) for the calculation of landscape metrics.</p></dd>
+<dd><p>Points locations (sf object) to calculate the metrics.</p></dd>
 <dt>buffer_sizes</dt>
-<dd><p>Radius of circles for sampling points (in mapunits);
-landscape metrics will be calculated within the buffer area.</p></dd>
+<dd><p>Radius of circle (in mapunits) for each point location;
+metrics will be calculated within the buffer area.</p></dd>
 <dt>class_names</dt>
 <dd><p>Vector (character) of land cover class names to be used to identify the corresponding integer values in <code>class_values</code>.</p></dd>
 <dt>class_values</dt>
@@ -128,8 +128,8 @@ Currently only supports class- and landscape-level metrics.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list containing the landscape metrics across the input <code>buffer_sizes</code>.
-Each element in the list contains results for each <code>point_id</code> and <code>period</code>, for a particular buffer size.</p>
+    <p>A list containing the features/metrics calculated for <code>points</code>.
+Each element in the list corresponds to a particular buffer size.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

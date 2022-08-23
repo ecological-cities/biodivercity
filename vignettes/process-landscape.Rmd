@@ -103,25 +103,41 @@ points <- st_sample(sampling_areas, 3) %>%
 The following lists the possible metrics that may be summarised from the downloaded OSM data:
 
 - Buildings (polygons) each with the number of levels
-    - Floor area ratio (`buildingFA_ratio`)    
+    - Building footprint area (`buildingArea_m2`)
+    - Building gross floor area (`buildingGFA_m2`)
     - Average number of levels (`buildingAvgLvl`)
+    - Building Volume (`buildingVol_m3`)
+    - Floor area ratio (`buildingFA_ratio`)    
 
 - Roads (lines) each with the number of lanes 
+    - Total lane length (`lanelength`)
     - Lane density (`laneDensity`)
     
 <br>
 
-The function `genfeatures_osm_specified()` can be be used to generate the summaries. To do so, we need to supply a character vector of predictor names to the function argument `predictors_osm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_osm_` denotes that the variables are based on OpenStreetMap data. For example, we can summarise the building floor area ratio at a radius of 50 m and 100 m around `points`–these variables are appended as new columns.
+The function `genfeatures_osm()` can be be used to generate the summaries, at multiple buffer radii. This returns a list, with each element corresponding to a particular buffer size. For example, all building metrics can be calculated, up to `100` and `200` metres away from `points`:
 
-```{r genfeatures_osm, warning = FALSE, message = FALSE}
+```{r genfeatures_osm, warning = FALSE, message = FALSE, eval = FALSE}
+
+genfeatures_osm(vector = buildings, points = points,
+                name = "buildings",
+                buffer_sizes = c(100, 200),
+                building_levels = "levels") 
+
+```
+
+
+Alternatively, the function `genfeatures_osm_specified()` can be used to generate the metrics specified by their name. To do so, we need to supply a character vector of predictor names to the function argument `predictors_osm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_osm_` denotes that the variables are based on OpenStreetMap data. For example, we can summarise the building floor area ratio at a radius of 100 m and 200 m around `points`–these variables are appended as new columns.
+
+```{r genfeatures_osm_specified, warning = FALSE, message = FALSE}
 
 # variables to summarise
-predictors <- c("r50m_osm_buildingFA_ratio", "r100m_osm_buildingFA_ratio") 
+predictors <- c("r100m_osm_buildingFA_ratio", "r200m_osm_buildingFA_ratio") 
 
 points <- genfeatures_osm_specified(vector_osm = buildings,
                                     building_levels = "levels",
                                     predictors_osm = predictors,
-                                    points = points) 
+                                    points = points)
 
 points
 ```
@@ -256,15 +272,15 @@ rm(lsm)
 
 <br>
 
-Similar to the OSM data, we will use the `points` dataset, which were randomly generated within the `sampling_areas` earlier on. A wide variety of metrics may be summarised using the function `genfeatures_lsm()`. The following example summarises all 'class-level' metrics for vegetation cover (`veg_classified`), at a buffer radii of 50 m and 100 m around `points`.
+Similar to the OSM data, we will use the `points` dataset, which were randomly generated within the `sampling_areas` earlier on. A wide variety of metrics may be summarised using the function `genfeatures_lsm()`. The following example summarises all 'class-level' metrics for vegetation cover (`veg_classified`), up to `100` and `200` metres away from `points`
 
 ```{r genfeatures_lsm, eval = FALSE, warning = FALSE, message = FALSE}
-points <- genfeatures_lsm(raster = veg_classified,
-                          points = points,
-                          buffer_sizes = c(50, 100), # in metres
-                          level = c("class"),
-                          class_names = c("veg"),
-                          class_values = c(1)) # pixel value of class
+genfeatures_lsm(raster = veg_classified,
+                points = points,
+                buffer_sizes = c(100, 200), # in metres
+                level = c("class"),
+                class_names = c("veg"),
+                class_values = c(1)) # pixel value of class
 ```
 
 Alternatively, the function `genfeatures_lsm_specified()` can be used to generate the metrics specified by their name. Similar to `genfeatures_osm_specified()`, we need to supply a character vector of predictor names to the function argument `predictors_lsm`. The naming format is `r<value>m_osm_<metric>`; the prefix `r<value>m` denotes the buffer radius that the particular landscape data was summarised within, and `_lsm_` denotes that the variables are landscape metrics. For example, we can summarise the percentage of vegetated landscape (`pland` metric) at a radius of 100 m and 200 m around `points`–these variables are appended as new columns.

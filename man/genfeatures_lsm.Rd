@@ -22,10 +22,10 @@ genfeatures_lsm(
 \item{raster}{SpatRaster object (\code{terra::rast()}). Classified land cover raster object to be analysed.
 The number of layers should correspond to the number of survey periods present in \code{points}.}
 
-\item{points}{Sampling points (sf object) for the calculation of landscape metrics.}
+\item{points}{Points locations (sf object) to calculate the metrics.}
 
-\item{buffer_sizes}{Radius of circles for sampling points (in mapunits);
-landscape metrics will be calculated within the buffer area.}
+\item{buffer_sizes}{Radius of circle (in mapunits) for each point location;
+metrics will be calculated within the buffer area.}
 
 \item{class_names}{Vector (character) of land cover class names to be used to identify the corresponding integer values in \code{class_values}.}
 
@@ -47,8 +47,8 @@ Currently only supports class- and landscape-level metrics.}
 \item{...}{Additional arguments (e.g. \verb{type=}) passed to \code{landscapemetrics::calculate_lsm()}.}
 }
 \value{
-A list containing the landscape metrics across the input \code{buffer_sizes}.
-Each element in the list contains results for each \code{point_id} and \code{period}, for a particular buffer size.
+A list containing the features/metrics calculated for \code{points}.
+Each element in the list corresponds to a particular buffer size.
 }
 \description{
 Generate features by summarising landscape metrics from a classified raster,

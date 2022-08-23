@@ -1,22 +1,22 @@
-#'Calculate specified OpenStreetMap metrics at point locations
+#'Generate specified metrics from OpenStreetMap data at point locations
 #'
-#'Summarise specified metrics of OpenStreetMap buildings/roads at point locations.
+#'Generate specified metrics from OpenStreetMap (OSM) vector data at point locations.
 #'The character vector of predictor names include the specified buffer radii within which to summarise each metric.
-#'Buildings and roads are to be calculated separately.
+#'Currently supports vector data of buildings (polygons) and roads (lines).
 #'
-#'@param vector_osm sf dataframe for either buildings (polygons) or roads (lines).
+#'@param vector_osm sf dataframe of either buildings (polygons) or roads (lines).
 #'@param predictors_osm Vector (character) of predictor variables to be calculated from the vector file(s).
 #'The naming format is `<radius in metres>_osm_<metric>` (e.g. `r50m_osm_buildingFA_ratio`).
 #'@param building_ndsm SpatRaster object (`terra::rast()`) (optional). A continuous raster
 #'of the normalised Digital Surface Model, used to calculate building heights.
 #'If absent (`NULL`) and the variable is named in `predictors_osm`, the column `building_height` is used instead.
 #'Defaults to `NULL`.
-#'@param building_height Column name of the building height for sf objects in `vector_list`.
+#'@param building_height Column name in `vector_osm` for building height.
 #'Defaults to `"height"`.
-#'@param building_levels Column name of the number of building levels for sf objects in `vector_list`.
+#'@param building_levels Column name in `vector_osm` for the number of building levels.
 #'Defaults to `"levels"`.
-#'@param road_lanes Column name of the number of
-#'@param points Sampling points (sf object) representing the locations to calculate the metrics.
+#'@param road_lanes Column name in `vector_osm` for the number of lanes per road line.
+#'@param points Points locations (sf object) to calculate the metrics.
 #'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.
 #'
 #'@return The `points` object including new columns for the variables specified in `predictors_osm`.
@@ -59,7 +59,7 @@ genfeatures_osm_specified <- function(vector_osm,
 
   for(i in seq_len(nrow(input))){ # per predictor
 
-    # subset to areas within sampling points for relevant round
+    # subset to areas within sampling points
     suppressWarnings(vector_sub <- vector_osm %>%
       sf::st_make_valid() %>%
       sf::st_intersection(points %>% # for relevant buffer radius
@@ -84,11 +84,12 @@ genfeatures_osm_specified <- function(vector_osm,
 
         suppressWarnings(buildings_summarised <- vector_sub %>%
           dplyr::group_by(.data[[point_id]]) %>%
+          mutate(height = as.numeric(.data[[building_height]])) %>%
           dplyr::summarise("r{input$radius[i]}m_osm_buildingVol_m3" :=
                              sum(units::set_units(.data$area_m2, value = NULL) * .data[[building_height]],
-                                 na.rm = TRUE)) %>%
-          dplyr::mutate(dplyr::across(.cols = tidyselect::everything(),
-                                      .fns = ~tidyr::replace_na(., 0))) %>%
+                                 na.rm = FALSE)) %>%
+          # dplyr::mutate(dplyr::across(.cols = tidyselect::everything(),
+          #                             .fns = ~tidyr::replace_na(., 0))) %>%
           sf::st_set_geometry(NULL)) # remove geometry
 
         # append to points
@@ -104,7 +105,7 @@ genfeatures_osm_specified <- function(vector_osm,
       } else if(is.null(building_ndsm) & stringr::str_detect(input$metric[i], "buildingVol_m3") &
                 is.null(vector_sub[[building_height]])){
 
-        warning(paste0("Column '", building_height, "' not present in element ", i," of vector_list for calculation of ",
+        warning(paste0("Column '", building_height, "' not present for calculation of ",
                        paste0("r", input$radius[i], "m_osm_", input$metric[i]), ". Returning NAs.\n"))
         points[[paste0("r", input$radius[i], "m_osm_", input$metric[i])]] <- NA
 

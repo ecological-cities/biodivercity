@@ -100,10 +100,13 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_lsm_specified.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_osm_specified.html</loc>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_manual.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_vect.html</loc>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_osm.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_osm_specified.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/get_buildings_osm.html</loc>
@@ -115,16 +118,7 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/lsm_perpoint.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/lsm_perpoint_specified.html</loc>
-  </url>
-  <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/mosaic_sen2r.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/osm_perpoint_specified.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/pipe.html</loc>
@@ -149,9 +143,6 @@
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/standard_SR.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/summarise_landscape_perpt.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/tally_observations.html</loc>

@@ -2,7 +2,7 @@
 % Please edit documentation in R/genfeatures_osm_specified.R
 \name{genfeatures_osm_specified}
 \alias{genfeatures_osm_specified}
-\title{Calculate specified OpenStreetMap metrics at point locations}
+\title{Generate specified metrics from OpenStreetMap data at point locations}
 \usage{
 genfeatures_osm_specified(
   vector_osm,
@@ -16,25 +16,25 @@ genfeatures_osm_specified(
 )
 }
 \arguments{
-\item{vector_osm}{sf dataframe for either buildings (polygons) or roads (lines).}
+\item{vector_osm}{sf dataframe of either buildings (polygons) or roads (lines).}
 
 \item{building_ndsm}{SpatRaster object (\code{terra::rast()}) (optional). A continuous raster
 of the normalised Digital Surface Model, used to calculate building heights.
 If absent (\code{NULL}) and the variable is named in \code{predictors_osm}, the column \code{building_height} is used instead.
 Defaults to \code{NULL}.}
 
-\item{building_height}{Column name of the building height for sf objects in \code{vector_list}.
+\item{building_height}{Column name in \code{vector_osm} for building height.
 Defaults to \code{"height"}.}
 
-\item{building_levels}{Column name of the number of building levels for sf objects in \code{vector_list}.
+\item{building_levels}{Column name in \code{vector_osm} for the number of building levels.
 Defaults to \code{"levels"}.}
 
-\item{road_lanes}{Column name of the number of}
+\item{road_lanes}{Column name in \code{vector_osm} for the number of lanes per road line.}
 
 \item{predictors_osm}{Vector (character) of predictor variables to be calculated from the vector file(s).
 The naming format is \verb{<radius in metres>_osm_<metric>} (e.g. \code{r50m_osm_buildingFA_ratio}).}
 
-\item{points}{Sampling points (sf object) representing the locations to calculate the metrics.}
+\item{points}{Points locations (sf object) to calculate the metrics.}
 
 \item{point_id}{Column name of the sampling point id within the \code{points} sf. Defaults to \code{"point_id"}.}
 }
@@ -42,7 +42,7 @@ The naming format is \verb{<radius in metres>_osm_<metric>} (e.g. \code{r50m_osm
 The \code{points} object including new columns for the variables specified in \code{predictors_osm}.
 }
 \description{
-Summarise specified metrics of OpenStreetMap buildings/roads at point locations.
+Generate specified metrics from OpenStreetMap (OSM) vector data at point locations.
 The character vector of predictor names include the specified buffer radii within which to summarise each metric.
-Buildings and roads are to be calculated separately.
+Currently supports vector data of buildings (polygons) and roads (lines).
 }

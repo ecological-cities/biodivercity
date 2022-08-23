@@ -2,7 +2,7 @@
 % Please edit documentation in R/genfeatures_lsm_specified.R
 \name{genfeatures_lsm_specified}
 \alias{genfeatures_lsm_specified}
-\title{Calculate specified landscape metrics at point locations}
+\title{Generate specified landscape metrics at point locations}
 \usage{
 genfeatures_lsm_specified(
   raster,
@@ -26,7 +26,7 @@ genfeatures_lsm_specified(
 The naming format is \verb{r<radius of point buffer in metres>m_lsm_<class>_<metric>} (e.g. \code{r50m_lsm_veg_pland}).
 Refer to \code{landscapemetrics::list_lsm()} for the full list of metrics.}
 
-\item{points}{Sampling points (sf object) representing the locations to calculate the metrics.}
+\item{points}{Points locations (sf object) to calculate the metrics.}
 
 \item{na_threshold}{Value for calculated predictor will be \code{NA} if the percentage of raster data
 within the respective point buffer areas is less than this value (\code{0} to \code{100}).}
@@ -39,7 +39,7 @@ within the respective point buffer areas is less than this value (\code{0} to \c
 The \code{points} object including new columns for the variables specified in \code{predictors_osm}.
 }
 \description{
-Summarise specified landscape metrics at point locations, for classified raster object. Calls the function \code{genfeatures_lsm()} internally.
+Generate specified landscape metrics at point locations, for classified raster object. Calls the function \code{genfeatures_lsm()} internally.
 The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 Refer to \code{landscapemetrics::list_lsm()} for the full list of metric names and abbreviations.
 }

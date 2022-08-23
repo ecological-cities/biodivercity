@@ -5,9 +5,9 @@
 #'
 #'@param raster SpatRaster object (`terra::rast()`). Classified land cover raster object to be analysed.
 #'The number of layers should correspond to the number of survey periods present in `points`.
-#'@param points Sampling points (sf object) for the calculation of landscape metrics.
-#'@param buffer_sizes Radius of circles for sampling points (in mapunits);
-#'landscape metrics will be calculated within the buffer area.
+#'@param points Points locations (sf object) to calculate the metrics.
+#'@param buffer_sizes Radius of circle (in mapunits) for each point location;
+#'metrics will be calculated within the buffer area.
 #'@param class_names Vector (character) of land cover class names to be used to identify the corresponding integer values in `class_values`.
 #'@param class_values Vector of (integer) values of interest within `raster`. Should not include the value `0`.
 #'@param landscape_name Character string for name of landscape. Used to label landscape-level metrics.
@@ -20,8 +20,8 @@
 #'Currently only supports class- and landscape-level metrics.
 #'@param ... Additional arguments (e.g. `type=`) passed to `landscapemetrics::calculate_lsm()`.
 #'
-#'@return A list containing the landscape metrics across the input `buffer_sizes`.
-#'Each element in the list contains results for each `point_id` and `period`, for a particular buffer size.
+#'@return A list containing the features/metrics calculated for `points`.
+#'Each element in the list corresponds to a particular buffer size.
 #'
 #'@import checkmate
 #'@import dplyr
