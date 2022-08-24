@@ -1,6 +1,6 @@
-#'Generate specified metrics from OpenStreetMap data at point locations
+#'Calculate specific metrics from OpenStreetMap data at point locations
 #'
-#'Generate specified metrics from OpenStreetMap (OSM) vector data at point locations.
+#'Calculate specific metrics from OpenStreetMap (OSM) vector data at point locations.
 #'The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 #'Currently supports vector data of buildings (polygons) and roads (lines).
 #'
@@ -33,12 +33,12 @@
 #'@importFrom units set_units
 #'
 #'@export
-genfeatures_osm_specified <- function(vector_osm,
-                                      building_ndsm = NULL, building_height = "height", building_levels = "levels",
-                                      road_lanes = "lanes",
-                                      predictors_osm,
-                                      points,
-                                      point_id = "point_id"){
+calc_specific_osm <- function(vector_osm,
+                              building_ndsm = NULL, building_height = "height", building_levels = "levels",
+                              road_lanes = "lanes",
+                              predictors_osm,
+                              points,
+                              point_id = "point_id"){
 
   # Error checking ------------------
   coll <- checkmate::makeAssertCollection()

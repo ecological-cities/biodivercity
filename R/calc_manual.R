@@ -1,4 +1,4 @@
-#'Generate features based on manually mapped data at point locations
+#'Calculate metrics based on manually mapped data at point locations
 #'
 #'Summaries will be calculated for each of the supplied layers (`layer_<layername>`)
 #'and appended to the `points` data as additional columns.
@@ -62,7 +62,7 @@
 #'@importFrom doParallel registerDoParallel
 #'
 #'@export
-genfeatures_manual <-
+calc_manual <-
   function(points,
            layer_trees = NULL, radii_trees = 50,
            layer_shrubs = NULL, radii_shrubs = 50,

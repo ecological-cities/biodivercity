@@ -1,6 +1,6 @@
-#'Generate features based on landscape metrics at point locations
+#'Calculate landscape metrics at point locations
 #'
-#'Generate features by summarising landscape metrics from a classified raster,
+#'Calculate landscape metrics from a classified raster,
 #'at specific point locations and buffer radii.
 #'
 #'@param raster SpatRaster object (`terra::rast()`). Classified land cover raster object to be analysed.
@@ -33,13 +33,13 @@
 #'@importFrom landscapemetrics sample_lsm
 #'
 #'@export
-genfeatures_lsm <- function(raster, points, buffer_sizes,
-                            class_names = NULL,
-                            class_values = NULL,
-                            landscape_name = NULL,
-                            point_id = "point_id", period = "period",
-                            what = NULL,
-                            level = NULL, ...){
+calc_lsm <- function(raster, points, buffer_sizes,
+                     class_names = NULL,
+                     class_values = NULL,
+                     landscape_name = NULL,
+                     point_id = "point_id", period = "period",
+                     what = NULL,
+                     level = NULL, ...){
 
   # Error checking ------------------
   # if(!methods::is(raster, "Raster")){

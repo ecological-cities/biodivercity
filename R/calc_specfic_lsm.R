@@ -1,6 +1,6 @@
-#'Generate specified landscape metrics at point locations
+#'Calculate specific landscape metrics at point locations
 #'
-#'Generate specified landscape metrics at point locations, for classified raster object. Calls the function `genfeatures_lsm()` internally.
+#'Calculate specific landscape metrics at point locations, for classified raster object. Calls the function `calc_lsm()` internally.
 #'The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 #'Refer to `landscapemetrics::list_lsm()` for the full list of metric names and abbreviations.
 #'
@@ -14,7 +14,7 @@
 #'@param na_threshold Value for calculated predictor will be `NA` if the percentage of raster data
 #'within the respective point buffer areas is less than this value (`0` to `100`).
 #'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.
-#'@param ... Arguments passed on to `genfeatures_lsm()`
+#'@param ... Arguments passed on to `calc_lsm()`
 #'
 #'@return The `points` object including new columns for the variables specified in `predictors_osm`.
 #'
@@ -29,12 +29,12 @@
 #'@importFrom tidyselect matches starts_with
 #'
 #'@export
-genfeatures_lsm_specified <- function(raster,
-                                   class_names, class_values,
-                                   predictors_lsm,
-                                   points,
-                                   na_threshold = 90,
-                                   point_id = "point_id", ...){
+calc_specific_lsm <- function(raster,
+                               class_names, class_values,
+                               predictors_lsm,
+                               points,
+                               na_threshold = 90,
+                               point_id = "point_id", ...){
 
   # Error checking ------------------
   coll <- checkmate::makeAssertCollection()
@@ -65,7 +65,7 @@ genfeatures_lsm_specified <- function(raster,
     succeeded <- tryCatch({
 
       suppressMessages(result <-
-                         genfeatures_lsm(raster = raster,
+                         calc_lsm(raster = raster,
                                       points = points,
                                       buffer_sizes = as.numeric(input$radius[i]),
                                       class_names = input$class[i],

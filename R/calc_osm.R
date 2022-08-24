@@ -1,6 +1,6 @@
-#'Generate features based on OpenStreetMap data at point locations
+#'Calculate metrics based on OpenStreetMap data at point locations
 #'
-#'Generate features from OpenStreetMap (OSM) vector data,
+#'Calculate metrics from OpenStreetMap (OSM) vector data,
 #'at specific point locations and buffer radii.
 #'Currently supports vector data of buildings (polygons) and roads (lines).
 #'
@@ -35,11 +35,11 @@
 #'@importFrom units set_units
 #'
 #'@export
-genfeatures_osm <- function(vector, name = NULL,
-                            points, buffer_sizes,
-                            building_ndsm = NULL, building_height = "height", building_levels = "levels",
-                            road_lanes = "lanes",
-                            point_id = "point_id"){
+calc_osm <- function(vector, name = NULL,
+                     points, buffer_sizes,
+                     building_ndsm = NULL, building_height = "height", building_levels = "levels",
+                     road_lanes = "lanes",
+                     point_id = "point_id"){
 
   # Error checking ------------------
   if(!all(sf::st_geometry_type(points) == "POINT")){

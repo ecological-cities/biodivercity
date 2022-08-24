@@ -11,7 +11,7 @@ template:
   opengraph:
     image:
       src: man/figures/logo.png
-      alt: "Biodiversity Indices for City Landscapes"
+      alt: "Spatial predictions of biodiversity across urban landscapes"
 
 development:
   mode: auto
@@ -120,11 +120,11 @@ reference:
   - mosaic_sen2r
   - classify_image_binary
   - threshold_otsu
-  - genfeatures_manual
-  - genfeatures_lsm
-  - genfeatures_osm
-  - genfeatures_lsm_specified
-  - genfeatures_osm_specified
+  - calc_manual
+  - calc_lsm
+  - calc_osm
+  - calc_specific_lsm
+  - calc_specific_osm
 - title: "Models"
   desc: "**_Predict and validate animal diversity_**"
 - contents:

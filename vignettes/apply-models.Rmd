@@ -167,11 +167,11 @@ grid_points <- generate_grid(target_areas = bound, # target area
 grid_points # geometry column has been added
 ```
 
-Next, use the function `genfeatures_manual()` to summarise the landscape data around each of the points in `grid_points`. For each of the landscape components (inputs to the arguments `layer_<component>`), the buffer radii values (inputs to the arguments `radii_<component>`) are manually specified depending on the predictor variables present in the model. For example, to use the bird models, we summarise the landscape data as follows. The predictor variables will be appended to the `grid_points` dataframe as new columns, corresponding to those present in  `predictors_birds`.
+Next, use the function `calc_manual()` to summarise the landscape data around each of the points in `grid_points`. For each of the landscape components (inputs to the arguments `layer_<component>`), the buffer radii values (inputs to the arguments `radii_<component>`) are manually specified depending on the predictor variables present in the model. For example, to use the bird models, we summarise the landscape data as follows. The predictor variables will be appended to the `grid_points` dataframe as new columns, corresponding to those present in  `predictors_birds`.
 
 ```{r grid landscape, warning = FALSE, message = FALSE}
 grid_landscape <-
-  genfeatures_manual(
+  calc_manual(
     points = grid_points,
     species = "species",
     layer_trees = trees, radii_trees = 50,

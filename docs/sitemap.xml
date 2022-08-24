@@ -76,6 +76,21 @@
     <loc>https://ecological-cities.github.io/biodivercity/reference/booter.html</loc>
   </url>
   <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/calc_lsm.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/calc_manual.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/calc_osm.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/calc_specific_lsm.html</loc>
+  </url>
+  <url>
+    <loc>https://ecological-cities.github.io/biodivercity/reference/calc_specific_osm.html</loc>
+  </url>
+  <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/calculate_sac.html</loc>
   </url>
   <url>
@@ -92,21 +107,6 @@
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/generate_grid.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_lsm.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_lsm_specified.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_manual.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_osm.html</loc>
-  </url>
-  <url>
-    <loc>https://ecological-cities.github.io/biodivercity/reference/genfeatures_osm_specified.html</loc>
   </url>
   <url>
     <loc>https://ecological-cities.github.io/biodivercity/reference/get_buildings_osm.html</loc>
