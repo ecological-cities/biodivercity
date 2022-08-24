@@ -1,7 +1,7 @@
 #'Extract site species richness normalised to highest common survey effort.
 #'
 #'Extract species richness for all sites supplied at the highest common survey effort.
-#'Wrapper function to `sac_extractor()` and `filter_obs()`
+#'Wrapper function to `calculate_sac()` and `filter_observations()`
 #'
 #'@param observations Dataframe or list of dataframes of species observations.
 #'It should include columns for `survey_id`, `town`, `round`, `priority`, `species` and `abundance`.
@@ -52,9 +52,9 @@ standard_SR <- function(observations, survey_ref,
     results <- foreach(i = seq_along(observations),
                        .packages = "tidyverse") %dopar% {
 
-                         source("../../R/filter_obs.R")
+                         source("../../R/filter_observations.R")
                          source("../../R/check_taxongrps.R")
-                         source("../../R/sac_extractor.R")
+                         source("../../R/calculate_sac.R")
 
                          unique <- survey_ref[[i]] %>%
                            distinct(town, round, priority)
@@ -67,7 +67,7 @@ standard_SR <- function(observations, survey_ref,
 
                          for(j in 1:nrow(unique)){
 
-                           sac_data <-  sac_extractor(observations = observations[[i]],
+                           sac_data <-  calculate_sac(observations = observations[[i]],
                                                       survey_ref = survey_ref[[i]],
                                                       specify_town = unique$town[j],
                                                       specify_round = unique$round[j],
@@ -113,7 +113,7 @@ standard_SR <- function(observations, survey_ref,
 
     for(j in 1:nrow(unique)){
 
-      sac_data <-  sac_extractor(observations = observations,
+      sac_data <-  calculate_sac(observations = observations,
                                  survey_ref = survey_ref,
                                  specify_town = unique$town[j],
                                  specify_round = unique$round[j],
