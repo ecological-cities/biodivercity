@@ -116,7 +116,7 @@ check_taxongrps <- function(observations, level,
       { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>% # rename back to original colname
       dplyr::rename(!!area := area)
 
-    all_remove <- bind_rows(genus_remove, family_remove)
+    all_remove <- dplyr::bind_rows(genus_remove, family_remove)
 
 
   # point level: compare with summary tables, filter sp tt n = n_total
@@ -148,7 +148,7 @@ check_taxongrps <- function(observations, level,
       { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>%
       dplyr::rename(!!point_id := point_id)
 
-    all_remove <- bind_rows(genus_remove, family_remove)
+    all_remove <- dplyr::bind_rows(genus_remove, family_remove)
 
   }
 

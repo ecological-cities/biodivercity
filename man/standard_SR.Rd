@@ -65,5 +65,5 @@ of results, as well as the information specified in \code{specify_town}, \code{s
 }
 \description{
 Extract species richness for all sites supplied at the highest common survey effort.
-Wrapper function to \code{sac_extractor()} and \code{filter_obs()}
+Wrapper function to \code{calculate_sac()} and \code{filter_observations()}
 }

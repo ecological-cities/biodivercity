@@ -97,7 +97,7 @@ random_pt_gen <- function(boundaries, area_per_pt, pt_radius, excess_modifier = 
             points <- sf::st_sample(boundaries, ceiling(ceiling(n - retain_n) *
                 excess_modifier), type = "random") %>%
                 sf::st_as_sf() %>%
-                dplyr::rename(geometry = x) %>%
+                dplyr::rename(geometry = .data$x) %>%
                 dplyr::mutate(id = dplyr::row_number()) %>%
                 dplyr::mutate(id = paste0("normal", id)) %>%
                 dplyr::mutate(status = "New") %>%
@@ -106,7 +106,7 @@ random_pt_gen <- function(boundaries, area_per_pt, pt_radius, excess_modifier = 
             points_subarea <- sf::st_sample(sub_areas, ceiling(ceiling(n_subarea - retain_n_subarea) *
                 excess_modifier), type = "random") %>%
                 sf::st_as_sf() %>%
-                dplyr::rename(geometry = x) %>%
+                dplyr::rename(geometry = .data$x) %>%
                 dplyr::mutate(id = dplyr::row_number()) %>%
                 dplyr::mutate(id = paste0("subarea", id)) %>%
                 dplyr::mutate(status = "New") %>%

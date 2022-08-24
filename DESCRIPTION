@@ -1,5 +1,5 @@
 Package: biodivercity
-Title: Biodiversity indices for city landscapes
+Title: Spatial predictions of biodiversity across urban landscapes
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Edwin",
