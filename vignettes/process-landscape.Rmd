@@ -10,7 +10,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This article details various ways to download and process landscape data to build predictive models of animal diversity. For example, the landscape data may be derived from open-source maps, publicly-available satellite data, or manually generated sources (e.g., on-site mapping, design scenarios). 
+This article details various ways to download and process landscape data to build predictive models of animal diversity. For example, the landscape data may be derived from (1) remotely sensed satellite imagery, (2) open-source maps, or (3) manually generated sources (e.g., from on-site mapping, design scenarios). We give examples of each in this article.
 
 First, load the necessary packages to run the analysis:
 
@@ -37,114 +37,43 @@ output_dir <- "</FILEPATH/TO/DIRECTORY>"
 
 <br>
 
-The Punggol (`PG`) area (town) in Singapore from the example data `sampling_areas` will be used as demonstration in this article.
+In this article, the Punggol (`PG`) area in Singapore from the example dataset `sampling_areas` will be used. Landscape data can be summarised at point locations where animal data are available (e.g., animal surveys have been conducted); to demonstrate this, we randomly generate three points within Punggol and assign it to the object '`points`':
 
-```{r plot punggol area, warning = FALSE, message = FALSE, fig.height = 1.0, dpi = 300, out.width="50%", fig.align='center'}
-
+```{r get example data ready}
 data(sampling_areas)
 
 sampling_areas <- sampling_areas %>%
    filter(area == "PG")
+
+# randomly generate 3 points
+set.seed(30)
+points <- st_sample(sampling_areas, 3) %>% 
+  st_as_sf() %>% 
+  mutate(point_id = row.names(.)) # unique identifier
 ```
-
-<br>
-
----
-
-## OpenStreetMap (OSM) data
-
-Built elements of the landscape can be retrieved from the OpenStreetMap (OSM) database. Building polygons and road lines will be extracted from `sampling_areas` using the functions `get_buildings_osm()` and `get_roads_osm()` respectively. The `date` argument, if specified, must be a snapshot date present within the [Geofabrik database](https://download.geofabrik.de). If not, the latest data will be downloaded. In this example, we download these urban elements for the date 1 Jan 2021.
-
-```{r download urban elements, eval = FALSE}
-
-dir.create(paste0(output_dir, "/osm")) # create sub-directory for raw data
-
-buildings <- get_buildings_osm(place = sampling_areas,
-                               date = as.Date("2021-01-01"),
-                               dir_raw = paste0(output_dir, "/osm"))
-
-roads <- get_roads_osm(sampling_areas,
-                       date = as.Date("2021-01-01"),
-                       dir_raw = paste0(output_dir, "/osm"))
-
-# alternatively, load example dataset from package
-filepath <- system.file("extdata", "osm_data.Rdata", package = "biodivercity")
-load(filepath)
-```
-
-```{r load example dataset of osm elements, echo = FALSE}
-filepath <- system.file("extdata", "osm_data.Rdata", package = "biodivercity")
-load(filepath)
-```
-
-
-<br>
-
-We can generate summary metrics for the OSM data, at point locations where animal data are available (e.g., animal surveys have been conducted). In this example, we randomly generate three points within the `sampling_areas`, and visualise the datasets in a interactive map:
 
 ```{r eval = FALSE}
-
-set.seed(30)
-points <- st_sample(sampling_areas, 3) %>% 
-  st_as_sf() %>% 
-  mutate(point_id = row.names(.)) # unique identifier
-
 tmap_mode("view")
 tm_basemap(c("CartoDB.Positron")) +
   tm_shape(sampling_areas) + tm_borders() +
-  tm_shape(buildings) + tm_polygons(col = "levels") +
-  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")+
   tm_shape(points) + tm_dots()
 ```
 
-```{r echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
+<center>
 
-set.seed(30)
-points <- st_sample(sampling_areas, 3) %>% 
-  st_as_sf() %>% 
-  mutate(point_id = row.names(.)) # unique identifier
-
+```{r plot punggol area, warning = FALSE, message = FALSE, fig.height = 1.0, dpi = 300, out.width="70%", fig.align='center', echo = FALSE}
 tmap_mode("view")
 tm_basemap(c("CartoDB.Positron")) +
   tm_shape(sampling_areas) + tm_borders() +
-  tm_shape(buildings) + tm_polygons(col = "levels") +
-  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")+
   tm_shape(points) + tm_dots()
 ```
-<br>
-
-The function `calc_osm()` can be be used to summarise the following metrics of buildings and roads, at multiple buffer radii. 
-
-- Buildings (polygons):
-    - Building footprint area (`buildingArea_m2`)
-    - Building gross floor area (`buildingGFA_m2`) - _Column for the no. of levels must be present_
-    - Average number of levels (`buildingAvgLvl`) - _Column for the no. of levels must be present_
-    - Building Volume (`buildingVol_m3`) - _Column for height must be present_
-    - Floor area ratio (`buildingFA_ratio`) - _Column for the no. of levels must be present_    
-
-- Roads (lines):
-    - Total lane length (`lanelength`) - _Column for the no. of lanes must be present_
-    - Lane density (`laneDensity`) - _Column for the no. of lanes must be present_
-
-<br>
-
-For example, calculate building metrics up to `100` and `200` metres away from `points`. This returns a list, with each element corresponding to a particular buffer radius. Column names include a prefix indicating that values are from OpenStreetMap (`osm_`).
-
-```{r calc_osm, warning = FALSE, message = FALSE}
-
-calc_osm(vector = buildings, 
-         points = points,
-         name = "buildings",
-         buffer_sizes = c(100, 200),
-         building_levels = "levels") 
-
-```
+</center>
 
 <br>
 
 ---
 
-## Sentinel-2 satellite data
+## 1. Remotely sensed land cover
 
 Land cover can be a useful predictor of animal diversity. For example, publicly-available data from Sentinel-2 may be downloaded using the package [`sen2r`](http://sen2r.ranghetti.info/index.html). The package includes data pre-processing steps such as cloud masking, atmospheric correction and the calculation of spectral indices.
 
@@ -154,7 +83,7 @@ sen2r() # view GUI
 ```
 
 
-```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure: A screenshot of the `sen2r` graphical user interface accessible by running `sen2r::sen2r()`.**"}
+```{r out.width = "80%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure: A screenshot of the `sen2r` graphical user interface accessible by running `sen2r::sen2r()`.**"}
 knitr::include_graphics("sen2r-gui.png", dpi = 300)
 ```
 
@@ -168,6 +97,7 @@ Data processing parameters can be specified as arguments within `sen2r()`, or lo
 dir.create(paste0(output_dir, "/sen2r")) # for processed output files
 dir.create(paste0(output_dir, "/sen2r/raw")) # for raw files
 
+# execute workflow
 out_paths <- sen2r(
   timewindow = as.Date(c("2021-01-01", "2021-06-30")),
   max_cloud_safe = 15, # max 15% cloud cover in raw tile
@@ -181,8 +111,6 @@ out_paths <- sen2r(
   path_out = paste0(output_dir, "/sen2r"),
   path_indices = paste0(output_dir, "/sen2r"))
 ```
-
-<br>
 
 For each spectral index, we can combine all raster images captured within the specified date range by averaging the pixel values across files, thus forming an image mosaic. This allows us to avoid relying on any one image for our analysis, and to deal with missing data (e.g. due to high cloud cover) during the period of interest. The function `mosaic_sen2r()` creates the mosaic by averaging the pixel values across the multiple rasters. It is a convenience function that processes the images based on the output folder structure of `sen2r()`; ensure that the function argument `parent_dir` in `mosaic_sen2r()` is similar to the function argument `path_out` in `sen2r()`.
 
@@ -203,11 +131,12 @@ ndvi_mosaic <-
 threshold <- threshold_otsu(ndvi_mosaic)
 threshold
 ```
+
 ```{r include = FALSE}
 histogram <- terra::hist(ndvi_mosaic, breaks = 70, yaxt = 'n')
 ```
 
-```{r echo = FALSE, fig.align='center', fig.height=4, fig.width = 5, warning = FALSE, message = FALSE, dpi = 300, out.width="70%", fig.cap="**Figure: Distribution of NDVI values across the Punggol area in Singapore, based on a mosaic of images collected from 2019-07-01 to 2021-06-30.** Pixel values to the right of the dashed line may be classified as 'vegetated', while those to the left are 'non-vegetated'."}
+```{r echo = FALSE, fig.align='center', fig.height=4, fig.width = 5, warning = FALSE, message = FALSE, dpi = 300, out.width="60%", fig.cap="**Figure: Distribution of NDVI values across the Punggol area in Singapore, based on a mosaic of images collected from 2019-07-01 to 2021-06-30.** Pixel values to the right of the dashed line may be classified as 'vegetated', while those to the left are 'non-vegetated'."}
 plot(histogram, 
      xlab = "NDVI", xlim = c(-1, 1), main = "", yaxt = 'n',
       col = rgb(178/255,223/255,138/255, 0.5))
@@ -225,7 +154,8 @@ tm_shape(ndvi_mosaic) +
   tm_raster(palette = c("Greens")) +
 tm_shape(veg_classified) +
   tm_raster(style = "cat",
-            palette = c("grey", "darkgreen"))
+            palette = c("grey", "darkgreen")) +
+  tm_shape(points) + tm_dots()
 ```
 
 <br>
@@ -266,7 +196,7 @@ rm(lsm)
 
 <br>
 
-Similar to the process for OSM data, we demonstrate here the calculation of landscape metrics for the `points` dataset. A wide variety of metrics can be summarised using the function `calc_lsm()`. The following example summarises all 'class-level' metrics for vegetation cover (`veg_classified`), up to `100` and `200` metres away from `points`. This returns a list, with each element corresponding to a particular buffer radius. Column names include a prefix indicating that values are landscape metrics derived from a classified raster (`lsm_`).
+A wide variety of landscape metrics can be summarised at point locations of interest, using the function `calc_lsm()`. The following example summarises all 'class-level' metrics for vegetation cover (`veg_classified`), up to `100` and `200` metres away from `points`. This returns a list, with each element corresponding to a particular buffer radius. Column names include a prefix indicating that values are landscape metrics derived from a classified raster (`lsm_`).
 
 ```{r calc_lsm, warning = FALSE, message = FALSE}
 calc_lsm(raster = veg_classified,
@@ -281,7 +211,81 @@ calc_lsm(raster = veg_classified,
 
 ---
 
-## Manually generated data
+## 2. OpenStreetMap landscape elements
+
+Landscape elements can be retrieved from the open-source maps such as OpenStreetMap (OSM). For instance, built elements such as building polygons and road lines can be extracted from `sampling_areas` using the functions `get_buildings_osm()` and `get_roads_osm()`, respectively. The `date` argument, if specified, must be a snapshot date present within the [Geofabrik database](https://download.geofabrik.de). If not, the latest data will be downloaded. In this example, we download these urban elements for the date 1 Jan 2021 and view them as an interactive map:
+
+```{r download urban elements, eval = FALSE}
+
+dir.create(paste0(output_dir, "/osm")) # create sub-directory for raw data
+
+buildings <- get_buildings_osm(place = sampling_areas,
+                               date = as.Date("2021-01-01"),
+                               dir_raw = paste0(output_dir, "/osm"))
+
+roads <- get_roads_osm(sampling_areas,
+                       date = as.Date("2021-01-01"),
+                       dir_raw = paste0(output_dir, "/osm"))
+
+# alternatively, load example dataset from package
+filepath <- system.file("extdata", "osm_data.Rdata", package = "biodivercity")
+load(filepath)
+
+# plot
+tm_basemap(c("CartoDB.Positron")) +
+  tm_shape(sampling_areas) + tm_borders() +
+  tm_shape(buildings) + tm_polygons(col = "levels") +
+  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")+
+  tm_shape(points) + tm_dots()
+```
+
+```{r load and view osm elements, echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
+
+filepath <- system.file("extdata", "osm_data.Rdata", package = "biodivercity")
+load(filepath)
+
+tmap_mode("view")
+tm_basemap(c("CartoDB.Positron")) +
+  tm_shape(sampling_areas) + tm_borders() +
+  tm_shape(buildings) + tm_polygons(col = "levels") +
+  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")+
+  tm_shape(points) + tm_dots()
+```
+
+<br>
+
+The function `calc_osm()` can be be used to summarise the following metrics of buildings and roads, at multiple buffer radii. 
+
+- Buildings (polygons):
+    - Building footprint area (`buildingArea_m2`)
+    - Building gross floor area (`buildingGFA_m2`) - _Column for the no. of levels must be present_
+    - Average number of levels (`buildingAvgLvl`) - _Column for the no. of levels must be present_
+    - Building Volume (`buildingVol_m3`) - _Column for height must be present_
+    - Floor area ratio (`buildingFA_ratio`) - _Column for the no. of levels must be present_    
+
+- Roads (lines):
+    - Total lane length (`lanelength`) - _Column for the no. of lanes must be present_
+    - Lane density (`laneDensity`) - _Column for the no. of lanes must be present_
+
+<br>
+
+For example, calculate building metrics up to `100` and `200` metres away from `points`. This returns a list, with each element corresponding to a particular buffer radius. Column names include a prefix indicating that values are from OpenStreetMap (`osm_`).
+
+```{r calc_osm, warning = FALSE, message = FALSE}
+
+calc_osm(vector = buildings, 
+         points = points,
+         name = "buildings",
+         buffer_sizes = c(100, 200),
+         building_levels = "levels") 
+
+```
+
+<br>
+
+---
+
+## 3. Manually generated landscape elements
 
 There may be cases where you intend to summarise data that have been generated manually, for instance, from on-site mapping or artificial design scenarios (see `vignette("use-cases")`). In our work, all of such datasets were in vector format (points, polygons, lines); the function `calc_manual()` is provided for interested users, to calculate the following landscape predictors, at multiple buffer radii. Column names include a prefix indicating that values were manually generated (`man_`).
     
