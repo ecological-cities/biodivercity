@@ -12,8 +12,7 @@ calc_osm(
   building_ndsm = NULL,
   building_height = "height",
   building_levels = "levels",
-  road_lanes = "lanes",
-  point_id = "point_id"
+  road_lanes = "lanes"
 )
 }
 \arguments{
@@ -39,8 +38,6 @@ Defaults to \code{"levels"}. Column data should be numeric.}
 
 \item{road_lanes}{Column name in \code{vector} for the number of lanes per road line.
 Defaults to \code{"lanes"}. Column data should be numeric.}
-
-\item{point_id}{Column name of the sampling point id within the \code{points} sf. Defaults to \code{"point_id"}.}
 }
 \value{
 A list containing the features/metrics calculated for \code{points},  appended as new columns.

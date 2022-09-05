@@ -19,7 +19,6 @@
 #'Defaults to `"levels"`. Column data should be numeric.
 #'@param road_lanes Column name in `vector` for the number of lanes per road line.
 #'Defaults to `"lanes"`. Column data should be numeric.
-#'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.
 #'
 #'@return A list containing the features/metrics calculated for `points`,  appended as new columns.
 #'Each element in the list corresponds to a particular buffer size.
@@ -39,8 +38,7 @@
 calc_osm <- function(vector, name = NULL,
                      points, buffer_sizes,
                      building_ndsm = NULL, building_height = "height", building_levels = "levels",
-                     road_lanes = "lanes",
-                     point_id = "point_id"){
+                     road_lanes = "lanes"){
 
   # Error checking ------------------
   if(!all(sf::st_geometry_type(points) == "POINT")){
@@ -67,10 +65,9 @@ calc_osm <- function(vector, name = NULL,
     suppressWarnings(vector_sub <- vector %>%
                        sf::st_make_valid() %>%
                        sf::st_intersection(points %>% # for relevant buffer radius
-                                             sf::st_buffer(dist = buffer_sizes[i])))
-    row.names(vector_sub) <- NULL # reset row names for later indexing
-    vector_sub <- vector_sub %>%
-      tibble::rownames_to_column("ID")
+                                             sf::st_buffer(dist = buffer_sizes[i]) %>%
+                                             magrittr::set_rownames(NULL) %>%
+                                             tibble::rownames_to_column("POINTID")))
 
 
     # PROCESS BUILDINGS
@@ -86,7 +83,7 @@ calc_osm <- function(vector, name = NULL,
 
         suppressWarnings(buildings_summarised <- vector_sub %>%
                            mutate(height = as.numeric(.data[[building_height]])) %>%
-                           dplyr::group_by(.data[[point_id]]) %>%
+                           dplyr::group_by(.data$POINTID) %>%
                            dplyr::summarise("osm_buildingVol_m3" :=
                                               sum(units::set_units(.data$area_m2, value = NULL) * .data[[building_height]],
                                                   na.rm = FALSE)) %>%
@@ -96,10 +93,12 @@ calc_osm <- function(vector, name = NULL,
 
         # append to points
         suppressMessages(points_result <- points %>%
-          dplyr::left_join(buildings_summarised,
-                           by = c(.data[[point_id]]))) #%>%
-          # dplyr::mutate(dplyr::across(.cols = everything(), # points with no buildings have a value of 0
-          #                             .fns = ~tidyr::replace_na(., 0)))
+                           magrittr::set_rownames(NULL) %>%
+                           tibble::rownames_to_column("POINTID") %>%
+                           dplyr::left_join(buildings_summarised,
+                                            by = c(.data$POINTID))) #%>%
+                           # dplyr::mutate(dplyr::across(.cols = everything(), # points with no buildings have a value of 0
+                           #                             .fns = ~tidyr::replace_na(., 0)))
         rm(buildings_summarised)
 
 
@@ -114,6 +113,10 @@ calc_osm <- function(vector, name = NULL,
         # building-height metrics: use ndsm data to process
       } else if(!is.null(building_ndsm)){
 
+        vector_sub <- vector_sub %>%
+          magrittr::set_rownames(NULL) %>%
+          tibble::rownames_to_column("BUILDINGID")
+
         buildingheights <-
           terra::extract(building_ndsm, # ndsm raster for relevant round.
                          terra::vect(vector_sub), # assign pixel values to polygons
@@ -125,12 +128,12 @@ calc_osm <- function(vector, name = NULL,
         vector_sub <- vector_sub %>%
           dplyr::select(-tidyselect::any_of("height")) %>% # remove col for height (to be replaced)
           dplyr::left_join(buildingheights %>%
-                             mutate(ID = as.character(.data$ID)), by = "ID") %>%
-          dplyr::select(-.data$ID)
+                             mutate(BUILDINGID = as.character(.data$BUILDINGID)), by = "ID") %>%
+          dplyr::select(-.data$BUILDINGID)
         rm(buildingheights)
 
         buildings_summarised <- vector_sub %>%
-          dplyr::group_by(.data[[point_id]]) %>%
+          dplyr::group_by(.data$POINTID) %>%
           dplyr::summarise("osm_buildingVol_m3" :=
                              sum(units::set_units(.data$area_m2, value = NULL) * .data$height,
                                  na.rm = TRUE)) %>%
@@ -140,10 +143,12 @@ calc_osm <- function(vector, name = NULL,
 
         # append to points
         suppressMessages(points_result <- points %>%
-          dplyr::left_join(buildings_summarised,
-                           by = c(.data[[point_id]])) %>%
-          dplyr::mutate(dplyr::across(.cols = tidyselect::contains("osm_buildingVol_m3"), # points with no buildings have a value of 0
-                                      .fns = ~tidyr::replace_na(., 0))))
+                           magrittr::set_rownames(NULL) %>%
+                           tibble::rownames_to_column("POINTID") %>%
+                           dplyr::left_join(buildings_summarised,
+                                            by = c(.data$POINTID)) %>%
+                           dplyr::mutate(dplyr::across(.cols = tidyselect::contains("osm_buildingVol_m3"), # points with no buildings have a value of 0
+                                                       .fns = ~tidyr::replace_na(., 0))))
         rm(buildings_summarised)
 
       }
@@ -156,7 +161,7 @@ calc_osm <- function(vector, name = NULL,
                          dplyr::mutate(GFA_m2 = units::set_units(.data$GFA_m2, value = NULL)) %>%
 
                          # summarise
-                         dplyr::group_by(.data[[point_id]]) %>%
+                         dplyr::group_by(.data$POINTID) %>%
 
                          dplyr::summarise("osm_buildingArea_m2" := sum(.data$area_m2, na.rm = TRUE),
                                           "osm_buildingGFA_m2" := sum(.data$GFA_m2, na.rm = TRUE)) %>%
@@ -170,7 +175,8 @@ calc_osm <- function(vector, name = NULL,
       suppressMessages(points_result <- points_result %>%
                          left_join(to_append) %>%
                          dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("osm_", c("buildingArea_m2", "buildingGFA_m2", "buildingAvgLvl", "buildingFA_ratio"))),
-                                                     .fns = ~tidyr::replace_na(., 0))))
+                                                     .fns = ~tidyr::replace_na(., 0))) %>%
+                         dplyr::select(-.data$POINTID))
       rm(to_append)
 
     }
@@ -186,15 +192,18 @@ calc_osm <- function(vector, name = NULL,
         dplyr::mutate(lanelength_m = units::set_units(.data$lanelength_m, value = NULL))
 
       suppressMessages(to_append <- vector_sub %>%
-                         dplyr::group_by(.data[[point_id]]) %>%
+                         dplyr::group_by(.data$POINTID) %>%
                          dplyr::summarise("osm_laneLength_m" := sum(.data$lanelength_m),
                                           "osm_laneDensity" := sum(.data$lanelength_m) / (pi * as.numeric(buffer_sizes[i]) ^ 2)) %>%
                          sf::st_set_geometry(NULL)) # remove geometry
 
       suppressMessages(points_result <- points %>%
+                         magrittr::set_rownames(NULL) %>%
+                         tibble::rownames_to_column("POINTID") %>%
                          dplyr::left_join(to_append) %>%
                          dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("osm_", c("laneLength_m", "laneDensity"))),
-                                                     .fns = ~tidyr::replace_na(., 0))))
+                                                     .fns = ~tidyr::replace_na(., 0))) %>%
+                         dplyr::select(-.data$POINTID))
       rm(to_append)
 
     }
