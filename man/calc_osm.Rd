@@ -19,9 +19,9 @@ calc_osm(
 \arguments{
 \item{vector}{sf dataframe of either buildings (polygons) or roads (lines).}
 
-\item{name}{Specify either 'buildings' or 'roads'.}
+\item{name}{Specify either \code{"buildings"} or \code{"roads"}.}
 
-\item{points}{Points locations (sf object) to calculate the metrics.}
+\item{points}{Point locations (sf object) to calculate the metrics.}
 
 \item{buffer_sizes}{Radius of circle (in mapunits) for each point location;
 metrics will be calculated within the buffer area.}
@@ -31,18 +31,19 @@ of the normalised Digital Surface Model, used to calculate building heights.
 If absent (\code{NULL}) and the variable is named in \code{predictors_osm}, the column \code{building_height} is used instead.
 Defaults to \code{NULL}.}
 
-\item{building_height}{Column name in \code{vector_osm} for building height.
+\item{building_height}{Column name in \code{vector} for building height.
 Defaults to \code{"height"}.}
 
-\item{building_levels}{Column name in \code{vector_osm} for the number of building levels.
-Defaults to \code{"levels"}.}
+\item{building_levels}{Column name in \code{vector} for the number of building levels.
+Defaults to \code{"levels"}. Column data should be numeric.}
 
-\item{road_lanes}{Column name in \code{vector_osm} for the number of lanes per road line.}
+\item{road_lanes}{Column name in \code{vector} for the number of lanes per road line.
+Defaults to \code{"lanes"}. Column data should be numeric.}
 
 \item{point_id}{Column name of the sampling point id within the \code{points} sf. Defaults to \code{"point_id"}.}
 }
 \value{
-A list containing the features/metrics calculated for \code{points}.
+A list containing the features/metrics calculated for \code{points},  appended as new columns.
 Each element in the list corresponds to a particular buffer size.
 }
 \description{

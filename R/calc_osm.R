@@ -5,22 +5,23 @@
 #'Currently supports vector data of buildings (polygons) and roads (lines).
 #'
 #'@param vector sf dataframe of either buildings (polygons) or roads (lines).
-#'@param name Specify either 'buildings' or 'roads'.
-#'@param points Points locations (sf object) to calculate the metrics.
+#'@param name Specify either `"buildings"` or `"roads"`.
+#'@param points Point locations (sf object) to calculate the metrics.
 #'@param buffer_sizes Radius of circle (in mapunits) for each point location;
 #'metrics will be calculated within the buffer area.
 #'@param building_ndsm SpatRaster object (`terra::rast()`) (optional). A continuous raster
 #'of the normalised Digital Surface Model, used to calculate building heights.
 #'If absent (`NULL`) and the variable is named in `predictors_osm`, the column `building_height` is used instead.
 #'Defaults to `NULL`.
-#'@param building_height Column name in `vector_osm` for building height.
+#'@param building_height Column name in `vector` for building height.
 #'Defaults to `"height"`.
-#'@param building_levels Column name in `vector_osm` for the number of building levels.
-#'Defaults to `"levels"`.
-#'@param road_lanes Column name in `vector_osm` for the number of lanes per road line.
+#'@param building_levels Column name in `vector` for the number of building levels.
+#'Defaults to `"levels"`. Column data should be numeric.
+#'@param road_lanes Column name in `vector` for the number of lanes per road line.
+#'Defaults to `"lanes"`. Column data should be numeric.
 #'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.
 #'
-#'@return A list containing the features/metrics calculated for `points`.
+#'@return A list containing the features/metrics calculated for `points`,  appended as new columns.
 #'Each element in the list corresponds to a particular buffer size.
 #'
 #'@import checkmate
@@ -48,7 +49,7 @@ calc_osm <- function(vector, name = NULL,
 
   coll <- checkmate::makeAssertCollection()
 
-  checkmate::assert_numeric(buffer_sizes, lower = 0, finite = TRUE, any.missing = FALSE, add = coll)
+  checkmate::assert_numeric(buffer_sizes, lower = 0.000001, finite = TRUE, any.missing = FALSE, add = coll)
   checkmate::assert_subset(name, choices = c("buildings", "roads"), empty.ok = FALSE, add = coll)
   # add check: if buildings, must be polygon/multipolygons
   # add check: if roads, must be line/polyline
@@ -192,7 +193,7 @@ calc_osm <- function(vector, name = NULL,
 
       suppressMessages(points_result <- points %>%
                          dplyr::left_join(to_append) %>%
-                         dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("r", buffer_sizes[i], "m_osm_", c("laneLength_m", "laneDensity"))),
+                         dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("osm_", c("laneLength_m", "laneDensity"))),
                                                      .fns = ~tidyr::replace_na(., 0))))
       rm(to_append)
 

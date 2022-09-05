@@ -20,7 +20,7 @@
 #'Currently only supports class- and landscape-level metrics.
 #'@param ... Additional arguments (e.g. `type=`) passed to `landscapemetrics::calculate_lsm()`.
 #'
-#'@return A list containing the features/metrics calculated for `points`.
+#'@return A list containing the features/metrics calculated for `points`, appended as new columns.
 #'Each element in the list corresponds to a particular buffer size.
 #'
 #'@import checkmate

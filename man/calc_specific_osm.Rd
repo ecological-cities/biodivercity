@@ -5,7 +5,7 @@
 \title{Calculate specific metrics from OpenStreetMap data at point locations}
 \usage{
 calc_specific_osm(
-  vector_osm,
+  vector,
   building_ndsm = NULL,
   building_height = "height",
   building_levels = "levels",
@@ -16,20 +16,20 @@ calc_specific_osm(
 )
 }
 \arguments{
-\item{vector_osm}{sf dataframe of either buildings (polygons) or roads (lines).}
+\item{vector}{sf dataframe of either buildings (polygons) or roads (lines).}
 
 \item{building_ndsm}{SpatRaster object (\code{terra::rast()}) (optional). A continuous raster
 of the normalised Digital Surface Model, used to calculate building heights.
 If absent (\code{NULL}) and the variable is named in \code{predictors_osm}, the column \code{building_height} is used instead.
 Defaults to \code{NULL}.}
 
-\item{building_height}{Column name in \code{vector_osm} for building height.
+\item{building_height}{Column name in \code{vector} for building height.
 Defaults to \code{"height"}.}
 
-\item{building_levels}{Column name in \code{vector_osm} for the number of building levels.
+\item{building_levels}{Column name in \code{vector} for the number of building levels.
 Defaults to \code{"levels"}.}
 
-\item{road_lanes}{Column name in \code{vector_osm} for the number of lanes per road line.}
+\item{road_lanes}{Column name in \code{vector} for the number of lanes per road line.}
 
 \item{predictors_osm}{Vector (character) of predictor variables to be calculated from the vector file(s).
 The naming format is \verb{<radius in metres>_osm_<metric>} (e.g. \code{r50m_osm_buildingFA_ratio}).}

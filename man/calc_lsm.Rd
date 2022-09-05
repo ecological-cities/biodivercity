@@ -47,7 +47,7 @@ Currently only supports class- and landscape-level metrics.}
 \item{...}{Additional arguments (e.g. \verb{type=}) passed to \code{landscapemetrics::calculate_lsm()}.}
 }
 \value{
-A list containing the features/metrics calculated for \code{points}.
+A list containing the features/metrics calculated for \code{points}, appended as new columns.
 Each element in the list corresponds to a particular buffer size.
 }
 \description{

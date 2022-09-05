@@ -4,18 +4,18 @@
 #'The character vector of predictor names include the specified buffer radii within which to summarise each metric.
 #'Currently supports vector data of buildings (polygons) and roads (lines).
 #'
-#'@param vector_osm sf dataframe of either buildings (polygons) or roads (lines).
+#'@param vector sf dataframe of either buildings (polygons) or roads (lines).
 #'@param predictors_osm Vector (character) of predictor variables to be calculated from the vector file(s).
 #'The naming format is `<radius in metres>_osm_<metric>` (e.g. `r50m_osm_buildingFA_ratio`).
 #'@param building_ndsm SpatRaster object (`terra::rast()`) (optional). A continuous raster
 #'of the normalised Digital Surface Model, used to calculate building heights.
 #'If absent (`NULL`) and the variable is named in `predictors_osm`, the column `building_height` is used instead.
 #'Defaults to `NULL`.
-#'@param building_height Column name in `vector_osm` for building height.
+#'@param building_height Column name in `vector` for building height.
 #'Defaults to `"height"`.
-#'@param building_levels Column name in `vector_osm` for the number of building levels.
+#'@param building_levels Column name in `vector` for the number of building levels.
 #'Defaults to `"levels"`.
-#'@param road_lanes Column name in `vector_osm` for the number of lanes per road line.
+#'@param road_lanes Column name in `vector` for the number of lanes per road line.
 #'@param points Points locations (sf object) to calculate the metrics.
 #'@param point_id Column name of the sampling point id within the `points` sf. Defaults to `"point_id"`.
 #'
@@ -33,7 +33,7 @@
 #'@importFrom units set_units
 #'
 #'@export
-calc_specific_osm <- function(vector_osm,
+calc_specific_osm <- function(vector,
                               building_ndsm = NULL, building_height = "height", building_levels = "levels",
                               road_lanes = "lanes",
                               predictors_osm,
@@ -60,7 +60,7 @@ calc_specific_osm <- function(vector_osm,
   for(i in seq_len(nrow(input))){ # per predictor
 
     # subset to areas within sampling points
-    suppressWarnings(vector_sub <- vector_osm %>%
+    suppressWarnings(vector_sub <- vector %>%
       sf::st_make_valid() %>%
       sf::st_intersection(points %>% # for relevant buffer radius
                             sf::st_buffer(dist = as.numeric(input$radius[i]))))
