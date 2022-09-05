@@ -102,9 +102,9 @@ Currently supports vector data of buildings (polygons) and roads (lines).</p>
     <dl><dt>vector</dt>
 <dd><p>sf dataframe of either buildings (polygons) or roads (lines).</p></dd>
 <dt>name</dt>
-<dd><p>Specify either 'buildings' or 'roads'.</p></dd>
+<dd><p>Specify either <code>"buildings"</code> or <code>"roads"</code>.</p></dd>
 <dt>points</dt>
-<dd><p>Points locations (sf object) to calculate the metrics.</p></dd>
+<dd><p>Point locations (sf object) to calculate the metrics.</p></dd>
 <dt>buffer_sizes</dt>
 <dd><p>Radius of circle (in mapunits) for each point location;
 metrics will be calculated within the buffer area.</p></dd>
@@ -114,19 +114,20 @@ of the normalised Digital Surface Model, used to calculate building heights.
 If absent (<code>NULL</code>) and the variable is named in <code>predictors_osm</code>, the column <code>building_height</code> is used instead.
 Defaults to <code>NULL</code>.</p></dd>
 <dt>building_height</dt>
-<dd><p>Column name in <code>vector_osm</code> for building height.
+<dd><p>Column name in <code>vector</code> for building height.
 Defaults to <code>"height"</code>.</p></dd>
 <dt>building_levels</dt>
-<dd><p>Column name in <code>vector_osm</code> for the number of building levels.
-Defaults to <code>"levels"</code>.</p></dd>
+<dd><p>Column name in <code>vector</code> for the number of building levels.
+Defaults to <code>"levels"</code>. Column data should be numeric.</p></dd>
 <dt>road_lanes</dt>
-<dd><p>Column name in <code>vector_osm</code> for the number of lanes per road line.</p></dd>
+<dd><p>Column name in <code>vector</code> for the number of lanes per road line.
+Defaults to <code>"lanes"</code>. Column data should be numeric.</p></dd>
 <dt>point_id</dt>
 <dd><p>Column name of the sampling point id within the <code>points</code> sf. Defaults to <code>"point_id"</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list containing the features/metrics calculated for <code>points</code>.
+    <p>A list containing the features/metrics calculated for <code>points</code>,  appended as new columns.
 Each element in the list corresponds to a particular buffer size.</p>
     </div>
 
