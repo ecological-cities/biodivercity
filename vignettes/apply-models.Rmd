@@ -162,25 +162,93 @@ With the `max_radius` defined, run the function `generate_grid()`. The output is
 ```{r create grid for each UGS town}
 grid_points <- generate_grid(target_areas = bound, # target area
                              innerbuffer_m = max_radius, # exclude areas < 126 m from boundaries
-                             pixelsize_m = 50) # pixel resolution
+                             pixelsize_m = 50) %>%  # pixel resolution
+  rownames_to_column("point_id") # add unique identifier
 
 grid_points # geometry column has been added
 ```
 
-Next, use the function `calc_manual()` to summarise the landscape data around each of the points in `grid_points`. For each of the landscape components (inputs to the arguments `layer_<component>`), the buffer radii values (inputs to the arguments `radii_<component>`) are manually specified depending on the predictor variables present in the model. For example, to use the bird models, we summarise the landscape data as follows. The predictor variables will be appended to the `grid_points` dataframe as new columns, corresponding to those present in  `predictors_birds`.
+Next, use the function `calc_manual()` to summarise each landscape component around each of the point locations in `grid_points`, and at specified buffer radii. For example, to use the bird models, we summarise the landscape data as follows. The predictor variables can be appended to the `grid_points` dataframe as new columns, corresponding to those present in  `predictors_birds`.
 
 ```{r grid landscape, warning = FALSE, message = FALSE}
-grid_landscape <-
-  calc_manual(
-    points = grid_points,
-    species = "species",
-    layer_trees = trees, radii_trees = 50,
-    layer_shrubs = shrubs, radii_shrubs = 50,
-    layer_turf = turf, radii_turf = 50,
-    layer_natveg = natveg, radii_natveg = 126,
-    layer_water = water, radii_water = 50, # no water within the target area, 'water_pland' will be 0
-    layer_buildings = buildings, radii_buildings = 50, buildings_levels = "levels",
-    layer_roads = roads, radii_roads = 50, roads_lanes = "lanes") 
+
+predictors_buildings <- 
+  calc_manual(vector = buildings, name = "buildings",
+              points = grid_points, buffer_sizes = 50,
+              building_levels = "levels") %>% 
+   lapply(st_drop_geometry) %>% 
+  bind_rows(.id = "radius_m") %>% 
+  pivot_wider(names_from = "radius_m", 
+              values_from = starts_with("man"),
+              names_glue = "r{radius_m}m_{.value}")
+
+predictors_roads <- 
+  calc_manual(vector = roads, name = "roads",
+              points = grid_points, buffer_sizes = 50,
+              road_lanes = "lanes") %>% 
+  lapply(st_drop_geometry) %>% 
+  bind_rows(.id = "radius_m") %>% 
+  pivot_wider(names_from = "radius_m", 
+              values_from = starts_with("man"),
+              names_glue = "r{radius_m}m_{.value}")
+
+predictors_trees <- 
+  calc_manual(vector = trees, name = "trees",
+              points = grid_points, buffer_sizes = 50,
+              plant_species = "species") %>% 
+  lapply(st_drop_geometry) %>% 
+  bind_rows(.id = "radius_m") %>% 
+  pivot_wider(names_from = "radius_m", 
+              values_from = starts_with("man"),
+              names_glue = "r{radius_m}m_{.value}")
+
+predictors_shrubs <- 
+  calc_manual(vector = shrubs, name = "shrubs",
+              points = grid_points, buffer_sizes = 50,
+              plant_species = "species") %>% 
+  lapply(st_drop_geometry) %>% 
+  bind_rows(.id = "radius_m") %>% 
+  pivot_wider(names_from = "radius_m", 
+              values_from = starts_with("man"),
+              names_glue = "r{radius_m}m_{.value}")
+
+predictors_turf <- 
+  calc_manual(vector = turf, name = "turf", 
+              points = grid_points, buffer_sizes = 50) %>% 
+  lapply(st_drop_geometry) %>% 
+  bind_rows(.id = "radius_m") %>% 
+  pivot_wider(names_from = "radius_m", 
+              values_from = starts_with("man"),
+              names_glue = "r{radius_m}m_{.value}")
+
+predictors_natveg <- 
+  calc_manual(vector = natveg, name = "natveg",
+              points = grid_points, buffer_sizes = c(50, 126)) %>% 
+  lapply(st_drop_geometry) %>% 
+  bind_rows(.id = "radius_m") %>% 
+  pivot_wider(names_from = "radius_m", 
+              values_from = starts_with("man"),
+              names_glue = "r{radius_m}m_{.value}")
+
+predictors_water <- 
+  calc_manual(vector = water, name = "water",
+              points = grid_points, buffer_sizes = 50) %>% 
+  lapply(st_drop_geometry) %>% 
+  bind_rows(.id = "radius_m") %>% 
+  pivot_wider(names_from = "radius_m", 
+              values_from = starts_with("man"),
+              names_glue = "r{radius_m}m_{.value}")
+
+
+# combine all landscape predictors
+grid_landscape <- grid_points %>% 
+  inner_join(predictors_buildings) %>% 
+  inner_join(predictors_roads) %>% 
+  inner_join(predictors_trees) %>% 
+  inner_join(predictors_shrubs) %>% 
+  inner_join(predictors_turf) %>% 
+  inner_join(predictors_natveg) %>% 
+  inner_join(predictors_water)
 
 grid_landscape
 ```

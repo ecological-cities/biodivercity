@@ -2,97 +2,52 @@
 % Please edit documentation in R/calc_manual.R
 \name{calc_manual}
 \alias{calc_manual}
-\title{Calculate metrics based on manually mapped data at point locations}
+\title{Calculate metrics based on manually generated data at point locations}
 \usage{
 calc_manual(
+  vector,
+  name = NULL,
   points,
-  layer_trees = NULL,
-  radii_trees = 50,
-  layer_shrubs = NULL,
-  radii_shrubs = 50,
-  species = "species",
-  layer_turf = NULL,
-  radii_turf = 50,
-  layer_natveg = NULL,
-  radii_natveg = c(50, 126),
-  layer_water = NULL,
-  radii_water = 50,
-  layer_buildings = NULL,
-  radii_buildings = 50,
-  buildings_levels = "levels",
-  layer_roads = NULL,
-  radii_roads = c(50, 126),
-  roads_lanes = "lanes"
+  buffer_sizes,
+  plant_species = "species",
+  building_levels = "levels",
+  road_lanes = "lanes"
 )
 }
 \arguments{
-\item{points}{Sampling points (sf object) with a projected coordinate reference system.}
-
-\item{layer_trees}{Geo-location of trees (sf points) to be summarised.
+\item{vector}{sf dataframe containing geometric features (points, polygons or lines) to be summarised.
 Coordinate reference system should be similar to \code{points}.}
 
-\item{radii_trees}{Numeric vector of radii (in the units of the
-projected coordinate reference system, e.g., metres) to summarise \code{layer_trees}.
-Default values for the model are supplied (in metres).}
+\item{name}{Specify either \code{"buildings"}, \code{"roads"}, \code{"trees"}, \verb{"shrubs'}, \code{"turf"}, \code{"natveg"}, or \code{"water"}.
+Used to represent the type of data in \code{vector}, each to be processed differently.}
 
-\item{layer_shrubs}{Vector of shrubs (sf polygons) to be summarised.
-Coordinate reference system should be similar to \code{points}.}
+\item{points}{Point locations (sf object) to calculate the metrics.}
 
-\item{radii_shrubs}{Numeric vector of radii (in the units of the
-projected coordinate reference system, e.g., metres) to summarise \code{layer_shrubs}.
-Default values for the model are supplied (in metres).}
+\item{buffer_sizes}{Radius of circle (in mapunits) for each point location;
+metrics will be calculated within the buffer area.}
 
-\item{species}{character. Specify column name for the species names
-within \code{layer_trees} and \code{layer_shrubs} (if provided). Defaults to \code{'species'}.
-Column data should be of type character.}
+\item{plant_species}{Column name in \code{vector} for plant species names,
+if input \code{vector} is vegetation (i.e., argument \verb{name=} \code{"trees"} or \code{"shrubs"}).
+Defaults to \code{"species"}. Column data should be of type character.}
 
-\item{layer_turf}{Vector of turf (sf polygons) to be summarised.
-Coordinate reference system should be similar to \code{points}.}
+\item{building_levels}{Column name in \code{vector} for the number of building levels,
+when \code{name="buildings"}. Defaults to \code{"levels"}. Column data should be numeric.}
 
-\item{radii_turf}{Numeric vector of radii (in the units of the
-projected coordinate reference system, e.g., metres) to summarise \code{layer_turf}.
-Default values for the model are supplied (in metres).}
-
-\item{layer_natveg}{Vector of natural vegetation (sf polygons) to be summarised.
-Coordinate reference system should be similar to \code{points}.}
-
-\item{radii_natveg}{Numeric vector of radii (in the units of the
-projected coordinate reference system, e.g., metres) to summarise \code{layer_natveg}.
-Default values for the model are supplied (in metres).}
-
-\item{layer_water}{Vector of water (sf polygons) to be summarised.
-Coordinate reference system should be similar to \code{points}.}
-
-\item{radii_water}{Numeric vector of radii (in the units of the
-projected coordinate reference system, e.g., metres) to summarise \code{layer_water}.
-Default values for the model are supplied (in metres).}
-
-\item{layer_buildings}{Vector of buildings (sf polygons) to be summarised.
-Coordinate reference system should be similar to \code{points}.}
-
-\item{radii_buildings}{Numeric vector of radii (in the units of the
-projected coordinate reference system, e.g., metres) to summarise \code{layer_buildings}.
-Default values for the model are supplied (in metres).}
-
-\item{buildings_levels}{character. Specify column name for the number of levels
-within \code{layer_buildings} (if provided). Defaults to \code{'levels'}. Column data should be numeric.}
-
-\item{layer_roads}{Vector of roads (sf lines) to be summarised.
-Coordinate reference system should be similar to \code{points}.}
-
-\item{radii_roads}{Numeric vector of radii (in the units of the
-projected coordinate reference system, e.g., metres) to summarise \code{layer_roads}.
-Default values for the model are supplied (in metres).}
-
-\item{roads_lanes}{character. Specify column name for the number of lanes
-within \code{layer_roads} (if provided). Defaults to \code{'lanes'}. Column data should be numeric.}
+\item{road_lanes}{Column name in \code{vector} for the number of lanes per road line,
+when \code{name="roads"}. Defaults to \code{"lanes"}. Column data should be numeric.}
 }
 \value{
-The dataframe \code{points} with appended columns summarising the
-various landscape layers provided (at their respective radii).
+A list containing the features/metrics calculated for \code{points}, appended as new columns.
+Each element in the list corresponds to a particular buffer size.
 }
 \description{
+Calculate metrics from manually generated vector data,
+at specific point locations and buffer radii.
+Currently supports vector data of buildings (polygons), roads (lines),
+trees (points), shrubs (polygons), turf (polygons), natural vegetation (polygons),
+and water (polygons).
+}
+\details{
 Summaries will be calculated for each of the supplied layers (\verb{layer_<layername>})
 and appended to the \code{points} data as additional columns.
-Ensure that all layers have a (projected) coordinate reference system similar to \code{points}.
 }
