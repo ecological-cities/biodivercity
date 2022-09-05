@@ -1,6 +1,6 @@
 ---
 title: "Process Animal Data"
-subtitle: "Clean up data from animal surveys"
+subtitle: "Process data from animal surveys conducted at point locations"
 author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette

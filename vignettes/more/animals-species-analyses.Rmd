@@ -1,6 +1,6 @@
 ---
 title: "Animals: Species-level Analyses"
-subtitle: ""
+subtitle: "Examine survey data at the level of individual species"
 author: "Song, Xiao Ping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
