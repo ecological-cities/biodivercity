@@ -96,7 +96,7 @@ calc_osm <- function(vector, name = NULL,
                            magrittr::set_rownames(NULL) %>%
                            tibble::rownames_to_column("POINTID") %>%
                            dplyr::left_join(buildings_summarised,
-                                            by = c(.data$POINTID))) #%>%
+                                            by = c("POINTID"))) #%>%
                            # dplyr::mutate(dplyr::across(.cols = everything(), # points with no buildings have a value of 0
                            #                             .fns = ~tidyr::replace_na(., 0)))
         rm(buildings_summarised)
@@ -146,7 +146,7 @@ calc_osm <- function(vector, name = NULL,
                            magrittr::set_rownames(NULL) %>%
                            tibble::rownames_to_column("POINTID") %>%
                            dplyr::left_join(buildings_summarised,
-                                            by = c(.data$POINTID)) %>%
+                                            by = c("POINTID")) %>%
                            dplyr::mutate(dplyr::across(.cols = tidyselect::contains("osm_buildingVol_m3"), # points with no buildings have a value of 0
                                                        .fns = ~tidyr::replace_na(., 0))))
         rm(buildings_summarised)

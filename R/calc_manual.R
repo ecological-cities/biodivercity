@@ -6,9 +6,6 @@
 #'trees (points), shrubs (polygons), turf (polygons), natural vegetation (polygons),
 #'and water (polygons).
 #'
-#'Summaries will be calculated for each of the supplied layers (`layer_<layername>`)
-#'and appended to the `points` data as additional columns.
-#'
 #'@param vector sf dataframe containing geometric features (points, polygons or lines) to be summarised.
 #'Coordinate reference system should be similar to `points`.
 #'@param name Specify either `"buildings"`, `"roads"`, `"trees"`, `"shrubs'`, `"turf"`, `"natveg"`, or `"water"`.

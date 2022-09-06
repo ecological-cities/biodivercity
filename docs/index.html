@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Biodiversity indices for city landscapes">
 <meta property="og:description" content="Assess the diversity of animal species in urban areas.">
@@ -106,42 +106,78 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Many frameworks to assess ‘biodiversity’ have been proposed in research and practice. Some offer a more holistic view, by including parts of the ecosystem (e.g., climate, soil, air, water, landscape structure, genetic variation) that may contribute to ‘total biodiversity’ within a given region. However, such conceptualisations of ‘biodiversity’ may include components with low causal proximity (e.g. indirect effect of the landscape on species diversity), and may be difficult to measure at wide spatial scales (e.g. genetic diversity, plant species diversity). In decision-making, unnecessary complexity may also risk contributing to mistrust or ignorance of the overall assessment.</p>
-<p><code>biodivercity</code> is an R package for assessing the diversity of animal species in urban areas. It provides a way to directly assess the <em>habitat value</em> of urban landscapes, based on their empirical effect on chosen animal groups (e.g., taxa such as birds, butterflies, odonates, amphibians, etc.). The key features include:</p>
+<p>Many frameworks to assess ‘biodiversity’ have been proposed in
+research and practice. Some offer a more holistic view, by including
+parts of the ecosystem (e.g., climate, soil, air, water, landscape
+structure, genetic variation) that may contribute to ‘total
+biodiversity’ within a given region. However, such conceptualisations of
+‘biodiversity’ may include components with low causal proximity
+(e.g. indirect effect of the landscape on species diversity), and may be
+difficult to measure at wide spatial scales (e.g. genetic diversity,
+plant species diversity). In decision-making, unnecessary complexity may
+also risk contributing to mistrust or ignorance of the overall
+assessment.</p>
+<p><code>biodivercity</code> is an R package for assessing the diversity
+of animal species in urban areas. It provides a way to directly assess
+the <em>habitat value</em> of urban landscapes, based on their empirical
+effect on chosen animal groups (e.g., taxa such as birds, butterflies,
+odonates, amphibians, etc.). The key features include:</p>
 <ul>
-<li>Step-by-step protocols for random point sampling of an animal group within areas of interest</li>
-<li>Generate data summaries of the animals surveyed, at multiple levels of granularity (e.g., areas, periods, animal groups, species)</li>
-<li>Download and process landscape data within areas of interest (e.g., satellite imagery, OpenStreetMap data)</li>
-<li>Convert vector data generated from future design scenarios into formats suitable for model predictions</li>
-<li>Build and validate predictive models to assess <em>Alpha</em> (local), <em>Beta</em> (community) and <em>Gamma</em> (total) diversity for an animal group</li>
-<li>Use models to make pixel-based spatial predictions across new areas and into the future</li>
-<li>Summarise predictions to benchmark and compare biodiversity ‘performance’ between planning units across the city</li>
+<li>Step-by-step protocols for random point sampling of an animal group
+within areas of interest</li>
+<li>Generate data summaries of the animals surveyed, at multiple levels
+of granularity (e.g., areas, periods, animal groups, species)</li>
+<li>Download and process landscape data within areas of interest (e.g.,
+satellite imagery, OpenStreetMap data)</li>
+<li>Convert vector data generated from future design scenarios into
+formats suitable for model predictions</li>
+<li>Build and validate predictive models to assess <em>Alpha</em>
+(local), <em>Beta</em> (community) and <em>Gamma</em> (total) diversity
+for an animal group</li>
+<li>Use models to make pixel-based spatial predictions across new areas
+and into the future</li>
+<li>Summarise predictions to benchmark and compare biodiversity
+‘performance’ between planning units across the city</li>
 </ul>
 <p><br></p>
 <img src="reference/figures/framework.png" width="70%" style="display: block; margin: auto;"><center>
-<b> Figure: Broad overview of the data workflow for a chosen animal group </b>
+<b> Figure: Broad overview of the data workflow for a chosen animal
+group </b>
 </center>
 <p><br></p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<p>To cite <code>biodivercity</code> or acknowledge its use, please cite the following:</p>
-<p><em>Tan, E. Y. W., Song, X. P., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package to assess the diversity of animal species in urban areas. R package version 0.0.1 (unreleased). <a href="https://github.com/ecological-cities/biodivercity" class="external-link uri">https://github.com/ecological-cities/biodivercity</a>.</em></p>
+<p>To cite <code>biodivercity</code> or acknowledge its use, please cite
+the following:</p>
+<p><em>Tan, E. Y. W., Song, X. P., Sim, H. J., Nai, J., Chong, K. Y.
+(2022). biodivercity: An R package to assess the diversity of animal
+species in urban areas. R package version 0.0.1 (unreleased). <a href="https://github.com/ecological-cities/biodivercity" class="external-link uri">https://github.com/ecological-cities/biodivercity</a>.</em></p>
 <p>To get a BibTex entry, run <code>citation("biodivercity")</code>.</p>
 <p><br></p>
 </div>
 <div class="section level2">
 <h2 id="data-sources">Data sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
 </h2>
-<p>Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys. 14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant. Awarded to the National University of Singapore (host institution) and the Singapore Housing &amp; Development Board.</p>
+<p>Development of a Biodiversity Index for Residential Towns using
+Biodiversity Field Surveys. 14 June 2016, 6.5 years, Ministry of
+National Development Research Fund (MNDRF) Grant. Awarded to the
+National University of Singapore (host institution) and the Singapore
+Housing &amp; Development Board.</p>
 <p><br></p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>Baker, D. J., Maclean, I. M., Goodall, M., &amp; Gaston, K. J. (2021). Species distribution modelling is needed to support ecological impact assessments. <em>Journal of Applied Ecology</em>, <em>58</em>(1), 21-26.</p>
-<p>Soto-Navarro, C. A., Harfoot, M., Hill, S. L. L., Campbell, J., Mora, F., Campos, C., … &amp; Burgess, N. D. (2021). Towards a multidimensional biodiversity index for national application. <em>Nature Sustainability</em>, 1-10.</p>
+<p>Baker, D. J., Maclean, I. M., Goodall, M., &amp; Gaston, K. J.
+(2021). Species distribution modelling is needed to support ecological
+impact assessments. <em>Journal of Applied Ecology</em>, <em>58</em>(1),
+21-26.</p>
+<p>Soto-Navarro, C. A., Harfoot, M., Hill, S. L. L., Campbell, J., Mora,
+F., Campos, C., … &amp; Burgess, N. D. (2021). Towards a
+multidimensional biodiversity index for national application. <em>Nature
+Sustainability</em>, 1-10.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -194,7 +230,11 @@
 <div class="funding">
 <h2 data-toc-skip>Funding</h2>
 <ul class="list-unstyled">
-<li><p>The Singapore Ministry of National Development Research Fund funded the grant project (2016 to 2022) that contributed to the development of this package. The grant was awarded to the National University of Singapore, in partnership with the Singapore Housing &amp; Development Board.</p></li>
+<li><p>The Singapore Ministry of National Development Research Fund funded
+the grant project (2016 to 2022) that contributed to the development of
+this package. The grant was awarded to the National University of
+Singapore, in partnership with the Singapore Housing &amp; Development
+Board.</p></li>
 </ul>
 </div>
 
@@ -214,7 +254,9 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Copyright © 2022 <a href="https://github.com/kwekiii" class="external-link">Kwek Yan Chong</a>, <a href="https://xp-song.github.io" class="external-link">Xiao Ping Song</a>, <a href="https://github.com/JustinNai" class="external-link">Justin Nai</a>, <a href="https://github.com/edwintyw" class="external-link">Edwin Tan</a>, <a href="https://github.com/hongjhun" class="external-link">Hong Jhun Sim</a> and contributors.</p>
+<p>Copyright © 2022 <a href="https://github.com/kwekiii" class="external-link">Kwek Yan
+Chong</a>, <a href="https://xp-song.github.io" class="external-link">Xiao Ping Song</a>, <a href="https://github.com/JustinNai" class="external-link">Justin Nai</a>, <a href="https://github.com/edwintyw" class="external-link">Edwin Tan</a>, <a href="https://github.com/hongjhun" class="external-link">Hong Jhun Sim</a> and
+contributors.</p>
 </div>
 
 <div class="pkgdown-footer-right">

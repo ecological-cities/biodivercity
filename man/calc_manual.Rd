@@ -47,7 +47,3 @@ Currently supports vector data of buildings (polygons), roads (lines),
 trees (points), shrubs (polygons), turf (polygons), natural vegetation (polygons),
 and water (polygons).
 }
-\details{
-Summaries will be calculated for each of the supplied layers (\verb{layer_<layername>})
-and appended to the \code{points} data as additional columns.
-}

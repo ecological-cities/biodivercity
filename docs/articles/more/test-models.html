@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../../apple-touch-icon-60x60.png">
 <script src="../../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="../../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../../pkgdown.js"></script><meta property="og:title" content="Test Models">
 <meta property="og:description" content="biodivercity">
@@ -98,8 +98,10 @@
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../../logo.png" class="logo" alt=""><h1>Test Models</h1>
-            <h3 data-toc-skip class="subtitle">Calculate accuracy metrics using new data obtained from animal surveys</h3>
-                        <h4 data-toc-skip class="author">Song, Xiao Ping</h4>
+            <h3 data-toc-skip class="subtitle">Calculate accuracy
+metrics using new data obtained from animal surveys</h3>
+                        <h4 data-toc-skip class="author">Song, Xiao
+Ping</h4>
             
             <h4 data-toc-skip class="date">2022-09-06</h4>
       
@@ -109,7 +111,12 @@
 
     
     
-<p>Predictive models can be used to assess animal diversity across broader areas that were not previously sampled (i.e. where animal surveys were not conducted). The accuracy of these predictions may be tested, by comparing them against results from more surveys conducted at new sampling points. This article outlines the steps required to make such comparisons, based on the calculation of accuracy metrics.</p>
+<p>Predictive models can be used to assess animal diversity across
+broader areas that were not previously sampled (i.e. where animal
+surveys were not conducted). The accuracy of these predictions may be
+tested, by comparing them against results from more surveys conducted at
+new sampling points. This article outlines the steps required to make
+such comparisons, based on the calculation of accuracy metrics.</p>
 <p>First, load the necessary packages to run the analysis:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">"biodivercity"</a></span><span class="op">)</span>
@@ -122,7 +129,13 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"models-manually-mapped.Rdata"</span>, package <span class="op">=</span> <span class="st">"biodivercity"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span></code></pre></div>
-<p>Load the new data from animal surveys, which will be used to check the accuracy of the models. In this example, we focus on birds (the taxon ‘Aves’) in the example data <code>animal_observations</code> and <code>animal_surveys</code>. Subset the full data to our area/period/taxon of interest, and then tally the species richness (no. of species) of birds using the function <code><a href="../../reference/tally_observations.html">tally_observations()</a></code>:</p>
+<p>Load the new data from animal surveys, which will be used to check
+the accuracy of the models. In this example, we focus on birds (the
+taxon ‘Aves’) in the example data <code>animal_observations</code> and
+<code>animal_surveys</code>. Subset the full data to our
+area/period/taxon of interest, and then tally the species richness (no.
+of species) of birds using the function
+<code><a href="../../reference/tally_observations.html">tally_observations()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_observations"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_surveys"</span><span class="op">)</span>
@@ -133,8 +146,18 @@
                                  specify_period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"2"</span><span class="op">)</span>,
                                  specify_taxon <span class="op">=</span> <span class="st">"Aves"</span>, <span class="co"># birds</span>
                                  level <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span>  <span class="co"># at sampling points</span></code></pre></div>
-<p>To predict the number of bird species where the new animal surveys were conducted, we also need the data for landscape predictors summarised at these locations. The <code>biodivercity</code> package includes examples at some of these sampling points, found in the dataset <code>points_landscape</code>. Join these landscape data to the bird data using the function <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join()</a></code>, then transform the data to the appropriate format.</p>
-<p>Note that the model object also includes the random effect <code>town</code>, based on the sampling strategy used in the model’s input data. If this random effect (column) is not provided in the new data, predictions will be based on the ‘average’ value for the random effect (in this example, the ‘average town’).</p>
+<p>To predict the number of bird species where the new animal surveys
+were conducted, we also need the data for landscape predictors
+summarised at these locations. The <code>biodivercity</code> package
+includes examples at some of these sampling points, found in the dataset
+<code>points_landscape</code>. Join these landscape data to the bird
+data using the function <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join()</a></code>, then transform the
+data to the appropriate format.</p>
+<p>Note that the model object also includes the random effect
+<code>town</code>, based on the sampling strategy used in the model’s
+input data. If this random effect (column) is not provided in the new
+data, predictions will be based on the ‘average’ value for the random
+effect (in this example, the ‘average town’).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">points_landscape</span><span class="op">)</span>
   
@@ -158,13 +181,16 @@
 <div class="section level2">
 <h2 id="bootstrapping-validation">Bootstrapping validation<a class="anchor" aria-label="anchor" href="#bootstrapping-validation"></a>
 </h2>
-<p>Run the function <code><a href="../../reference/validate_newdata.html">validate_newdata()</a></code> to obtain the accuracy of each prediction based on the new data:</p>
+<p>Run the function <code><a href="../../reference/validate_newdata.html">validate_newdata()</a></code> to obtain the
+accuracy of each prediction based on the new data:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">bird_xv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/validate_newdata.html">validate_newdata</a></span><span class="op">(</span>models <span class="op">=</span> <span class="va">models_birds</span>,
                             recipe_data <span class="op">=</span> <span class="va">recipe_birds</span>,
                             newdata <span class="op">=</span> <span class="va">birds_new</span>,
                             response_var <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></code></pre></div>
-<p>Perform bootstrapped sampling of the output <code>bird_xv</code>, in order to obtain bootstrapped statistics of accuracy metrics (100 scenarios). The helper function <code><a href="../../reference/booter.html">booter()</a></code> is used:</p>
+<p>Perform bootstrapped sampling of the output <code>bird_xv</code>, in
+order to obtain bootstrapped statistics of accuracy metrics (100
+scenarios). The helper function <code><a href="../../reference/booter.html">booter()</a></code> is used:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
@@ -176,7 +202,9 @@
 <div class="section level2">
 <h2 id="visualise-accuracy">Visualise accuracy<a class="anchor" aria-label="anchor" href="#visualise-accuracy"></a>
 </h2>
-<p>Finally, we can visualise the accuracy of the model for birds using the package <code>ggplot2</code>. This can be done in the original scale of the response variable (counts):</p>
+<p>Finally, we can visualise the accuracy of the model for birds using
+the package <code>ggplot2</code>. This can be done in the original scale
+of the response variable (counts):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># if multiple animal groups present, combine lists into single df for plotting</span>
 <span class="va">XV_dfs</span> <span class="op">&lt;-</span> <span class="va">XV_dfs</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span> 
@@ -214,11 +242,16 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid.major.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="test-models_files/figure-html/print%20xvalid%20plots%20for%20new%20data-1.png" alt="**Figure: The accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples." width="70%"><p class="caption">
-<strong>Figure: The accuracy of predictions for each taxon based on new data supplied.</strong> Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.
+<strong>Figure: The accuracy of predictions for each taxon based on new
+data supplied.</strong> Grey points denote the mean errors, and the
+error bars denote their 95% confidence interval across 100 bootstrapped
+samples.
 </p>
 </div>
 <p><br></p>
-<p>The values can also be normalised, which is especially useful when comparing between multiple animal groups (in this example, only birds are shown):</p>
+<p>The values can also be normalised, which is especially useful when
+comparing between multiple animal groups (in this example, only birds
+are shown):</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"> <span class="va">XV_dfs</span> <span class="op"><a href="../../reference/pipe.html">%&gt;%</a></span>  
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -235,7 +268,10 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid.major.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="test-models_files/figure-html/print%20xvalid%20plots%20for%20new%20data%20-%20scaled-1.png" alt="**Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples." width="70%"><p class="caption">
-<strong>Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.</strong> Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.
+<strong>Figure: The (scaled) accuracy of predictions for each taxon
+based on new data supplied.</strong> Grey points denote the mean errors,
+and the error bars denote their 95% confidence interval across 100
+bootstrapped samples.
 </p>
 </div>
 </div>
@@ -247,7 +283,9 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Copyright © 2022 <a href="https://github.com/kwekiii" class="external-link">Kwek Yan Chong</a>, <a href="https://xp-song.github.io" class="external-link">Xiao Ping Song</a>, <a href="https://github.com/JustinNai" class="external-link">Justin Nai</a>, <a href="https://github.com/edwintyw" class="external-link">Edwin Tan</a>, <a href="https://github.com/hongjhun" class="external-link">Hong Jhun Sim</a> and contributors.</p>
+<p>Copyright © 2022 <a href="https://github.com/kwekiii" class="external-link">Kwek Yan
+Chong</a>, <a href="https://xp-song.github.io" class="external-link">Xiao Ping Song</a>, <a href="https://github.com/JustinNai" class="external-link">Justin Nai</a>, <a href="https://github.com/edwintyw" class="external-link">Edwin Tan</a>, <a href="https://github.com/hongjhun" class="external-link">Hong Jhun Sim</a> and
+contributors.</p>
 </div>
 
 <div class="pkgdown-footer-right">
