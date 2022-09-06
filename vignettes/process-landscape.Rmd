@@ -59,15 +59,13 @@ tm_basemap(c("CartoDB.Positron")) +
   tm_shape(points) + tm_dots()
 ```
 
-<center>
 
-```{r plot punggol area, warning = FALSE, message = FALSE, fig.height = 1.0, dpi = 300, out.width="70%", fig.align='center', echo = FALSE}
+```{r plot punggol area, warning = FALSE, message = FALSE, fig.height = 1.0, dpi = 300, out.width="100%", fig.align='center', echo = FALSE}
 tmap_mode("view")
 tm_basemap(c("CartoDB.Positron")) +
   tm_shape(sampling_areas) + tm_borders() +
   tm_shape(points) + tm_dots()
 ```
-</center>
 
 <br>
 
@@ -150,12 +148,13 @@ The function `classify_image_binary()` can be used to directly classify a contin
 ```{r mosaic classification, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
 veg_classified <- classify_image_binary(ndvi_mosaic, threshold = "otsu")
 
-tm_shape(ndvi_mosaic) +
-  tm_raster(palette = c("Greens")) +
-tm_shape(veg_classified) +
-  tm_raster(style = "cat",
+tm_basemap(c("CartoDB.Positron")) +
+  tm_shape(ndvi_mosaic) +
+    tm_raster(palette = c("Greens")) +
+  tm_shape(veg_classified) +
+    tm_raster(style = "cat",
             palette = c("grey", "darkgreen")) +
-  tm_shape(points) + tm_dots()
+    tm_shape(points) + tm_dots()
 ```
 
 <br>
@@ -269,7 +268,7 @@ The function `calc_osm()` can be be used to summarise the following metrics of b
 
 <br>
 
-For example, calculate building metrics up to `100` and `200` metres away from `points`. This returns a list, with each element corresponding to a particular buffer radius. Column names include a prefix indicating that values are from OpenStreetMap (`osm_`).
+For example, we can calculate building metrics up to `100` and `200` metres away from `points`. This returns a list, with each element corresponding to a particular buffer radius. Column names include a prefix indicating that values are from OpenStreetMap (`osm_`).
 
 ```{r calc_osm, warning = FALSE, message = FALSE}
 
@@ -322,7 +321,7 @@ For example, we can summarise the species and count of trees up to `50` metres a
 
 ```{r calculate metrics for manually generated data, message = FALSE}
 filepath <- system.file("extdata", "pg_layers.Rdata", package = "biodivercity")
-load(filepath)
+load(filepath) # example landscape vector data
 
 calc_manual(vector = trees, name = "trees",
             points = points, buffer_sizes = 50,

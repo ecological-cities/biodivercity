@@ -101,7 +101,7 @@
             <h3 data-toc-skip class="subtitle">Process data from animal surveys conducted at point locations</h3>
                         <h4 data-toc-skip class="author">Edwin Tan</h4>
             
-            <h4 data-toc-skip class="date">2022-09-05</h4>
+            <h4 data-toc-skip class="date">2022-09-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/process-animal.Rmd" class="external-link"><code>vignettes/process-animal.Rmd</code></a></small>
       <div class="d-none name"><code>process-animal.Rmd</code></div>
@@ -118,7 +118,10 @@
 <div class="section level2">
 <h2 id="data-format">Data format<a class="anchor" aria-label="anchor" href="#data-format"></a>
 </h2>
-<p>Data from animal surveys can be organised into two separate tables: (1) a record of animal observations during each survey; and (2) reference information about each survey. The existence of (2) also ensures that surveys with zero animal observations are accounted for. More details on how data are collected can be found in <code><a href="../articles/more/animals-survey-protocols.html">vignette("animals-survey-protocols")</a></code>. Examples of data within the two tables are shown below:</p>
+<p>Data from animal surveys are organised into two separate tables: (1) a record of animal observations during each survey; and (2) reference information about each survey. The existence of (2) ensures that surveys with zero animal observations are accounted for. More details on how data are collected can be found in <code><a href="../articles/more/animals-survey-protocols.html">vignette("animals-survey-protocols")</a></code>. These example data can be loaded by running the following code:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_observations</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_surveys</span><span class="op">)</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
 <table class="table table table-striped" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -628,37 +631,9 @@ NA
 </tbody>
 </table>
 </div>
-<p>These example data are present in the package, and can be previewed by running the following code:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_observations</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">animal_observations</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 6 × 13</span></span>
-<span class="co">##   survey_id            point_id area  period cycle resampled start_time         </span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>             </span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> 1 QTNa14a_P 1 Odona… QTNa14a… QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> 1 QTNa14a_P 1 Odona… QTNa14a… QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> 1 QTNa14a_P 1 Odona… QTNa14a… QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">4</span> 1 QTNa14a_P 1 Odona… QTNa14a… QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">5</span> 1 QTNa14a_P 1 Odona… QTNa14a… QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">6</span> 1 QTNb1a_P 1 Odonata QTNb1a_P QT         1     1 <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:44:00</span></span>
-<span class="co">## <span style="color: #949494;"># … with 6 more variables: time &lt;dttm&gt;, taxon &lt;chr&gt;, species &lt;chr&gt;,</span></span>
-<span class="co">## <span style="color: #949494;">#   family &lt;chr&gt;, genus &lt;chr&gt;, abundance &lt;dbl&gt;</span></span></code></pre>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_surveys</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">animal_surveys</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 6 × 9</span></span>
-<span class="co">##   survey_id     point_id  area  period cycle taxon resampled start_time         </span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>             </span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> 1 QTNa14a_P … QTNa14a_P QT         1     1 Odon… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:00:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> 1 QTNb1a_P 1… QTNb1a_P  QT         1     1 Odon… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">14:44:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> 1 QTNa14a_P … QTNa14a_P QT         1     1 Amph… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">19:55:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">4</span> 1 QTNb1a_P 1… QTNb1a_P  QT         1     1 Amph… <span style="color: #BB0000;">NA</span>        2016-08-04 <span style="color: #949494;">20:40:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">5</span> 1 PGT15 1 Av… PGT15     PG         1     1 Aves  <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:00:00</span></span>
-<span class="co">## <span style="color: #BCBCBC;">6</span> 1 PGT14 1 Av… PGT14     PG         1     1 Aves  <span style="color: #BB0000;">NA</span>        2016-08-08 <span style="color: #949494;">07:33:00</span></span>
-<span class="co">## <span style="color: #949494;"># … with 1 more variable: notes &lt;chr&gt;</span></span></code></pre>
 <p><br></p>
 <p>If necessary, the convenience function <code><a href="../reference/filter_observations.html">filter_observations()</a></code> may be used to filter the animal survey data based on specified grouping variables (e.g. <code>area</code>, <code>period</code>, <code>taxon</code>). For example, observations from bird (<code>Aves</code>) surveys in Tampines (<code>TP</code>) conducted during 2020-2021 (survey period <code>2</code>) can be filtered as follows:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">observations_subset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_observations.html">filter_observations</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">animal_observations</span>, 
                                            survey_ref <span class="op">=</span> <span class="va">animal_surveys</span>,
                                            specify_taxon <span class="op">=</span> <span class="st">"Aves"</span>,
@@ -681,16 +656,16 @@ NA
 <span class="co">## <span style="color: #BCBCBC;">10</span> 2 TPa3b 1 Aves TPa3b    TP         2     1 FALSE     2020-07-01 <span style="color: #949494;">06:55:00</span></span>
 <span class="co">## <span style="color: #949494;"># … with 4,170 more rows, and 6 more variables: time &lt;dttm&gt;, taxon &lt;chr&gt;,</span></span>
 <span class="co">## <span style="color: #949494;">#   species &lt;chr&gt;, family &lt;chr&gt;, genus &lt;chr&gt;, abundance &lt;dbl&gt;</span></span></code></pre>
-<p>Note that the column <code>survey_id</code> will be converted to a factor variable, which includes levels that are not present in the observation data (i.e. no butterflies were observed during those surveys).</p>
+<p>Note that the column <code>survey_id</code> will be converted to a factor variable, which includes levels that are not present in the observation data (i.e., no butterflies were observed during those surveys).</p>
 <p><br></p>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="data-checks">Data checks<a class="anchor" aria-label="anchor" href="#data-checks"></a>
 </h2>
-<p>Checks can be performed to remove group-level observations, to prevent over-counting the number of species when summarising the data afterwards. For instance, if the <em>species</em> name of an observed animal is unknown, surveyors may instead record such observations at a higher (group) level of classification, such as the <em>family</em> or <em>genus</em>. However, this same species recorded as a group-level entry may also be identified correctly (at the species-level) during other surveys at the same point/area (e.g. by another surveyor). When the number of species is tallied at each point/area, it may result in a double-count of the particular animal species.</p>
+<p>Checks can be performed to remove group-level observations, to prevent over-counting the number of species when summarising the data afterwards. For instance, if the <em>species</em> name of an observed animal is unknown, surveyors may have recorded such observations at a higher (group) level of classification, such as the <em>family</em> or <em>genus</em>. However, this same species recorded as a group-level entry may also be identified correctly (at the species-level) during other surveys at the same point/area (e.g., by another surveyor). When the number of species is tallied, it may result in a double-count of the particular animal species.</p>
 <p>For example, there are two species of swallows observed across all points in the example dataset–<em>Hirundo tahitica</em> and <em>Hirundo rustica</em>. <em>Hirundo spp.</em> is entered (in the <code>species</code> column) when the species cannot be identified with confidence:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">observations_swallows</span> <span class="op">&lt;-</span> <span class="va">observations_subset</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Hirundo"</span>, <span class="va">species</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">area</span>, <span class="va">point_id</span>, <span class="va">species</span>, <span class="va">family</span>, <span class="va">genus</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
@@ -712,8 +687,8 @@ NA
 <span class="co">## <span style="color: #BCBCBC;"> 9</span> TP    TPa16a   Hirundo spp.     Hirundinidae Hirundo spp.</span>
 <span class="co">## <span style="color: #BCBCBC;">10</span> TP    TPa16a   Hirundo tahitica Hirundinidae Hirundo spp.</span>
 <span class="co">## <span style="color: #949494;"># … with 32 more rows</span></span></code></pre>
-<p>This would result in an inflated value when tallying in the number of species per point/area, since <em>Hirundo spp.</em> is a unique entry in the <code>species</code> column. For example, in the example dataset, a total of three swallow species would be reported at <code>TP</code> (Tampines <code>area</code>), rather than the two known to be present in Singapore:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<p>This would inflate the tallied number of species per point/area, since <em>Hirundo spp.</em> is a unique entry in the <code>species</code> column. For example, in the example dataset, a total of three swallow species would be reported within the Tampines (<code>TP</code>) area, rather than the two known to be present in the city of Singapore:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">observations_swallows</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">area</span>, <span class="va">species</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># tally by area</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
@@ -722,8 +697,8 @@ NA
 <span class="co">##   area  `n()`</span>
 <span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="co">## <span style="color: #BCBCBC;">1</span> TP        3</span></code></pre>
-<p>One way to avoid such double-counting is to remove these group-level entries if all species in that particular classification group are observed, at the specified granularity of interest (<code>point</code> or <code>area</code>). The function <code><a href="../reference/check_taxongrps.html">check_taxongrps()</a></code> identifies such group-level entries, as well as the total number of species within that grouping level (by referring to the columns <code>genus</code> and <code>family</code>). For example, for our dataset of swallows at Tampines (<code>TP</code>), we can check the number of unique species within the <em>Hirundo spp.</em> genus and <em>Hirundinidae</em> family:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>One way to avoid such double-counting is to remove these group-level entries if all species in that particular classification group are observed, at the specified granularity of interest (<code>point</code> or <code>area</code>). The function <code><a href="../reference/check_taxongrps.html">check_taxongrps()</a></code> identifies such group-level entries, as well as the total number of species within that grouping level (by referring to the columns <code>genus</code> and <code>family</code>). For example, for the example dataset of swallows within the Tampines (<code>TP</code>) area, we can check the number of unique species within the <em>Hirundo spp.</em> genus and <em>Hirundinidae</em> family:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">to_remove</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_taxongrps.html">check_taxongrps</a></span><span class="op">(</span><span class="va">observations_swallows</span>, level <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span>
 <span class="va">to_remove</span></code></pre></div>
 <pre><code><span class="co">## <span style="color: #949494;"># A tibble: 2 × 3</span></span>
@@ -732,8 +707,8 @@ NA
 <span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="co">## <span style="color: #BCBCBC;">1</span> TP    Hirundo spp.     2</span>
 <span class="co">## <span style="color: #BCBCBC;">2</span> TP    Hirundinidae     3</span></code></pre>
-<p>These entries can subsequently be removed from the observational data <code>observations_swallows</code>, if they have been recorded in the <code>species</code> column:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>These entries can subsequently be removed from <code>observations_swallows</code>, if they have been recorded in the <code>species</code> column:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">filtered_observations</span> <span class="op">&lt;-</span> <span class="va">observations_swallows</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">anti_join</a></span><span class="op">(</span><span class="va">to_remove</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"species"</span> <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span><span class="op">)</span>
 
@@ -753,8 +728,8 @@ NA
 <span class="co">## <span style="color: #BCBCBC;"> 9</span> TP    TPa54    Hirundo tahitica Hirundinidae Hirundo spp.</span>
 <span class="co">## <span style="color: #BCBCBC;">10</span> TP    TPb13_E  Hirundo tahitica Hirundinidae Hirundo spp.</span>
 <span class="co">## <span style="color: #949494;"># … with 22 more rows</span></span></code></pre>
-<p>To verify that these entries have been removed, we can re-tally the filtered observations; the number of species will be reduced by one:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<p>To verify that these entries have been removed, we can re-tally the filtered observations. The number of species will be reduced by one:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">filtered_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">area</span>, <span class="va">species</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># tally by area</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
@@ -763,6 +738,7 @@ NA
 <span class="co">##   area  `n()`</span>
 <span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="co">## <span style="color: #BCBCBC;">1</span> TP        2</span></code></pre>
+<p><br></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

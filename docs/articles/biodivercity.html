@@ -100,7 +100,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Get started with biodivercity</h1>
                         <h4 data-toc-skip class="author">Song, Xiao Ping</h4>
             
-            <h4 data-toc-skip class="date">2022-09-05</h4>
+            <h4 data-toc-skip class="date">2022-09-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/biodivercity.Rmd" class="external-link"><code>vignettes/biodivercity.Rmd</code></a></small>
       <div class="d-none name"><code>biodivercity.Rmd</code></div>
@@ -111,16 +111,16 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Multiple frameworks to assess urban biodiversity have been proposed in both research and practice. Some conceptualise ‘biodiversity’ to include genetic variation, landscape structure and other human-centric dimensions such as climate regulation and ecosystem functioning. While these offer a more comprehensive view of ‘total biodiversity’, certain components may have shortcomings in terms of their (1) causal proximity (e.g. indirect effect of the landscape on the diversity of other species); (2) measurability at-scale (e.g. genetic diversity, plant species diversity); and (3) precision (e.g. estimating water or thermal regulation by vegetation). In decision-making, unnecessary complexity may also risk contributing to mistrust or ignorance of the overall assessment.</p>
-<p><code>biodivercity</code> is an R package for assessing the diversity of animal species in urban areas. It provides a way to directly assess the <em>habitat value</em> of urban landscapes, based on their empirical effect on chosen animal groups (taxa). Examples for birds, butterflies, odonates and amphibians are provided. The key features include:</p>
+<p>Many frameworks to assess ‘biodiversity’ have been proposed in research and practice. Some offer a more holistic view, by including parts of the ecosystem (e.g., climate, soil, air, water, landscape structure, genetic variation) that may contribute to ‘total biodiversity’ within a given region. However, such conceptualisations of ‘biodiversity’ may include components with low causal proximity (e.g. indirect effect of the landscape on species diversity), and may be difficult to measure at wide spatial scales (e.g. genetic diversity, plant species diversity). In decision-making, unnecessary complexity may also risk contributing to mistrust or ignorance of the overall assessment.</p>
+<p><code>biodivercity</code> is an R package for assessing the diversity of animal species in urban areas. It provides a way to directly assess the <em>habitat value</em> of urban landscapes, based on their empirical effect on chosen animal groups (e.g., taxa such as birds, butterflies, odonates, amphibians, etc.). The key features include:</p>
 <ul>
-<li>Step-by-step protocols for random point sampling of an animal group within areas of interest.</li>
-<li>Generate data summaries of the animals surveyed at multiple levels (e.g. areas, periods, animal groups, species).</li>
-<li>Download and process landscape predictors within areas of interest (e.g. satellite imagery, OpenStreetMap data).</li>
-<li>Build and validate predictive models to assess local (alpha), community (beta) and total (gamma) diversity for an animal group.</li>
-<li>Convert vector data generated from future design scenarios into formats suitable for model predictions.</li>
-<li>Use models to make pixel-based spatial predictions across new areas, for both monitoring and future scenario planning purposes.</li>
-<li>Summarise predictions for city-wide scoring and benchmarking (i.e. allow comparisons to be made between zones used in city planning).</li>
+<li>Step-by-step protocols for random point sampling of an animal group within areas of interest</li>
+<li>Generate data summaries of the animals surveyed, at multiple levels of granularity (e.g., areas, periods, animal groups, species)</li>
+<li>Download and process landscape data within areas of interest (e.g., satellite imagery, OpenStreetMap data)</li>
+<li>Convert vector data generated from future design scenarios into formats suitable for model predictions</li>
+<li>Build and validate predictive models to assess <em>Alpha</em> (local), <em>Beta</em> (community) and <em>Gamma</em> (total) diversity for an animal group</li>
+<li>Use models to make pixel-based spatial predictions across new areas and into the future</li>
+<li>Summarise predictions to benchmark and compare biodiversity ‘performance’ between planning units across the city</li>
 </ul>
 <p><br></p>
 <div class="figure" style="text-align: center">

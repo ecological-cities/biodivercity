@@ -27,11 +27,14 @@ devtools::load_all()
 
 ## Data format
 
-Data from animal surveys can be organised into two separate tables: (1) a record of animal observations during each survey; and (2) reference information about each survey. The existence of (2) also ensures that surveys with zero animal observations are accounted for. More details on how data are collected can be found in `vignette("animals-survey-protocols")`. Examples of data within the two tables are shown below:
+Data from animal surveys are organised into two separate tables: (1) a record of animal observations during each survey; and (2) reference information about each survey. The existence of (2) ensures that surveys with zero animal observations are accounted for. More details on how data are collected can be found in `vignette("animals-survey-protocols")`. These example data can be loaded by running the following code:
+
+```{r}
+data(animal_observations)
+data(animal_surveys)
+```
 
 ```{r sample data table, echo = FALSE, message = FALSE, warning = FALSE}
-
-data(animal_observations)
 
 knitr::kable(head(animal_observations), caption = "**Table: Example showing animal observations recorded during surveys.** Each row represents a unique observation at a specified time, which includes the species name and count (abundance) of individuals. Refer to `help(animal_observations)` for more information.") %>%
   kableExtra::kable_styling("striped", font_size = 12, full_width = TRUE) %>%
@@ -42,23 +45,9 @@ knitr::kable(head(animal_observations), caption = "**Table: Example showing anim
 
 ```{r sample info table, echo = FALSE, message = FALSE}
 
-data(animal_surveys)
-
 knitr::kable(head(animal_surveys), caption = "**Table: Example showing the information recorded for each animal survey.** Each row represents a unique 30-minute survey. Refer to `help(animal_surveys)` for more information.") %>%
   kableExtra::kable_styling("striped", font_size = 12, full_width = TRUE) %>% 
   kableExtra::scroll_box(width = "100%")
-```
-
-These example data are present in the package, and can be previewed by running the following code:
-
-```{r}
-data(animal_observations)
-head(animal_observations)
-```
-
-```{r}
-data(animal_surveys)
-head(animal_surveys)
 ```
 
 <br>
@@ -76,7 +65,7 @@ observations_subset <- filter_observations(observations = animal_observations,
 observations_subset
 ```
 
-Note that the column `survey_id` will be converted to a factor variable, which includes levels that are not present in the observation data (i.e. no butterflies were observed during those surveys).
+Note that the column `survey_id` will be converted to a factor variable, which includes levels that are not present in the observation data (i.e., no butterflies were observed during those surveys).
 
 <br>
 
@@ -84,7 +73,7 @@ Note that the column `survey_id` will be converted to a factor variable, which i
 
 ## Data checks
 
-Checks can be performed to remove group-level observations, to prevent over-counting the number of species when summarising the data afterwards. For instance, if the _species_ name of an observed animal is unknown, surveyors may instead record such observations at a higher (group) level of classification, such as the _family_ or _genus_. However, this same species recorded as a group-level entry may also be identified correctly (at the species-level) during other surveys at the same point/area (e.g. by another surveyor). When the number of species is tallied at each point/area, it may result in a double-count of the particular animal species.
+Checks can be performed to remove group-level observations, to prevent over-counting the number of species when summarising the data afterwards. For instance, if the _species_ name of an observed animal is unknown, surveyors may have recorded such observations at a higher (group) level of classification, such as the _family_ or _genus_. However, this same species recorded as a group-level entry may also be identified correctly (at the species-level) during other surveys at the same point/area (e.g., by another surveyor). When the number of species is tallied, it may result in a double-count of the particular animal species.
 
 For example, there are two species of swallows observed across all points in the example dataset–*Hirundo tahitica* and *Hirundo rustica*. *Hirundo spp.* is entered (in the `species` column) when the species cannot be identified with confidence: 
 
@@ -97,7 +86,7 @@ observations_swallows <- observations_subset %>%
 observations_swallows
 ```
 
-This would result in an inflated value when tallying in the number of species per point/area, since _Hirundo spp._ is a unique entry in the `species` column. For example, in the example dataset, a total of three swallow species would be reported at `TP` (Tampines `area`), rather than the two known to be present in Singapore:
+This would inflate the tallied number of species per point/area, since _Hirundo spp._ is a unique entry in the `species` column. For example, in the example dataset, a total of three swallow species would be reported within the Tampines (`TP`) area, rather than the two known to be present in the city of Singapore:
 
 ```{r message = FALSE}
 observations_swallows %>% 
@@ -106,14 +95,14 @@ observations_swallows %>%
   summarise(n())
 ```
 
-One way to avoid such double-counting is to remove these group-level entries if all species in that particular classification group are observed, at the specified granularity of interest (`point` or `area`). The function `check_taxongrps()` identifies such group-level entries, as well as the total number of species within that grouping level (by referring to the columns `genus` and `family`). For example, for our dataset of swallows at Tampines (`TP`), we can check the number of unique species within the _Hirundo spp._ genus and _Hirundinidae_ family:
+One way to avoid such double-counting is to remove these group-level entries if all species in that particular classification group are observed, at the specified granularity of interest (`point` or `area`). The function `check_taxongrps()` identifies such group-level entries, as well as the total number of species within that grouping level (by referring to the columns `genus` and `family`). For example, for the example dataset of swallows within the Tampines (`TP`) area, we can check the number of unique species within the _Hirundo spp._ genus and _Hirundinidae_ family:
 
 ```{r}
 to_remove <- check_taxongrps(observations_swallows, level = "area")
 to_remove
 ```
 
-These entries can subsequently be removed from the observational data `observations_swallows`, if they have been recorded in the `species` column: 
+These entries can subsequently be removed from `observations_swallows`, if they have been recorded in the `species` column: 
 
 ```{r}
 filtered_observations <- observations_swallows %>%
@@ -122,7 +111,7 @@ filtered_observations <- observations_swallows %>%
 filtered_observations
 ```
 
-To verify that these entries have been removed, we can re-tally the filtered observations; the number of species will be reduced by one:
+To verify that these entries have been removed, we can re-tally the filtered observations. The number of species will be reduced by one:
 
 ```{r check taxon groups 2, message = FALSE, warning = FALSE}
 filtered_observations %>% 
@@ -130,3 +119,5 @@ filtered_observations %>%
   summarise() %>%
   summarise(n())
 ```
+
+<br>
