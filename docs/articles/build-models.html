@@ -94,10 +94,7 @@
     
   </div>
 </nav><div class="container template-article">
-<script src="build-models_files/htmlwidgets-1.5.4/htmlwidgets.js"></script><script src="build-models_files/jquery-1.12.4/jquery.min.js"></script><link href="build-models_files/leaflet-1.3.1/leaflet.css" rel="stylesheet">
-<script src="build-models_files/leaflet-1.3.1/leaflet.js"></script><link href="build-models_files/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
-<script src="build-models_files/proj4-2.6.2/proj4.min.js"></script><script src="build-models_files/Proj4Leaflet-1.0.1/proj4leaflet.js"></script><link href="build-models_files/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
-<script src="build-models_files/leaflet-binding-2.0.4.1/leaflet.js"></script><script src="build-models_files/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script><script src="build-models_files/leaflet-providers-plugin-2.0.4.1/leaflet-providers-plugin.js"></script><script src="build-models_files/kePrint-0.0.1/kePrint.js"></script><link href="build-models_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script src="build-models_files/kePrint-0.0.1/kePrint.js"></script><link href="build-models_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Build Models</h1>
@@ -105,7 +102,7 @@
 models with processed animal and landscape data</h3>
                         <h4 data-toc-skip class="author">Edwin Tan</h4>
             
-            <h4 data-toc-skip class="date">2022-09-07</h4>
+            <h4 data-toc-skip class="date">2022-09-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/build-models.Rmd" class="external-link"><code>vignettes/build-models.Rmd</code></a></small>
       <div class="d-none name"><code>build-models.Rmd</code></div>
@@ -122,78 +119,6 @@ owing to the large number of landscape predictors at multiple buffer
 radii generated from the remotely sensed and open data, variable
 selection has to be performed as there is a limit to the number of
 variables <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code> is allowed to accept.</p>
-<div class="section level2">
-<h2 id="combining-fauna-and-landscape-data">Combining fauna and landscape data<a class="anchor" aria-label="anchor" href="#combining-fauna-and-landscape-data"></a>
-</h2>
-<p>To build the models, animal and landscape datasets as processed in
-the previous two articles have to be combined and prepared.</p>
-<p>First, load the required packages to run the analysis:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">"biodivercity"</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://tidyverse.tidyverse.org" class="external-link">"tidyverse"</a></span><span class="op">)</span> <span class="co"># to process/wrangle data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-spatial.github.io/sf/" class="external-link">"sf"</a></span><span class="op">)</span> <span class="co"># to process landscape data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/mtennekes/tmap" class="external-link">"tmap"</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">"kableExtra"</a></span><span class="op">)</span></code></pre></div>
-<p>In this short example, load the datasets and filter for
-<code>area == "PG"</code> and <code>period == 1</code> only.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_observations</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">animal_surveys</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"sampling_points"</span><span class="op">)</span> 
-
-
-<span class="va">observations</span> <span class="op">&lt;-</span> <span class="va">animal_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">area</span> <span class="op">==</span> <span class="st">"PG"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">period</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>
-
-<span class="va">surveys</span> <span class="op">&lt;-</span> <span class="va">animal_surveys</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">area</span> <span class="op">==</span> <span class="st">"PG"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">period</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>
-
-<span class="va">points</span> <span class="op">&lt;-</span> <span class="va">sampling_points</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">area</span> <span class="op">==</span> <span class="st">"PG"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">period</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<p>Animal observations are then tallied to retrieve species richness at
-each point. The <code>tally_observations</code> function can be used
-with the argument <code>level = "point"</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">birds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tally_observations.html">tally_observations</a></span><span class="op">(</span><span class="va">observations</span>,
-                            <span class="va">surveys</span>,
-                            specify_taxon <span class="op">=</span> <span class="st">"Aves"</span>,
-                            specify_area <span class="op">=</span> <span class="st">"PG"</span>,
-                            specify_period <span class="op">=</span> <span class="fl">1</span>,
-                            level <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>sprich <span class="op">=</span> <span class="va">n</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## Joining, by = c("point_id", "area", "period", "taxon")</span></code></pre>
-<p>Re-calculate the landscape metrics for the area of Punggol with the
-<code>ndvi_mosaic.tif</code> raster by first classifying for vegetation
-with <code><a href="../reference/classify_image_binary.html">classify_image_binary()</a></code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ndvi_mosaic</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ndvi_mosaic.tif"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">veg_classified</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_image_binary.html">classify_image_binary</a></span><span class="op">(</span><span class="va">ndvi_mosaic</span>, threshold <span class="op">=</span> <span class="st">"otsu"</span><span class="op">)</span></code></pre></div>
-<p>The classified raster <code>veg_classified</code> is then input into
-<code>genfeatures_lsm()</code> as per the <code>Process landscape</code>
-article to retrieve relevant landscape metrics.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu">genfeatures_lsm</span><span class="op">(</span>raster <span class="op">=</span> <span class="va">veg_classified</span>,
-                          points <span class="op">=</span> <span class="va">points</span>,
-                          buffer_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>, <span class="co"># in metres</span>
-                          level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"class"</span><span class="op">)</span>,
-                          class_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"veg"</span><span class="op">)</span>,
-                          class_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># pixel value of class</span></code></pre></div>
-<p>Finally, the two datasets will be combined with an
-<code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join()</a></code>. An input dataset for model building will
-follow the same format.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">birds</span> <span class="op">&lt;-</span> <span class="va">birds</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">points</span>, 
-             by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"town"</span>, <span class="st">"round"</span>, <span class="st">"point_id"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">birds</span><span class="op">)</span></code></pre></div>
-<hr>
 <div class="section level3">
 <h3 id="if-too-many-variables-are-present-for-mumindredge">If too many variables are present for
 <code>MuMIn::dredge</code>:<a class="anchor" aria-label="anchor" href="#if-too-many-variables-are-present-for-mumindredge"></a>
@@ -207,24 +132,34 @@ overfitting, as well as the collinearity and selection bias of
 predictors (Hothorn et al., 2006). In the following sections, the
 example variables were selected using the <code>randomForest</code>
 package.</p>
-</div>
+<hr>
 </div>
 <div class="section level2">
-<h2 id="building-the-glm-models">Building the GLM models<a class="anchor" aria-label="anchor" href="#building-the-glm-models"></a>
+<h2 id="alpha-diversity-models">Alpha diversity models<a class="anchor" aria-label="anchor" href="#alpha-diversity-models"></a>
 </h2>
+<div class="section level3">
+<h3 id="building-the-glm-models">Building the GLM models<a class="anchor" aria-label="anchor" href="#building-the-glm-models"></a>
+</h3>
 <p>Now, load the necessary packages to run the model building:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lme4/lme4/" class="external-link">"lme4"</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"biodivercity"</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://tidyverse.tidyverse.org" class="external-link">"tidyverse"</a></span><span class="op">)</span> <span class="co"># to process/wrangle data</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-spatial.github.io/sf/" class="external-link">"sf"</a></span><span class="op">)</span> <span class="co"># to process landscape data</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/mtennekes/tmap" class="external-link">"tmap"</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">"kableExtra"</a></span><span class="op">)</span>
+
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lme4/lme4/" class="external-link">"lme4"</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"MuMIn"</span><span class="op">)</span></code></pre></div>
 <p>Bird species density and landscape data for sampling points across
 six areas (towns) in Singapore from the example data
 <code>model_data</code> will be used to demonstrate the model building
-process in this article. The variable selection output using random
-forest is also loaded from <code>model_variables</code> to inform
-<code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">model_data</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">model_variables</span><span class="op">)</span></code></pre></div>
+process in this article. In this example dataset, animal and landscape
+datasets as processed in the previous two articles were combined. The
+variable selection output using random forest is also loaded from
+<code>model_variables</code> to inform <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"model_data"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span> <span class="co"># model_data has been filtered to match model_variables </span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"model_variables"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span></code></pre></div>
 <p>Before running <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code>, model constraints have to
 be considered to avoid combinations of variables that represented
 similar landscape characteristics. For example, for each land cover
@@ -233,7 +168,7 @@ model, and similar landscape predictors at different buffer radii were
 not allowed. To do so, <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code> accepts expressions
 for the <code>subset</code> argument and such an object is automatically
 created from <code>model_variables</code> below.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">var_comb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/combn.html" class="external-link">combn</a></span><span class="op">(</span><span class="va">model_variables</span><span class="op">$</span><span class="va">variable</span>, <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># unique combinations of variables</span>
   <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
@@ -287,7 +222,7 @@ created from <code>model_variables</code> below.</p>
 
 <span class="va">subset_exp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"!("</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">subset_vec</span>, collapse <span class="op">=</span> <span class="st">") &amp; !("</span><span class="op">)</span>, <span class="st">")"</span><span class="op">)</span><span class="op">)</span> <span class="co"># returns exp - subset doesn't accept paste</span></code></pre></div>
 <p>Model data should then be scaled before building the models.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># scale/center model_data</span>
 
 <span class="va">model_data</span> <span class="op">&lt;-</span> <span class="va">model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
@@ -298,7 +233,7 @@ created from <code>model_variables</code> below.</p>
 fitted as a primary input. A null model is also fitted for the
 <code>extra</code> argument to calculate a delta-AIC value for model
 selection.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model_global</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"sprich"</span>, <span class="st">"~"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">model_variables</span><span class="op">$</span><span class="va">variable</span>, collapse <span class="op">=</span> <span class="st">" + "</span><span class="op">)</span>, <span class="st">"+ (1|town) "</span><span class="op">)</span>,
                       family <span class="op">=</span> <span class="va">poisson</span>,
                       data <span class="op">=</span> <span class="va">model_data</span>,
@@ -310,7 +245,7 @@ selection.</p>
 <p>The <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code> function is then run with
 <code>model_global</code>, <code>subset = subset_exp</code> and
 <code>m.lim=c(NA,9)</code> as model combination constraints.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model_glm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">dredge</a></span><span class="op">(</span><span class="va">model_global</span>,
                     subset<span class="op">=</span> <span class="va">subset_exp</span>,
                     m.lim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>,<span class="fl">9</span><span class="op">)</span>, <span class="co"># max of 9 variables</span>
@@ -726,10 +661,10 @@ weight
 
 
 
-<p>Furthermore, to View the breakdown of variables in the top models, a
-plot of the top important variables and their sum of model weights
-across all models can be produced:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>For a visual breakdown of variables in the top models, a plot of the
+top important variables and their sum of model weights across all models
+can be produced:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">coef</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">bestmodels_info</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/tidyverse.html" class="external-link">summarise</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">.x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"var"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
@@ -749,120 +684,892 @@ across all models can be produced:</p>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#4daf4a"</span>, <span class="st">"#e41a1c"</span>, <span class="st">"#377eb8"</span><span class="op">)</span>,
                     name <span class="op">=</span> <span class="st">"Effect"</span><span class="op">)</span></code></pre></div>
 <p><img src="build-models_files/figure-html/plot%20of%20coefs-1.png" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">coef</span>, caption <span class="op">=</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">"**Mean coefficient value for each predictor within the best models.**"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span><span class="st">"striped"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/scroll_box.html" class="external-link">scroll_box</a></span><span class="op">(</span>width <span class="op">=</span> <span class="st">"100%"</span>, height <span class="op">=</span> <span class="st">"300px"</span><span class="op">)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:300px; overflow-x: scroll; width:100%; ">
-<table class="table table table-striped" style="margin-left: auto; margin-right: auto;">
-<caption>
-<strong>Mean coefficient value for each predictor within the best
-models.</strong>
-</caption>
-<thead><tr>
-<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-var
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-value
-</th>
-<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-effect
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-r100m_osm_buildingVol_m3
-</td>
-<td style="text-align:right;">
--0.0957250
-</td>
-<td style="text-align:left;">
-Negative
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-r200m_lsm_veg_gyrate_mn
-</td>
-<td style="text-align:right;">
-0.0766337
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-r400m_lsm_water_pd
-</td>
-<td style="text-align:right;">
--0.0531445
-</td>
-<td style="text-align:left;">
-Negative
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-r50m_lsm_veg_para_mn
-</td>
-<td style="text-align:right;">
--0.0658100
-</td>
-<td style="text-align:left;">
-Negative
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-r50m_lsm_veg_contig_mn
-</td>
-<td style="text-align:right;">
-0.0662889
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-r200m_lsm_veg_area_mn
-</td>
-<td style="text-align:right;">
-0.0728842
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-r50m_osm_laneDensity
-</td>
-<td style="text-align:right;">
--0.0210567
-</td>
-<td style="text-align:left;">
-Negative
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-r200m_lsm_veg_lsi
-</td>
-<td style="text-align:right;">
--0.0219117
-</td>
-<td style="text-align:left;">
-Negative
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><br></p>
 <hr>
+<p><br></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="beta-diversity-models">Beta diversity models<a class="anchor" aria-label="anchor" href="#beta-diversity-models"></a>
+</h2>
+<div class="section level3">
+<h3 id="variable-selection">Variable selection<a class="anchor" aria-label="anchor" href="#variable-selection"></a>
+</h3>
+<p>Similarly, variable selection by random forest was performed on the
+landscape variables prior to beta model building. In the following
+sections, the example variables were selected using the
+<code>randomForestSRC</code> and <code>MultivariateRandomForest</code>
+packages.</p>
+</div>
+<div class="section level3">
+<h3 id="building-the-pca-pcnm-and-rda-models">Building the PCA, PCNM and RDA models<a class="anchor" aria-label="anchor" href="#building-the-pca-pcnm-and-rda-models"></a>
+</h3>
+<p>Load the additional package <code>vegan</code> for beta diversity
+model building:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://cran.r-project.org" class="external-link">"vegan"</a></span><span class="op">)</span></code></pre></div>
+<p>As before, bird species density and landscape data for sampling
+points across six areas (towns) in Singapore will be analysed in this
+example. In this example dataset <code>beta_model_data</code>, animal
+and landscape datasets as processed in the previous two articles were
+combined. The variable selection output using random forest is also
+loaded from <code>beta_model_variables</code> to inform the principal
+component analysis (PCA) of the selected landscape variables later.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"beta_model_data.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span> <span class="co">#summarised landscape information per point</span>
+<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span>
+
+<span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"beta_model_variables.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span>
+
+<span class="co"># load("../inst/extdata/beta_model_data.Rdata")</span>
+<span class="co"># load("../inst/extdata/beta_model_variables.Rdata")</span>
+
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_observations"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"sampling_points"</span><span class="op">)</span>
+
+<span class="va">sampling_points</span> <span class="op">&lt;-</span> <span class="va">sampling_points</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">period</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<p>Next, we process the fauna datasets into acceptable formats for
+analyses.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rmspp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_taxongrps.html">check_taxongrps</a></span><span class="op">(</span><span class="va">animal_observations</span>, level <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span> 
+
+<span class="va">animal_observations</span> <span class="op">&lt;-</span> <span class="va">animal_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">anti_join</a></span><span class="op">(</span><span class="va">rmspp</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"species"</span> <span class="op">=</span> <span class="st">"name"</span>,<span class="st">"point_id"</span>, <span class="st">"period"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">period</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>An presence/absence community matrix is created from the observations
+to summarise total species incidence.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bird_com</span> <span class="op">&lt;-</span> <span class="va">animal_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">taxon</span> <span class="op">==</span> <span class="st">"Aves"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">period</span>, <span class="va">point_id</span>, <span class="va">species</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/tidyverse.html" class="external-link">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">abundance</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">point_id</span>, <span class="va">period</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">species</span>, values_from <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/base/replace.html" class="external-link">replace</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,<span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span>  <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join</a></span><span class="op">(</span><span class="va">beta_model_data</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"point_id"</span>, <span class="st">"period"</span> <span class="op">=</span> <span class="st">"round"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># filtering for the same period</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">period</span>, <span class="op">-</span><span class="va">point_id</span><span class="op">)</span>
+
+<span class="va">bird_com</span> <span class="op">&lt;-</span> <span class="va">bird_com</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span>.cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">.</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">~</span> <span class="fl">1</span>,
+                                                  <span class="va">.</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+  
+<span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">rmspp</span><span class="op">)</span></code></pre></div>
+<p>After the <code>birds</code> dataset has been used to filter
+<code>bird_com</code>, it is further processed to include coordinate
+information for PCNM analysis later.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">beta_model_data</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">town</span>, <span class="va">round</span>, <span class="va">priority</span>, <span class="va">sprich</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co">#keep only point_id and landscape variables</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">point_id</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co">#sort alphabetically</span>
+  
+  <span class="co">#adding coordinate information</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>X <span class="op">=</span> <span class="op">{</span><span class="op">(</span><span class="va">sampling_points</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">beta_model_data</span><span class="op">$</span><span class="va">point_id</span>,<span class="va">sampling_points</span><span class="op">$</span><span class="va">point_id</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">}</span>, 
+         .after <span class="op">=</span> <span class="va">point_id</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="op">{</span><span class="op">(</span><span class="va">sampling_points</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">beta_model_data</span><span class="op">$</span><span class="va">point_id</span>,<span class="va">sampling_points</span><span class="op">$</span><span class="va">point_id</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">}</span>,
+         .after <span class="op">=</span> <span class="va">X</span><span class="op">)</span></code></pre></div>
+<p>Using the variables selected by random forest, principal component
+analysis (PCA) is performed for dimensionality reduction to further
+decrease the number of input variables. <strong>Unsure</strong></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">imp_var_birds</span> <span class="op">&lt;-</span> <span class="va">beta_model_variables</span><span class="op">$</span><span class="va">var</span>
+
+<span class="va">pca_birds</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">imp_var_birds</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="va">.</span>,scale.<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/stats/biplot.html" class="external-link">biplot</a></span><span class="op">(</span><span class="va">pca_birds</span>, choices<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="build-models_files/figure-html/diagnosis%20by%20PCA-1.png" width="700"></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># view(pca_birds$rotation)</span>
+
+<span class="va">birds_select</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pca_birds</span><span class="op">$</span><span class="va">sdev</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span>
+
+<span class="va">birds_selected</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pca_birds</span><span class="op">$</span><span class="va">x</span><span class="op">[</span>,<span class="va">birds_select</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">X</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## </span>
+<span class="co">## Start: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM9 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 +      PCNM15 + PCNM16 + PCNM17 + PCNM18 + PCNM19 + PCNM20 + PCNM21 +      PCNM22 + PCNM23 + PCNM24 + PCNM25 + PCNM26 + PCNM27 + PCNM28 +      PCNM29 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM22  1 250.76 0.5961  0.950   </span>
+<span class="co">## - PCNM29  1 250.86 0.6666  0.870   </span>
+<span class="co">## - PCNM9   1 251.02 0.7750  0.850   </span>
+<span class="co">## - PCNM28  1 250.94 0.7179  0.845   </span>
+<span class="co">## - PCNM15  1 250.94 0.7178  0.840   </span>
+<span class="co">## - PCNM16  1 250.92 0.7088  0.805   </span>
+<span class="co">## - PCNM17  1 251.07 0.8135  0.735   </span>
+<span class="co">## - PCNM1   1 251.17 0.8843  0.620   </span>
+<span class="co">## - PCNM19  1 251.23 0.9275  0.620   </span>
+<span class="co">## - PCNM25  1 251.20 0.9051  0.570   </span>
+<span class="co">## - PCNM7   1 251.25 0.9442  0.525   </span>
+<span class="co">## - PCNM8   1 251.31 0.9810  0.480   </span>
+<span class="co">## - PCNM14  1 251.32 0.9911  0.450   </span>
+<span class="co">## - PCNM18  1 251.44 1.0791  0.335   </span>
+<span class="co">## - PCNM6   1 251.44 1.0762  0.280   </span>
+<span class="co">## - PCNM12  1 251.47 1.0973  0.275   </span>
+<span class="co">## - PCNM4   1 251.53 1.1410  0.225   </span>
+<span class="co">## - PCNM13  1 251.59 1.1800  0.210   </span>
+<span class="co">## - PCNM2   1 251.57 1.1654  0.200   </span>
+<span class="co">## - PCNM27  1 251.72 1.2749  0.185   </span>
+<span class="co">## - PCNM26  1 251.80 1.3321  0.180   </span>
+<span class="co">## - PCNM23  1 251.71 1.2707  0.160   </span>
+<span class="co">## - PCNM21  1 251.82 1.3453  0.145   </span>
+<span class="co">## - PCNM20  1 251.97 1.4527  0.110   </span>
+<span class="co">## - PCNM10  1 251.93 1.4273  0.095 . </span>
+<span class="co">## - PCNM5   1 251.88 1.3921  0.090 . </span>
+<span class="co">## - PCNM11  1 252.66 1.9510  0.010 **</span>
+<span class="co">## - PCNM24  1 252.87 2.0987  0.005 **</span>
+<span class="co">## - PCNM3   1 253.00 2.1952  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM9 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 +      PCNM15 + PCNM16 + PCNM17 + PCNM18 + PCNM19 + PCNM20 + PCNM21 +      PCNM23 + PCNM24 + PCNM25 + PCNM26 + PCNM27 + PCNM28 + PCNM29 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM29  1 249.70 0.6704  0.900   </span>
+<span class="co">## - PCNM15  1 249.77 0.7219  0.870   </span>
+<span class="co">## - PCNM16  1 249.76 0.7128  0.845   </span>
+<span class="co">## - PCNM28  1 249.78 0.7220  0.830   </span>
+<span class="co">## - PCNM9   1 249.85 0.7794  0.830   </span>
+<span class="co">## - PCNM17  1 249.91 0.8181  0.685   </span>
+<span class="co">## - PCNM1   1 250.01 0.8894  0.575   </span>
+<span class="co">## - PCNM19  1 250.07 0.9328  0.575   </span>
+<span class="co">## - PCNM25  1 250.04 0.9103  0.535   </span>
+<span class="co">## - PCNM8   1 250.14 0.9866  0.535   </span>
+<span class="co">## - PCNM14  1 250.16 0.9968  0.485   </span>
+<span class="co">## - PCNM7   1 250.09 0.9496  0.450   </span>
+<span class="co">## - PCNM6   1 250.28 1.0824  0.345   </span>
+<span class="co">## - PCNM18  1 250.28 1.0853  0.330   </span>
+<span class="co">## - PCNM12  1 250.31 1.1036  0.305   </span>
+<span class="co">## - PCNM4   1 250.37 1.1475  0.265   </span>
+<span class="co">## - PCNM13  1 250.42 1.1867  0.240   </span>
+<span class="co">## - PCNM2   1 250.40 1.1720  0.210   </span>
+<span class="co">## - PCNM27  1 250.55 1.2822  0.170   </span>
+<span class="co">## - PCNM23  1 250.55 1.2779  0.145   </span>
+<span class="co">## - PCNM26  1 250.63 1.3397  0.145   </span>
+<span class="co">## - PCNM21  1 250.65 1.3530  0.095 . </span>
+<span class="co">## - PCNM5   1 250.72 1.4001  0.095 . </span>
+<span class="co">## - PCNM20  1 250.80 1.4610  0.080 . </span>
+<span class="co">## - PCNM10  1 250.76 1.4355  0.075 . </span>
+<span class="co">## - PCNM11  1 251.49 1.9621  0.015 * </span>
+<span class="co">## - PCNM24  1 251.69 2.1107  0.005 **</span>
+<span class="co">## - PCNM3   1 251.82 2.2077  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM9 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 +      PCNM15 + PCNM16 + PCNM17 + PCNM18 + PCNM19 + PCNM20 + PCNM21 +      PCNM23 + PCNM24 + PCNM25 + PCNM26 + PCNM27 + PCNM28 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM16  1 248.69 0.7161  0.850   </span>
+<span class="co">## - PCNM15  1 248.71 0.7253  0.835   </span>
+<span class="co">## - PCNM28  1 248.71 0.7254  0.805   </span>
+<span class="co">## - PCNM9   1 248.78 0.7830  0.775   </span>
+<span class="co">## - PCNM17  1 248.84 0.8219  0.695   </span>
+<span class="co">## - PCNM19  1 249.00 0.9371  0.575   </span>
+<span class="co">## - PCNM25  1 248.97 0.9145  0.560   </span>
+<span class="co">## - PCNM7   1 249.02 0.9540  0.545   </span>
+<span class="co">## - PCNM1   1 248.94 0.8934  0.525   </span>
+<span class="co">## - PCNM8   1 249.07 0.9912  0.490   </span>
+<span class="co">## - PCNM14  1 249.08 1.0013  0.425   </span>
+<span class="co">## - PCNM18  1 249.21 1.0903  0.340   </span>
+<span class="co">## - PCNM6   1 249.20 1.0873  0.310   </span>
+<span class="co">## - PCNM12  1 249.23 1.1087  0.295   </span>
+<span class="co">## - PCNM4   1 249.29 1.1528  0.220   </span>
+<span class="co">## - PCNM13  1 249.34 1.1922  0.220   </span>
+<span class="co">## - PCNM2   1 249.32 1.1774  0.205   </span>
+<span class="co">## - PCNM23  1 249.47 1.2838  0.165   </span>
+<span class="co">## - PCNM27  1 249.48 1.2881  0.155   </span>
+<span class="co">## - PCNM26  1 249.56 1.3458  0.120   </span>
+<span class="co">## - PCNM20  1 249.72 1.4678  0.115   </span>
+<span class="co">## - PCNM21  1 249.57 1.3592  0.105   </span>
+<span class="co">## - PCNM5   1 249.64 1.4065  0.085 . </span>
+<span class="co">## - PCNM10  1 249.69 1.4421  0.070 . </span>
+<span class="co">## - PCNM11  1 250.40 1.9712  0.005 **</span>
+<span class="co">## - PCNM24  1 250.60 2.1204  0.005 **</span>
+<span class="co">## - PCNM3   1 250.74 2.2179  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM9 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 +      PCNM15 + PCNM17 + PCNM18 + PCNM19 + PCNM20 + PCNM21 + PCNM23 +      PCNM24 + PCNM25 + PCNM26 + PCNM27 + PCNM28 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM28  1 247.69 0.7282  0.850   </span>
+<span class="co">## - PCNM15  1 247.69 0.7281  0.840   </span>
+<span class="co">## - PCNM9   1 247.76 0.7861  0.790   </span>
+<span class="co">## - PCNM17  1 247.82 0.8251  0.665   </span>
+<span class="co">## - PCNM1   1 247.91 0.8969  0.620   </span>
+<span class="co">## - PCNM19  1 247.97 0.9407  0.570   </span>
+<span class="co">## - PCNM25  1 247.94 0.9180  0.550   </span>
+<span class="co">## - PCNM7   1 248.00 0.9577  0.465   </span>
+<span class="co">## - PCNM8   1 248.05 0.9950  0.435   </span>
+<span class="co">## - PCNM14  1 248.06 1.0053  0.435   </span>
+<span class="co">## - PCNM6   1 248.18 1.0916  0.340   </span>
+<span class="co">## - PCNM12  1 248.21 1.1130  0.330   </span>
+<span class="co">## - PCNM18  1 248.18 1.0945  0.320   </span>
+<span class="co">## - PCNM23  1 248.44 1.2888  0.230   </span>
+<span class="co">## - PCNM4   1 248.26 1.1573  0.225   </span>
+<span class="co">## - PCNM2   1 248.30 1.1820  0.190   </span>
+<span class="co">## - PCNM13  1 248.32 1.1969  0.170   </span>
+<span class="co">## - PCNM27  1 248.45 1.2931  0.155   </span>
+<span class="co">## - PCNM21  1 248.54 1.3645  0.135   </span>
+<span class="co">## - PCNM26  1 248.53 1.3511  0.125   </span>
+<span class="co">## - PCNM20  1 248.69 1.4735  0.110   </span>
+<span class="co">## - PCNM5   1 248.61 1.4120  0.095 . </span>
+<span class="co">## - PCNM10  1 248.66 1.4477  0.070 . </span>
+<span class="co">## - PCNM11  1 249.37 1.9789  0.005 **</span>
+<span class="co">## - PCNM24  1 249.57 2.1286  0.005 **</span>
+<span class="co">## - PCNM3   1 249.70 2.2265  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM9 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 +      PCNM15 + PCNM17 + PCNM18 + PCNM19 + PCNM20 + PCNM21 + PCNM23 +      PCNM24 + PCNM25 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM15  1 246.67 0.7308  0.820   </span>
+<span class="co">## - PCNM9   1 246.75 0.7890  0.765   </span>
+<span class="co">## - PCNM17  1 246.80 0.8282  0.710   </span>
+<span class="co">## - PCNM1   1 246.89 0.9002  0.660   </span>
+<span class="co">## - PCNM7   1 246.98 0.9612  0.565   </span>
+<span class="co">## - PCNM19  1 246.95 0.9442  0.505   </span>
+<span class="co">## - PCNM25  1 246.92 0.9214  0.495   </span>
+<span class="co">## - PCNM8   1 247.03 0.9987  0.430   </span>
+<span class="co">## - PCNM14  1 247.04 1.0090  0.425   </span>
+<span class="co">## - PCNM6   1 247.16 1.0956  0.325   </span>
+<span class="co">## - PCNM12  1 247.18 1.1171  0.255   </span>
+<span class="co">## - PCNM2   1 247.28 1.1864  0.245   </span>
+<span class="co">## - PCNM18  1 247.16 1.0986  0.225   </span>
+<span class="co">## - PCNM4   1 247.24 1.1616  0.185   </span>
+<span class="co">## - PCNM26  1 247.50 1.3561  0.175   </span>
+<span class="co">## - PCNM13  1 247.29 1.2013  0.160   </span>
+<span class="co">## - PCNM27  1 247.42 1.2979  0.150   </span>
+<span class="co">## - PCNM23  1 247.42 1.2936  0.140   </span>
+<span class="co">## - PCNM21  1 247.52 1.3695  0.105   </span>
+<span class="co">## - PCNM5   1 247.58 1.4172  0.105   </span>
+<span class="co">## - PCNM20  1 247.66 1.4789  0.100 . </span>
+<span class="co">## - PCNM10  1 247.63 1.4531  0.060 . </span>
+<span class="co">## - PCNM11  1 248.33 1.9861  0.015 * </span>
+<span class="co">## - PCNM24  1 248.53 2.1365  0.010 **</span>
+<span class="co">## - PCNM3   1 248.66 2.2347  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM9 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 +      PCNM17 + PCNM18 + PCNM19 + PCNM20 + PCNM21 + PCNM23 + PCNM24 +      PCNM25 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM9   1 245.72 0.7918  0.835   </span>
+<span class="co">## - PCNM17  1 245.77 0.8311  0.680   </span>
+<span class="co">## - PCNM1   1 245.87 0.9035  0.600   </span>
+<span class="co">## - PCNM25  1 245.89 0.9247  0.580   </span>
+<span class="co">## - PCNM7   1 245.95 0.9647  0.505   </span>
+<span class="co">## - PCNM19  1 245.92 0.9476  0.465   </span>
+<span class="co">## - PCNM14  1 246.01 1.0126  0.465   </span>
+<span class="co">## - PCNM8   1 246.00 1.0023  0.425   </span>
+<span class="co">## - PCNM12  1 246.15 1.1211  0.295   </span>
+<span class="co">## - PCNM6   1 246.12 1.0995  0.265   </span>
+<span class="co">## - PCNM2   1 246.24 1.1907  0.265   </span>
+<span class="co">## - PCNM18  1 246.13 1.1025  0.260   </span>
+<span class="co">## - PCNM13  1 246.26 1.2056  0.230   </span>
+<span class="co">## - PCNM4   1 246.21 1.1658  0.200   </span>
+<span class="co">## - PCNM23  1 246.38 1.2982  0.170   </span>
+<span class="co">## - PCNM26  1 246.47 1.3610  0.155   </span>
+<span class="co">## - PCNM27  1 246.39 1.3026  0.125   </span>
+<span class="co">## - PCNM21  1 246.48 1.3745  0.125   </span>
+<span class="co">## - PCNM5   1 246.55 1.4223  0.075 . </span>
+<span class="co">## - PCNM20  1 246.63 1.4842  0.060 . </span>
+<span class="co">## - PCNM10  1 246.59 1.4583  0.050 * </span>
+<span class="co">## - PCNM11  1 247.29 1.9933  0.015 * </span>
+<span class="co">## - PCNM3   1 247.61 2.2428  0.015 * </span>
+<span class="co">## - PCNM24  1 247.49 2.1442  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 + PCNM17 +      PCNM18 + PCNM19 + PCNM20 + PCNM21 + PCNM23 + PCNM24 + PCNM25 +      PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM17  1 244.81 0.8334  0.680   </span>
+<span class="co">## - PCNM1   1 244.90 0.9060  0.570   </span>
+<span class="co">## - PCNM25  1 244.93 0.9273  0.570   </span>
+<span class="co">## - PCNM19  1 244.96 0.9502  0.540   </span>
+<span class="co">## - PCNM7   1 244.98 0.9673  0.535   </span>
+<span class="co">## - PCNM8   1 245.03 1.0050  0.445   </span>
+<span class="co">## - PCNM14  1 245.04 1.0154  0.440   </span>
+<span class="co">## - PCNM6   1 245.16 1.1026  0.325   </span>
+<span class="co">## - PCNM18  1 245.16 1.1056  0.305   </span>
+<span class="co">## - PCNM4   1 245.24 1.1690  0.250   </span>
+<span class="co">## - PCNM12  1 245.19 1.1242  0.245   </span>
+<span class="co">## - PCNM23  1 245.42 1.3018  0.230   </span>
+<span class="co">## - PCNM13  1 245.30 1.2089  0.200   </span>
+<span class="co">## - PCNM2   1 245.28 1.1939  0.190   </span>
+<span class="co">## - PCNM26  1 245.50 1.3647  0.150   </span>
+<span class="co">## - PCNM21  1 245.51 1.3782  0.125   </span>
+<span class="co">## - PCNM27  1 245.42 1.3061  0.105   </span>
+<span class="co">## - PCNM5   1 245.58 1.4262  0.090 . </span>
+<span class="co">## - PCNM20  1 245.66 1.4883  0.090 . </span>
+<span class="co">## - PCNM10  1 245.62 1.4623  0.055 . </span>
+<span class="co">## - PCNM24  1 246.51 2.1501  0.015 * </span>
+<span class="co">## - PCNM11  1 246.31 1.9988  0.005 **</span>
+<span class="co">## - PCNM3   1 246.63 2.2490  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 + PCNM18 +      PCNM19 + PCNM20 + PCNM21 + PCNM23 + PCNM24 + PCNM25 + PCNM26 +      PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM1   1 243.98 0.9079  0.610   </span>
+<span class="co">## - PCNM25  1 244.01 0.9293  0.555   </span>
+<span class="co">## - PCNM19  1 244.04 0.9523  0.520   </span>
+<span class="co">## - PCNM7   1 244.06 0.9694  0.495   </span>
+<span class="co">## - PCNM8   1 244.11 1.0072  0.375   </span>
+<span class="co">## - PCNM14  1 244.12 1.0176  0.365   </span>
+<span class="co">## - PCNM6   1 244.23 1.1050  0.335   </span>
+<span class="co">## - PCNM12  1 244.26 1.1266  0.335   </span>
+<span class="co">## - PCNM18  1 244.24 1.1080  0.240   </span>
+<span class="co">## - PCNM13  1 244.37 1.2115  0.230   </span>
+<span class="co">## - PCNM4   1 244.32 1.1715  0.195   </span>
+<span class="co">## - PCNM2   1 244.35 1.1965  0.185   </span>
+<span class="co">## - PCNM23  1 244.49 1.3046  0.180   </span>
+<span class="co">## - PCNM26  1 244.57 1.3677  0.145   </span>
+<span class="co">## - PCNM20  1 244.73 1.4915  0.125   </span>
+<span class="co">## - PCNM27  1 244.49 1.3090  0.090 . </span>
+<span class="co">## - PCNM21  1 244.59 1.3812  0.085 . </span>
+<span class="co">## - PCNM5   1 244.65 1.4293  0.070 . </span>
+<span class="co">## - PCNM10  1 244.69 1.4655  0.050 * </span>
+<span class="co">## - PCNM11  1 245.38 2.0031  0.010 **</span>
+<span class="co">## - PCNM24  1 245.57 2.1547  0.005 **</span>
+<span class="co">## - PCNM3   1 245.69 2.2538  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 + PCNM8 +      PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 + PCNM18 + PCNM19 +      PCNM20 + PCNM21 + PCNM23 + PCNM24 + PCNM25 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM25  1 243.17 0.9304  0.575   </span>
+<span class="co">## - PCNM19  1 243.20 0.9534  0.530   </span>
+<span class="co">## - PCNM7   1 243.22 0.9706  0.525   </span>
+<span class="co">## - PCNM8   1 243.26 1.0084  0.450   </span>
+<span class="co">## - PCNM14  1 243.28 1.0188  0.380   </span>
+<span class="co">## - PCNM18  1 243.39 1.1093  0.335   </span>
+<span class="co">## - PCNM12  1 243.42 1.1280  0.255   </span>
+<span class="co">## - PCNM6   1 243.39 1.1063  0.245   </span>
+<span class="co">## - PCNM4   1 243.47 1.1729  0.220   </span>
+<span class="co">## - PCNM13  1 243.52 1.2130  0.220   </span>
+<span class="co">## - PCNM2   1 243.50 1.1979  0.205   </span>
+<span class="co">## - PCNM27  1 243.65 1.3105  0.165   </span>
+<span class="co">## - PCNM23  1 243.64 1.3062  0.145   </span>
+<span class="co">## - PCNM26  1 243.72 1.3693  0.140   </span>
+<span class="co">## - PCNM5   1 243.80 1.4310  0.115   </span>
+<span class="co">## - PCNM21  1 243.74 1.3829  0.110   </span>
+<span class="co">## - PCNM10  1 243.84 1.4672  0.100 . </span>
+<span class="co">## - PCNM20  1 243.88 1.4933  0.095 . </span>
+<span class="co">## - PCNM11  1 244.52 2.0055  0.015 * </span>
+<span class="co">## - PCNM24  1 244.71 2.1573  0.005 **</span>
+<span class="co">## - PCNM3   1 244.83 2.2565  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 + PCNM8 +      PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 + PCNM18 + PCNM19 +      PCNM20 + PCNM21 + PCNM23 + PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM7   1 242.39 0.9714  0.505   </span>
+<span class="co">## - PCNM19  1 242.37 0.9542  0.500   </span>
+<span class="co">## - PCNM8   1 242.44 1.0093  0.450   </span>
+<span class="co">## - PCNM14  1 242.45 1.0197  0.410   </span>
+<span class="co">## - PCNM6   1 242.56 1.1072  0.335   </span>
+<span class="co">## - PCNM12  1 242.59 1.1290  0.300   </span>
+<span class="co">## - PCNM18  1 242.56 1.1103  0.280   </span>
+<span class="co">## - PCNM2   1 242.67 1.1990  0.240   </span>
+<span class="co">## - PCNM4   1 242.64 1.1739  0.195   </span>
+<span class="co">## - PCNM13  1 242.69 1.2140  0.195   </span>
+<span class="co">## - PCNM23  1 242.81 1.3073  0.160   </span>
+<span class="co">## - PCNM26  1 242.89 1.3705  0.145   </span>
+<span class="co">## - PCNM27  1 242.81 1.3117  0.135   </span>
+<span class="co">## - PCNM21  1 242.90 1.3841  0.105   </span>
+<span class="co">## - PCNM20  1 243.04 1.4946  0.100 . </span>
+<span class="co">## - PCNM5   1 242.96 1.4322  0.080 . </span>
+<span class="co">## - PCNM10  1 243.01 1.4685  0.040 * </span>
+<span class="co">## - PCNM11  1 243.68 2.0072  0.010 **</span>
+<span class="co">## - PCNM24  1 243.86 2.1592  0.005 **</span>
+<span class="co">## - PCNM3   1 243.99 2.2585  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM8 + PCNM10 +      PCNM11 + PCNM12 + PCNM13 + PCNM14 + PCNM18 + PCNM19 + PCNM20 +      PCNM21 + PCNM23 + PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM19  1 241.57 0.9546  0.525   </span>
+<span class="co">## - PCNM14  1 241.66 1.0200  0.440   </span>
+<span class="co">## - PCNM8   1 241.64 1.0097  0.390   </span>
+<span class="co">## - PCNM6   1 241.76 1.1076  0.290   </span>
+<span class="co">## - PCNM18  1 241.77 1.1106  0.280   </span>
+<span class="co">## - PCNM12  1 241.79 1.1294  0.205   </span>
+<span class="co">## - PCNM4   1 241.85 1.1743  0.205   </span>
+<span class="co">## - PCNM2   1 241.88 1.1994  0.185   </span>
+<span class="co">## - PCNM26  1 242.09 1.3710  0.180   </span>
+<span class="co">## - PCNM13  1 241.90 1.2145  0.170   </span>
+<span class="co">## - PCNM27  1 242.01 1.3121  0.145   </span>
+<span class="co">## - PCNM21  1 242.10 1.3846  0.140   </span>
+<span class="co">## - PCNM23  1 242.01 1.3078  0.130   </span>
+<span class="co">## - PCNM20  1 242.24 1.4952  0.125   </span>
+<span class="co">## - PCNM5   1 242.16 1.4328  0.080 . </span>
+<span class="co">## - PCNM10  1 242.21 1.4690  0.055 . </span>
+<span class="co">## - PCNM11  1 242.87 2.0080  0.015 * </span>
+<span class="co">## - PCNM24  1 243.05 2.1600  0.010 **</span>
+<span class="co">## - PCNM3   1 243.17 2.2593  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM8 + PCNM10 +      PCNM11 + PCNM12 + PCNM13 + PCNM14 + PCNM18 + PCNM20 + PCNM21 +      PCNM23 + PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM8   1 240.81 1.0102  0.455   </span>
+<span class="co">## - PCNM14  1 240.83 1.0206  0.435   </span>
+<span class="co">## - PCNM18  1 240.94 1.1113  0.305   </span>
+<span class="co">## - PCNM12  1 240.96 1.1300  0.290   </span>
+<span class="co">## - PCNM6   1 240.93 1.1083  0.265   </span>
+<span class="co">## - PCNM2   1 241.04 1.2001  0.200   </span>
+<span class="co">## - PCNM4   1 241.01 1.1750  0.190   </span>
+<span class="co">## - PCNM13  1 241.06 1.2151  0.160   </span>
+<span class="co">## - PCNM26  1 241.25 1.3717  0.155   </span>
+<span class="co">## - PCNM27  1 241.18 1.3129  0.110   </span>
+<span class="co">## - PCNM23  1 241.18 1.3085  0.100 . </span>
+<span class="co">## - PCNM21  1 241.27 1.3853  0.100 . </span>
+<span class="co">## - PCNM5   1 241.33 1.4336  0.085 . </span>
+<span class="co">## - PCNM20  1 241.41 1.4960  0.080 . </span>
+<span class="co">## - PCNM10  1 241.37 1.4699  0.060 . </span>
+<span class="co">## - PCNM11  1 242.03 2.0091  0.010 **</span>
+<span class="co">## - PCNM24  1 242.21 2.1612  0.010 **</span>
+<span class="co">## - PCNM3   1 242.33 2.2606  0.010 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM10 + PCNM11 +      PCNM12 + PCNM13 + PCNM14 + PCNM18 + PCNM20 + PCNM21 + PCNM23 +      PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM14  1 240.05 1.0205  0.420   </span>
+<span class="co">## - PCNM6   1 240.16 1.1081  0.295   </span>
+<span class="co">## - PCNM12  1 240.18 1.1299  0.240   </span>
+<span class="co">## - PCNM4   1 240.24 1.1749  0.220   </span>
+<span class="co">## - PCNM2   1 240.27 1.1999  0.215   </span>
+<span class="co">## - PCNM18  1 240.16 1.1111  0.195   </span>
+<span class="co">## - PCNM13  1 240.28 1.2150  0.170   </span>
+<span class="co">## - PCNM26  1 240.47 1.3716  0.160   </span>
+<span class="co">## - PCNM23  1 240.40 1.3083  0.145   </span>
+<span class="co">## - PCNM27  1 240.40 1.3127  0.145   </span>
+<span class="co">## - PCNM21  1 240.49 1.3852  0.140   </span>
+<span class="co">## - PCNM20  1 240.62 1.4958  0.075 . </span>
+<span class="co">## - PCNM10  1 240.59 1.4697  0.070 . </span>
+<span class="co">## - PCNM5   1 240.55 1.4334  0.060 . </span>
+<span class="co">## - PCNM11  1 241.24 2.0088  0.010 **</span>
+<span class="co">## - PCNM3   1 241.53 2.2603  0.010 **</span>
+<span class="co">## - PCNM24  1 241.41 2.1609  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM10 + PCNM11 +      PCNM12 + PCNM13 + PCNM18 + PCNM20 + PCNM21 + PCNM23 + PCNM24 +      PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM6   1 239.38 1.1078  0.325   </span>
+<span class="co">## - PCNM18  1 239.38 1.1109  0.310   </span>
+<span class="co">## - PCNM12  1 239.40 1.1296  0.285   </span>
+<span class="co">## - PCNM4   1 239.46 1.1746  0.210   </span>
+<span class="co">## - PCNM27  1 239.62 1.3124  0.180   </span>
+<span class="co">## - PCNM13  1 239.50 1.2147  0.170   </span>
+<span class="co">## - PCNM2   1 239.49 1.1996  0.160   </span>
+<span class="co">## - PCNM26  1 239.69 1.3712  0.135   </span>
+<span class="co">## - PCNM23  1 239.62 1.3080  0.105   </span>
+<span class="co">## - PCNM20  1 239.84 1.4954  0.105   </span>
+<span class="co">## - PCNM21  1 239.71 1.3848  0.095 . </span>
+<span class="co">## - PCNM5   1 239.76 1.4330  0.065 . </span>
+<span class="co">## - PCNM10  1 239.81 1.4693  0.050 * </span>
+<span class="co">## - PCNM24  1 240.62 2.1604  0.010 **</span>
+<span class="co">## - PCNM11  1 240.44 2.0083  0.005 **</span>
+<span class="co">## - PCNM3   1 240.74 2.2597  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM10 + PCNM11 +      PCNM12 + PCNM13 + PCNM18 + PCNM20 + PCNM21 + PCNM23 + PCNM24 +      PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM12  1 238.71 1.1281  0.290   </span>
+<span class="co">## - PCNM18  1 238.69 1.1094  0.235   </span>
+<span class="co">## - PCNM2   1 238.79 1.1981  0.235   </span>
+<span class="co">## - PCNM4   1 238.76 1.1731  0.210   </span>
+<span class="co">## - PCNM13  1 238.81 1.2131  0.180   </span>
+<span class="co">## - PCNM27  1 238.93 1.3107  0.170   </span>
+<span class="co">## - PCNM23  1 238.92 1.3063  0.150   </span>
+<span class="co">## - PCNM21  1 239.01 1.3831  0.145   </span>
+<span class="co">## - PCNM26  1 238.99 1.3695  0.130   </span>
+<span class="co">## - PCNM5   1 239.07 1.4312  0.080 . </span>
+<span class="co">## - PCNM20  1 239.14 1.4935  0.080 . </span>
+<span class="co">## - PCNM10  1 239.11 1.4674  0.070 . </span>
+<span class="co">## - PCNM11  1 239.74 2.0058  0.015 * </span>
+<span class="co">## - PCNM24  1 239.91 2.1576  0.015 * </span>
+<span class="co">## - PCNM3   1 240.03 2.2568  0.010 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM10 + PCNM11 +      PCNM13 + PCNM18 + PCNM20 + PCNM21 + PCNM23 + PCNM24 + PCNM26 +      PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM18  1 238.01 1.1078  0.245   </span>
+<span class="co">## - PCNM13  1 238.13 1.2113  0.205   </span>
+<span class="co">## - PCNM4   1 238.08 1.1713  0.200   </span>
+<span class="co">## - PCNM2   1 238.11 1.1963  0.190   </span>
+<span class="co">## - PCNM27  1 238.24 1.3087  0.190   </span>
+<span class="co">## - PCNM23  1 238.23 1.3044  0.155   </span>
+<span class="co">## - PCNM21  1 238.32 1.3810  0.135   </span>
+<span class="co">## - PCNM26  1 238.31 1.3674  0.120   </span>
+<span class="co">## - PCNM20  1 238.45 1.4913  0.115   </span>
+<span class="co">## - PCNM10  1 238.42 1.4652  0.090 . </span>
+<span class="co">## - PCNM5   1 238.38 1.4290  0.085 . </span>
+<span class="co">## - PCNM24  1 239.21 2.1544  0.010 **</span>
+<span class="co">## - PCNM3   1 239.33 2.2534  0.010 **</span>
+<span class="co">## - PCNM11  1 239.04 2.0028  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM10 + PCNM11 +      PCNM13 + PCNM20 + PCNM21 + PCNM23 + PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM4   1 237.36 1.1698  0.255   </span>
+<span class="co">## - PCNM2   1 237.39 1.1948  0.230   </span>
+<span class="co">## - PCNM13  1 237.40 1.2098  0.190   </span>
+<span class="co">## - PCNM27  1 237.51 1.3071  0.165   </span>
+<span class="co">## - PCNM23  1 237.51 1.3027  0.140   </span>
+<span class="co">## - PCNM21  1 237.60 1.3792  0.135   </span>
+<span class="co">## - PCNM26  1 237.58 1.3657  0.095 . </span>
+<span class="co">## - PCNM20  1 237.72 1.4894  0.085 . </span>
+<span class="co">## - PCNM10  1 237.69 1.4634  0.070 . </span>
+<span class="co">## - PCNM5   1 237.65 1.4272  0.050 * </span>
+<span class="co">## - PCNM11  1 238.31 2.0002  0.015 * </span>
+<span class="co">## - PCNM24  1 238.48 2.1517  0.010 **</span>
+<span class="co">## - PCNM3   1 238.59 2.2506  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM2 + PCNM3 + PCNM5 + PCNM10 + PCNM11 + PCNM13 +      PCNM20 + PCNM21 + PCNM23 + PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM2   1 236.72 1.1925  0.255   </span>
+<span class="co">## - PCNM13  1 236.74 1.2074  0.175   </span>
+<span class="co">## - PCNM27  1 236.84 1.3046  0.135   </span>
+<span class="co">## - PCNM23  1 236.84 1.3002  0.125   </span>
+<span class="co">## - PCNM26  1 236.91 1.3630  0.120   </span>
+<span class="co">## - PCNM21  1 236.93 1.3766  0.100 . </span>
+<span class="co">## - PCNM20  1 237.05 1.4865  0.075 . </span>
+<span class="co">## - PCNM5   1 236.98 1.4245  0.065 . </span>
+<span class="co">## - PCNM10  1 237.02 1.4605  0.045 * </span>
+<span class="co">## - PCNM3   1 237.91 2.2462  0.015 * </span>
+<span class="co">## - PCNM24  1 237.79 2.1475  0.010 **</span>
+<span class="co">## - PCNM11  1 237.63 1.9963  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM5 + PCNM10 + PCNM11 + PCNM13 + PCNM20 +      PCNM21 + PCNM23 + PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM23  1 236.18 1.2974  0.175   </span>
+<span class="co">## - PCNM13  1 236.08 1.2048  0.170   </span>
+<span class="co">## - PCNM26  1 236.25 1.3601  0.150   </span>
+<span class="co">## - PCNM21  1 236.27 1.3735  0.130   </span>
+<span class="co">## - PCNM27  1 236.19 1.3017  0.120   </span>
+<span class="co">## - PCNM10  1 236.36 1.4574  0.090 . </span>
+<span class="co">## - PCNM5   1 236.32 1.4214  0.085 . </span>
+<span class="co">## - PCNM20  1 236.39 1.4833  0.085 . </span>
+<span class="co">## - PCNM24  1 237.12 2.1428  0.010 **</span>
+<span class="co">## - PCNM11  1 236.96 1.9920  0.005 **</span>
+<span class="co">## - PCNM3   1 237.23 2.2413  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM5 + PCNM10 + PCNM11 + PCNM13 + PCNM20 +      PCNM21 + PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM13  1 235.52 1.2008  0.195   </span>
+<span class="co">## - PCNM26  1 235.69 1.3555  0.195   </span>
+<span class="co">## - PCNM27  1 235.63 1.2974  0.180   </span>
+<span class="co">## - PCNM21  1 235.71 1.3690  0.110   </span>
+<span class="co">## - PCNM20  1 235.83 1.4783  0.105   </span>
+<span class="co">## - PCNM10  1 235.80 1.4525  0.085 . </span>
+<span class="co">## - PCNM5   1 235.76 1.4166  0.075 . </span>
+<span class="co">## - PCNM11  1 236.39 1.9854  0.010 **</span>
+<span class="co">## - PCNM3   1 236.66 2.2339  0.010 **</span>
+<span class="co">## - PCNM24  1 236.55 2.1356  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM5 + PCNM10 + PCNM11 + PCNM20 + PCNM21 +      PCNM24 + PCNM26 + PCNM27 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM27  1 234.95 1.2945  0.150   </span>
+<span class="co">## - PCNM26  1 235.01 1.3525  0.145   </span>
+<span class="co">## - PCNM21  1 235.03 1.3659  0.115   </span>
+<span class="co">## - PCNM20  1 235.15 1.4750  0.105   </span>
+<span class="co">## - PCNM5   1 235.08 1.4135  0.085 . </span>
+<span class="co">## - PCNM10  1 235.12 1.4493  0.060 . </span>
+<span class="co">## - PCNM3   1 235.97 2.2289  0.015 * </span>
+<span class="co">## - PCNM11  1 235.70 1.9809  0.010 **</span>
+<span class="co">## - PCNM24  1 235.86 2.1309  0.010 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM5 + PCNM10 + PCNM11 + PCNM20 + PCNM21 +      PCNM24 + PCNM26 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM26  1 234.42 1.3482  0.200   </span>
+<span class="co">## - PCNM21  1 234.44 1.3615  0.120   </span>
+<span class="co">## - PCNM20  1 234.55 1.4703  0.080 . </span>
+<span class="co">## - PCNM10  1 234.53 1.4446  0.065 . </span>
+<span class="co">## - PCNM5   1 234.49 1.4089  0.045 * </span>
+<span class="co">## - PCNM24  1 235.26 2.1240  0.015 * </span>
+<span class="co">## - PCNM11  1 235.10 1.9745  0.010 **</span>
+<span class="co">## - PCNM3   1 235.36 2.2217  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM5 + PCNM10 + PCNM11 + PCNM20 + PCNM21 +      PCNM24 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM21  1 233.88 1.3564  0.140   </span>
+<span class="co">## - PCNM5   1 233.94 1.4036  0.085 . </span>
+<span class="co">## - PCNM10  1 233.97 1.4391  0.065 . </span>
+<span class="co">## - PCNM20  1 234.00 1.4647  0.055 . </span>
+<span class="co">## - PCNM24  1 234.69 2.1160  0.010 **</span>
+<span class="co">## - PCNM11  1 234.54 1.9671  0.005 **</span>
+<span class="co">## - PCNM3   1 234.80 2.2133  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM5 + PCNM10 + PCNM11 + PCNM20 + PCNM24 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM10  1 233.41 1.4337  0.115   </span>
+<span class="co">## - PCNM5   1 233.38 1.3982  0.095 . </span>
+<span class="co">## - PCNM20  1 233.44 1.4591  0.095 . </span>
+<span class="co">## - PCNM3   1 234.23 2.2049  0.015 * </span>
+<span class="co">## - PCNM11  1 233.97 1.9596  0.005 **</span>
+<span class="co">## - PCNM24  1 234.13 2.1079  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM5 + PCNM11 + PCNM20 + PCNM24 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM20  1 232.95 1.4524  0.130   </span>
+<span class="co">## - PCNM5   1 232.88 1.3918  0.060 . </span>
+<span class="co">## - PCNM24  1 233.62 2.0983  0.020 * </span>
+<span class="co">## - PCNM11  1 233.47 1.9506  0.010 **</span>
+<span class="co">## - PCNM3   1 233.72 2.1947  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM5 + PCNM11 + PCNM24 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM5   1 232.40 1.3852  0.080 . </span>
+<span class="co">## - PCNM11  1 232.97 1.9414  0.010 **</span>
+<span class="co">## - PCNM24  1 233.12 2.0883  0.005 **</span>
+<span class="co">## - PCNM3   1 233.22 2.1843  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></code></pre>
+<pre><code><span class="co">## </span>
+<span class="co">## Start: bird_com ~ PCNM3 + PCNM5 + PCNM11 + PCNM24 + PC1 + PC2 + PC3 +      PC4 + PC5 + PC6 + PC7 + PC8 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM5   1 225.34 0.9216  0.590   </span>
+<span class="co">## - PCNM11  1 225.43 0.9965  0.405   </span>
+<span class="co">## - PCNM3   1 225.68 1.2213  0.185   </span>
+<span class="co">## - PC3     1 225.68 1.2196  0.155   </span>
+<span class="co">## - PC7     1 225.92 1.4302  0.095 . </span>
+<span class="co">## - PCNM24  1 225.88 1.3960  0.090 . </span>
+<span class="co">## - PC4     1 226.20 1.6807  0.035 * </span>
+<span class="co">## - PC8     1 226.56 1.9976  0.020 * </span>
+<span class="co">## - PC6     1 226.45 1.8997  0.015 * </span>
+<span class="co">## - PC5     1 226.47 1.9190  0.015 * </span>
+<span class="co">## - PC2     1 228.40 3.6539  0.005 **</span>
+<span class="co">## - PC1     1 233.74 8.6180  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM11 + PCNM24 + PC1 + PC2 + PC3 + PC4 +      PC5 + PC6 + PC7 + PC8 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM11  1 224.47 0.9973  0.410   </span>
+<span class="co">## - PC3     1 224.73 1.2311  0.175   </span>
+<span class="co">## - PCNM3   1 224.79 1.2808  0.125   </span>
+<span class="co">## - PCNM24  1 224.93 1.4083  0.090 . </span>
+<span class="co">## - PC7     1 225.04 1.5076  0.080 . </span>
+<span class="co">## - PC4     1 225.26 1.7026  0.030 * </span>
+<span class="co">## - PC6     1 225.68 2.0825  0.010 **</span>
+<span class="co">## - PC5     1 225.53 1.9410  0.005 **</span>
+<span class="co">## - PC8     1 225.80 2.1849  0.005 **</span>
+<span class="co">## - PC2     1 227.39 3.6351  0.005 **</span>
+<span class="co">## - PC1     1 232.78 8.7036  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM3 + PCNM24 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 +      PC7 + PC8 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PCNM3   1 223.91 1.2912  0.135   </span>
+<span class="co">## - PCNM24  1 224.04 1.4040  0.095 . </span>
+<span class="co">## - PC7     1 224.23 1.5793  0.055 . </span>
+<span class="co">## - PC3     1 224.06 1.4295  0.050 * </span>
+<span class="co">## - PC4     1 224.37 1.7050  0.010 **</span>
+<span class="co">## - PC6     1 224.75 2.0534  0.010 **</span>
+<span class="co">## - PC8     1 224.91 2.1947  0.010 **</span>
+<span class="co">## - PC5     1 224.71 2.0183  0.005 **</span>
+<span class="co">## - PC2     1 226.48 3.6409  0.005 **</span>
+<span class="co">## - PC1     1 232.58 9.4698  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">## </span>
+<span class="co">## Step: bird_com ~ PCNM24 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 +      PC8 </span>
+<span class="co">## </span>
+<span class="co">##          Df    AIC      F Pr(&gt;F)   </span>
+<span class="co">## - PC3     1 223.53 1.4640  0.095 . </span>
+<span class="co">## - PCNM24  1 223.46 1.4000  0.075 . </span>
+<span class="co">## - PC7     1 223.70 1.6254  0.050 * </span>
+<span class="co">## - PC4     1 223.74 1.6609  0.020 * </span>
+<span class="co">## - PC5     1 224.10 1.9968  0.010 **</span>
+<span class="co">## - PC8     1 224.38 2.2534  0.005 **</span>
+<span class="co">## - PC6     1 224.73 2.5701  0.005 **</span>
+<span class="co">## - PC2     1 226.25 3.9956  0.005 **</span>
+<span class="co">## - PC1     1 231.94 9.4946  0.005 **</span>
+<span class="co">## ---</span>
+<span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></code></pre>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># fitted_126 &lt;- fitted(birds1.rda.fin, model = "CCA")</span>
+<span class="va">p_hats_birds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">bird_com</span>, <span class="fl">2</span>, <span class="va">mean</span><span class="op">)</span>
+<span class="va">p_hats_birds</span></code></pre></div>
+<pre><code><span class="co">##        Acridotheres javanicus              Aegithina tiphia </span>
+<span class="co">##                          1.00                          0.42 </span>
+<span class="co">##        Amaurornis phoenicurus            Aplonis panayensis </span>
+<span class="co">##                          0.16                          0.95 </span>
+<span class="co">##                      Apodidae                Ardea purpurea </span>
+<span class="co">##                          0.99                          0.09 </span>
+<span class="co">##                  Ardeola spp.                 Bubulcus ibis </span>
+<span class="co">##                          0.02                          0.06 </span>
+<span class="co">##             Butorides striata            Cinnyris jugularis </span>
+<span class="co">##                          0.06                          0.97 </span>
+<span class="co">##                 Columba livia            Copsychus saularis </span>
+<span class="co">##                          0.82                          0.10 </span>
+<span class="co">##              Corvus splendens            Dicaeum cruentatum </span>
+<span class="co">##                          0.83                          0.74 </span>
+<span class="co">##         Eudynamys scolopaceus              Geopelia striata </span>
+<span class="co">##                          0.62                          0.45 </span>
+<span class="co">##            Halcyon smyrnensis               Haliastur indus </span>
+<span class="co">##                          0.27                          0.11 </span>
+<span class="co">##        Hemiprocne longipennis               Hirundo rustica </span>
+<span class="co">##                          0.10                          0.34 </span>
+<span class="co">##           Ixobrychus sinensis              Lanius cristatus </span>
+<span class="co">##                          0.03                          0.13 </span>
+<span class="co">##           Lonchura punctulata            Loriculus galgulus </span>
+<span class="co">##                          0.17                          0.52 </span>
+<span class="co">##            Muscicapa dauurica             Oriolus chinensis </span>
+<span class="co">##                          0.56                          0.91 </span>
+<span class="co">##           Orthotomus sutorius          Psittacula alexandri </span>
+<span class="co">##                          0.48                          0.52 </span>
+<span class="co">##            Psittacula krameri         Psittacula longicauda </span>
+<span class="co">##                          0.31                          0.38 </span>
+<span class="co">##                 Psittaculidae           Pycnonotus goiavier </span>
+<span class="co">##                          0.08                          0.87 </span>
+<span class="co">##            Rhipidura javanica        Streptopelia chinensis </span>
+<span class="co">##                          0.11                          0.96 </span>
+<span class="co">##           Todiramphus chloris                Treron vernans </span>
+<span class="co">##                          0.33                          0.73 </span>
+<span class="co">##        Yungipicus moluccensis         Zosterops palpebrosus </span>
+<span class="co">##                          0.55                          0.79 </span>
+<span class="co">##               Apus nipalensis                 Ardea cinerea </span>
+<span class="co">##                          0.02                          0.06 </span>
+<span class="co">##            Dinopium javanense        Haliaeetus leucogaster </span>
+<span class="co">##                          0.25                          0.04 </span>
+<span class="co">##                 Lanius schach           Orthotomus ruficeps </span>
+<span class="co">##                          0.23                          0.03 </span>
+<span class="co">##               Passer montanus          Pelargopsis capensis </span>
+<span class="co">##                          0.61                          0.01 </span>
+<span class="co">##      Trichoglossus haematodus            Agropsar sturninus </span>
+<span class="co">##                          0.09                          0.15 </span>
+<span class="co">## Gallus gallus (domestic type)                   Lanius spp. </span>
+<span class="co">##                          0.08                          0.01 </span>
+<span class="co">##                Merops viridis       Micropternus brachyurus </span>
+<span class="co">##                          0.13                          0.05 </span>
+<span class="co">##         Anthreptes malacensis              Hirundo tahitica </span>
+<span class="co">##                          0.66                          0.58 </span>
+<span class="co">##         Phylloscopus borealis          Acridotheres tristis </span>
+<span class="co">##                          0.28                          0.38 </span>
+<span class="co">##                      Ardeidae          Corvus macrorhynchos </span>
+<span class="co">##                          0.04                          0.06 </span>
+<span class="co">##              Falco peregrinus                  Lalage nigra </span>
+<span class="co">##                          0.02                          0.29 </span>
+<span class="co">##        Orthotomus atrogularis                Anthus rufulus </span>
+<span class="co">##                          0.13                          0.17 </span>
+<span class="co">##           Dicrurus paradiseus              Egretta garzetta </span>
+<span class="co">##                          0.05                          0.05 </span>
+<span class="co">##          Pernis ptilorhynchus                Ducula bicolor </span>
+<span class="co">##                          0.14                          0.20 </span>
+<span class="co">##            Gerygone sulphurea            Dicrurus annectans </span>
+<span class="co">##                          0.16                          0.01 </span>
+<span class="co">##            Merops philippinus              Ardea intermedia </span>
+<span class="co">##                          0.31                          0.02 </span>
+<span class="co">##            Cisticola juncidis            Actitis hypoleucos </span>
+<span class="co">##                          0.03                          0.01 </span>
+<span class="co">##               Lanius tigrinus             Motacilla cinerea </span>
+<span class="co">##                          0.01                          0.01 </span>
+<span class="co">##              Elanus caeruleus            Pycnonotus jocosus </span>
+<span class="co">##                          0.01                          0.10 </span>
+<span class="co">##       Chrysococcyx minutillus                  Hirundo spp. </span>
+<span class="co">##                          0.02                          0.02 </span>
+<span class="co">##            Cacatua goffiniana         Eurystomus orientalis </span>
+<span class="co">##                          0.12                          0.13 </span>
+<span class="co">##                Picus vittatus      Psilopogon haemacephalus </span>
+<span class="co">##                          0.06                          0.07 </span>
+<span class="co">##            Chalcophaps indica       Chrysophlegma miniaceum </span>
+<span class="co">##                          0.01                          0.05 </span>
+<span class="co">##           Cuculus micropterus            Nisaetus cirrhatus </span>
+<span class="co">##                          0.01                          0.04 </span>
+<span class="co">##           Orthotomus sericeus         Pycnonotus aurigaster </span>
+<span class="co">##                          0.04                          0.09 </span>
+<span class="co">##              Mixornis gularis                      Rallidae </span>
+<span class="co">##                          0.07                          0.01 </span>
+<span class="co">##          Ficedula zanthopygia                Muscicapa spp. </span>
+<span class="co">##                          0.01                          0.02 </span>
+<span class="co">##         Centropus bengalensis              Cecropis daurica </span>
+<span class="co">##                          0.01                          0.02 </span>
+<span class="co">##           Ploceus philippinus             Aviceda leuphotes </span>
+<span class="co">##                          0.03                          0.01 </span>
+<span class="co">##      Pericrocotus divaricatus           Psilopogon lineatus </span>
+<span class="co">##                          0.02                          0.05 </span>
+<span class="co">##           Prinia flaviventris           Pycnonotus plumosus </span>
+<span class="co">##                          0.03                          0.02 </span>
+<span class="co">##                 Lonchura spp.            Centropus sinensis </span>
+<span class="co">##                          0.01                          0.01 </span>
+<span class="co">##             Gracula religiosa             Pandion haliaetus </span>
+<span class="co">##                          0.03                          0.01 </span>
+<span class="co">##     Anthracoceros albirostris         Accipiter trivirgatus </span>
+<span class="co">##                          0.02                          0.01 </span>
+<span class="co">##                   Corvus spp.        Gallus gallus (hybrid) </span>
+<span class="co">##                          0.01                          0.01 </span>
+<span class="co">##            Aethopyga siparaja   Chrysococcyx xanthorhynchus </span>
+<span class="co">##                          0.01                          0.02 </span>
+<span class="co">##         Hierococcyx nisicolor      Lonchura leucogastroides </span>
+<span class="co">##                          0.01                          0.01 </span>
+<span class="co">##          Garrulax leucolophus         Pycnonotus zeylanicus </span>
+<span class="co">##                          0.01                          0.02 </span>
+<span class="co">##          Terpsiphone paradisi                 Nectariniidae </span>
+<span class="co">##                          0.01                          0.01 </span>
+<span class="co">##          Muscicapa ferruginea          Lonchura atricapilla </span>
+<span class="co">##                          0.01                          0.01 </span>
+<span class="co">##                 Mycteria spp. </span>
+<span class="co">##                          0.01</span></code></pre>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">pca_birds</span>,
+     <span class="va">raw_pcnm_birds</span>, <span class="va">plots.pcnm_birds</span>,
+     <span class="va">birds.rda.fin</span>, 
+     <span class="va">p_hats_birds</span>,
+     file <span class="op">=</span> <span class="st">"./your/working/directory/beta_model_birds.Rdata"</span><span class="op">)</span></code></pre></div>
+<hr>
+</div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
