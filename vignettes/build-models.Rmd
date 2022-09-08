@@ -13,11 +13,17 @@ vignette: >
 Following the preparation of collected fauna and landscape data, this article outlines a workflow to build predictive models of animal diversity. Species density at sampling points were modelled against the summarised landscape metrics with generalised linear mixed-effects models (GLMMs) using the `MuMIn::dredge` function. However, owing to the large number of landscape predictors at multiple buffer radii generated from the remotely
 sensed and open data, variable selection has to be performed as there is a limit to the number of variables `MuMIn::dredge` is allowed to accept.
 
-## Combining fauna and landscape data
+### If too many variables are present for `MuMIn::dredge`:
 
-To build the models, animal and landscape datasets as processed in the previous two articles have to be combined and prepared.
+For this collection of articles, random forest models were first used to select variables based on their relative importance in improving model performance, i.e., averaged variable importance (Arthur et al., 2010; Li et al., 2017). The random forest algorithm is a machine learning technique that can handle and reduce the effects of overfitting, as well as the collinearity and selection bias of predictors (Hothorn et al., 2006). In the following sections, the example variables were selected using the `randomForest` package.
 
-First, load the required packages to run the analysis:
+---
+
+## Alpha diversity models
+
+### Building the GLM models
+
+Now, load the necessary packages to run the model building:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
 library("biodivercity")
@@ -25,6 +31,9 @@ library("tidyverse") # to process/wrangle data
 library("sf") # to process landscape data
 library("tmap")
 library("kableExtra")
+
+library("lme4")
+library("MuMIn")
 ```
 
 ```{r load biodivercity while in dev, include = FALSE}
@@ -33,105 +42,16 @@ library("tidyverse")
 library("sf") 
 library("tmap")
 library("kableExtra")
-```
 
-In this short example, load the datasets and filter for `area == "PG"` and `period == 1` only.
-```{r}
-data(animal_observations)
-data(animal_surveys)
-data("sampling_points") 
-
-
-observations <- animal_observations %>% 
-  dplyr::filter(area == "PG") %>% 
-  dplyr::filter(period == 1)
-
-surveys <- animal_surveys %>% 
-  dplyr::filter(area == "PG") %>% 
-  dplyr::filter(period == 1)
-
-points <- sampling_points %>% 
-  dplyr::filter(area == "PG") %>% 
-  dplyr::filter(period == 1)
-```
-
-Animal observations are then tallied to retrieve species richness at each point. The `tally_observations` function can be used with the argument `level = "point"`.
-
-```{r}
-birds <- tally_observations(observations,
-                            surveys,
-                            specify_taxon = "Aves",
-                            specify_area = "PG",
-                            specify_period = 1,
-                            level = "point") %>%
-  rename(sprich = n)
-```
-
-Re-calculate the landscape metrics for the area of Punggol with the `ndvi_mosaic.tif` raster by first classifying for vegetation with `classify_image_binary()`. 
-
-```{r}
-ndvi_mosaic <- 
-  system.file("extdata", "ndvi_mosaic.tif", package="biodivercity") %>% 
-  terra::rast()
-
-veg_classified <- classify_image_binary(ndvi_mosaic, threshold = "otsu")
-```
-
-```{r, include = FALSE}
-tmap_mode("view")
-tmap_options(check.and.fix = TRUE)
-
-tm_shape(ndvi_mosaic) +
-  tm_raster(palette = c("Greens")) +
-tm_shape(veg_classified) +
-  tm_raster(title = "veg_classified",
-            style = "cat",
-            palette = c("grey", "darkgreen")) +
-tm_shape(sampling_points) +
-  tm_dots(col = "yellow")
-```
-
-The classified raster `veg_classified` is then input into `genfeatures_lsm()` as per the `Process landscape` article to retrieve relevant landscape metrics.
-
-```{r, eval = FALSE}
-points <- genfeatures_lsm(raster = veg_classified,
-                          points = points,
-                          buffer_sizes = c(100, 200), # in metres
-                          level = c("class"),
-                          class_names = c("veg"),
-                          class_values = c(1)) # pixel value of class
-```
-
-Finally, the two datasets will be combined with an `inner_join()`. An input dataset for model building will follow the same format.
-
-```{r, eval = FALSE}
-birds <- birds %>% 
-  inner_join(points, 
-             by = c("town", "round", "point_id"))
-
-head(birds)
-```
-
----
-
-### If too many variables are present for `MuMIn::dredge`:
-
-For this collection of articles, random forest models were first used to select variables based on their relative importance in improving model performance, i.e., averaged variable importance (Arthur et al., 2010; Li et al., 2017). The random forest algorithm is a machine learning technique that can handle and reduce the effects of overfitting, as well as the collinearity and selection bias of predictors (Hothorn et al., 2006). In the following sections, the example variables were selected using the `randomForest` package.
-
-## Building the GLM models
-
-Now, load the necessary packages to run the model building:
-
-```{r load more libraries, message = FALSE, warning = FALSE}
 library("lme4")
 library("MuMIn")
 ```
 
-Bird species density and landscape data for sampling points across six areas (towns) in Singapore from the example data `model_data` will be used to demonstrate the model building process in this article. The variable selection output using random forest is also loaded from `model_variables` to inform `MuMIn::dredge`.
+Bird species density and landscape data for sampling points across six areas (towns) in Singapore from the example data `model_data` will be used to demonstrate the model building process in this article. In this example dataset, animal and landscape datasets as processed in the previous two articles were combined. The variable selection output using random forest is also loaded from `model_variables` to inform `MuMIn::dredge`. 
 
 ```{r load example data, eval = FALSE}
-data(model_data)
-data(model_variables)
+system.file("extdata", "model_data", package="biodivercity") # model_data has been filtered to match model_variables 
+system.file("extdata", "model_variables", package="biodivercity")
 ```
 
 Before running `MuMIn::dredge`, model constraints have to be considered to avoid combinations of variables that represented similar landscape characteristics. For example, for each land cover class, only one of each metric type could be present in the fitted model, and similar landscape predictors at different buffer radii were not allowed. To do so, `MuMIn::dredge` accepts expressions for the `subset` argument and such an object is automatically created from `model_variables` below.
@@ -235,12 +155,12 @@ model_glm <- subset(model_glm,
 filepath <- system.file("extdata", "models-remote-post-rf_sample.Rdata", package = "biodivercity")
 load(filepath)
 
-data(model_data)
+filepath <- system.file("extdata", "model_data.Rdata", package = "biodivercity")
+load(filepath)
 
 model_data <- model_data %>% 
-  mutate(across(.cols = where(is.numeric) & 
-                  !sprich, 
-                scale)) 
+  dplyr::mutate(across(.cols = where(is.numeric) & !sprich, 
+                scale))
 ```
 
 The resulting `model_glm` object contains all of the top models with values of ΔAIC < 8. Here, a summary of the top models with values of ΔAIC < 2 can be viewed:
@@ -260,7 +180,7 @@ knitr::kable(to_print, caption = glue::glue("**Summary of best models ranked bas
   kable_styling("striped") %>% scroll_box(width = "100%", height = "300px")
 ```
 
-Furthermore, to View the breakdown of variables in the top models, a plot of the top important variables and their sum of model weights across all models can be produced:
+For a visual breakdown of variables in the top models, a plot of the top important variables and their sum of model weights across all models can be produced:
 
 ```{r plot of coefs, message = FALSE}
 coef <- data.frame(coef(bestmodels_info)[,-1]) %>% 
@@ -282,9 +202,6 @@ ggplot(data=imp, aes(x = imp, y = reorder(var, imp),
   scale_fill_manual(values = c("#4daf4a", "#e41a1c", "#377eb8"),
                     name = "Effect")
 
-knitr::kable(coef, caption = glue::glue("**Mean coefficient value for each predictor within the best models.**")) %>%
-  kable_styling("striped") %>% scroll_box(width = "100%", height = "300px")
-
 ```
 
 ```{r, include = FALSE}
@@ -296,7 +213,145 @@ rm(filepath, to_print, coef, imp)
 rm(bestmodels_info)
 ```
 
+---
+
 <br>
+
+## Beta diversity models
+
+### Variable selection
+
+Similarly, variable selection by random forest was performed on the landscape variables prior to beta model building. In the following sections, the example variables were selected using the `randomForestSRC` and `MultivariateRandomForest` packages.
+
+### Building the PCA, PCNM and RDA models
+
+Load the additional package `vegan` for beta diversity model building:
+
+```{r load vegan, message = FALSE, warning = FALSE}
+library("vegan")
+```
+
+As before, bird species density and landscape data for sampling points across six areas (towns) in Singapore will be analysed in this example. In this example dataset `beta_model_data`, animal and landscape datasets as processed in the previous two articles were combined. The variable selection output using random forest is also loaded from `beta_model_variables` to inform the principal component analysis (PCA) of the selected landscape variables later. 
+
+```{r load data, message = FALSE, warning = FALSE}
+filepath <- system.file("extdata", "beta_model_data.Rdata", package="biodivercity") #summarised landscape information per point
+load(filepath)
+
+filepath <- system.file("extdata", "beta_model_variables.Rdata", package="biodivercity")
+load(filepath)
+
+# load("../inst/extdata/beta_model_data.Rdata")
+# load("../inst/extdata/beta_model_variables.Rdata")
+
+data("animal_observations")
+data("sampling_points")
+
+sampling_points <- sampling_points %>% 
+  filter(period == 1)
+```
+
+Next, we process the fauna datasets into acceptable formats for analyses.
+
+```{r removing extra genus/family lvl records}
+rmspp <- check_taxongrps(animal_observations, level = "point") 
+
+animal_observations <- animal_observations %>%
+  anti_join(rmspp, by = c("species" = "name","point_id", "period")) %>% 
+  mutate(period = as.character(period))
+```
+
+An presence/absence community matrix is created from the observations to summarise total species incidence. 
+
+```{r creating a presence/absence matrix, message = FALSE, warning = FALSE}
+bird_com <- animal_observations %>% 
+  filter(taxon == "Aves") %>%
+  group_by(period, point_id, species) %>%
+  summarise(n = sum(abundance)) %>%
+  group_by(point_id, period) %>%
+  pivot_wider(names_from = species, values_from = n) %>%
+  replace(is.na(.),0) %>%
+  ungroup()  %>%
+  semi_join(beta_model_data, by = c("point_id", "period" = "round")) %>% # filtering for the same period
+  as.data.frame(.) %>% 
+  dplyr::select(-period, -point_id)
+
+bird_com <- bird_com %>% 
+  mutate(across(.cols = everything(), ~ case_when(. > 0 ~ 1,
+                                                  . == 0 ~ 0))) %>% 
+  select(which(colMeans(.)>0))
+  
+rm(rmspp)
+```
+
+After the `birds` dataset has been used to filter `bird_com`, it is further processed to include coordinate information for PCNM analysis later.
+
+```{r appending spatial information to landscape dataset, message = FALSE, warning = FALSE}
+beta_model_data <- beta_model_data %>% 
+  select(!c(town, round, priority, sprich)) %>% #keep only point_id and landscape variables
+  arrange(point_id) %>% #sort alphabetically
+  
+  #adding coordinate information
+  mutate(X = {(sampling_points$geometry[match(beta_model_data$point_id,sampling_points$point_id)] %>% sf::st_coordinates())[,2]}, 
+         .after = point_id) %>% 
+  mutate(Y = {(sampling_points$geometry[match(beta_model_data$point_id,sampling_points$point_id)] %>% sf::st_coordinates())[,1]},
+         .after = X)
+```
+
+Using the variables selected by random forest, principal component analysis (PCA) is performed for dimensionality reduction to further decrease the number of input variables. **Unsure**
+
+```{r diagnosis by PCA}
+imp_var_birds <- beta_model_variables$var
+
+pca_birds <- beta_model_data %>% select(any_of(imp_var_birds)) %>% prcomp(.,scale.=TRUE)
+
+biplot(pca_birds, choices=c(1,2))
+# view(pca_birds$rotation)
+
+birds_select <- which(pca_birds$sdev > 1)
+
+birds_selected <- beta_model_data %>% dplyr::select(X) %>% cbind(pca_birds$x[,birds_select]) %>% dplyr::select(-X)
+```
+
+```{r PCNM, message = FALSE, warning = FALSE, echo = FALSE}
+plots.xy <- cbind(beta_model_data$X,beta_model_data$Y)
+plots.pcnm_birds <-data.frame(scores(pcnm(dist(plots.xy))))
+
+set.seed(123)
+
+birds.pcnm.all <- rda(bird_com~.,data=plots.pcnm_birds)
+birds.pcnm.sub <- ordistep(birds.pcnm.all, direction = "backward",pout=0.075)
+# birds.pcnm.fin <- update(birds.pcnm.sub, ~. -PCNM7-PCNM19)
+# birds.pcnm.fin$terms
+
+# plots.pcnm_birds <- plots.pcnm_birds %>% dplyr::select(PCNM1, PCNM2, PCNM3, PCNM4, PCNM5)
+
+raw_pcnm_birds <- pcnm(dist(plots.xy))
+```
+
+```{r stepwise selection with env vars, message = FALSE, warning = FALSE, echo = FALSE}
+birds_selected <- cbind(birds_selected,plots.pcnm_birds)
+
+birds.rda.all <- update(birds.pcnm.sub, ~. +PC1 +PC2 +PC3 +PC4 +PC5 +PC6 +PC7 +PC8, data = birds_selected) #add landscape variables
+
+birds.rda.sub <- ordistep(birds.rda.all, direction = "backward") #assess p-value for dropping
+
+birds.rda.fin <- rda(bird_com ~ PC1 + PC2 + PC4 + PC6 + PC7 + PC8 + Condition(PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5), data=birds_selected)#find a cleaner selection for scales?
+
+```
+
+```{r p-hats}
+# fitted_126 <- fitted(birds1.rda.fin, model = "CCA")
+p_hats_birds <- apply(bird_com, 2, mean)
+p_hats_birds
+```
+
+```{r save beta model objs, eval = FALSE}
+save(pca_birds,
+     raw_pcnm_birds, plots.pcnm_birds,
+     birds.rda.fin, 
+     p_hats_birds,
+     file = "./your/working/directory/beta_model_birds.Rdata")
+```
 
 ---
 
