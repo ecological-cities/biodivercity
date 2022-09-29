@@ -102,7 +102,7 @@
 models with processed animal and landscape data</h3>
                         <h4 data-toc-skip class="author">Edwin Tan</h4>
             
-            <h4 data-toc-skip class="date">2022-09-08</h4>
+            <h4 data-toc-skip class="date">2022-09-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/build-models.Rmd" class="external-link"><code>vignettes/build-models.Rmd</code></a></small>
       <div class="d-none name"><code>build-models.Rmd</code></div>
@@ -112,16 +112,11 @@ models with processed animal and landscape data</h3>
     
 <p>Following the preparation of collected fauna and landscape data, this
 article outlines a workflow to build predictive models of animal
-diversity. Species density at sampling points were modelled against the
-summarised landscape metrics with generalised linear mixed-effects
-models (GLMMs) using the <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code> function. However,
-owing to the large number of landscape predictors at multiple buffer
-radii generated from the remotely sensed and open data, variable
-selection has to be performed as there is a limit to the number of
-variables <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code> is allowed to accept.</p>
+diversity. We drew on the community ecology theory and the concept of
+‘decomposing’ diversity into α-diversity and β-diversity components. A
+predictive model was built for each of the diversity components.</p>
 <div class="section level3">
-<h3 id="if-too-many-variables-are-present-for-mumindredge">If too many variables are present for
-<code>MuMIn::dredge</code>:<a class="anchor" aria-label="anchor" href="#if-too-many-variables-are-present-for-mumindredge"></a>
+<h3 id="if-too-many-variables-are-present">If too many variables are present:<a class="anchor" aria-label="anchor" href="#if-too-many-variables-are-present"></a>
 </h3>
 <p>For this collection of articles, random forest models were first used
 to select variables based on their relative importance in improving
@@ -130,8 +125,8 @@ model performance, i.e., averaged variable importance (Arthur et al.,
 learning technique that can handle and reduce the effects of
 overfitting, as well as the collinearity and selection bias of
 predictors (Hothorn et al., 2006). In the following sections, the
-example variables were selected using the <code>randomForest</code>
-package.</p>
+example variables were for both α-diversity and β-diversity models were
+selected using the <code>randomForest</code> package.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -140,9 +135,16 @@ package.</p>
 <div class="section level3">
 <h3 id="building-the-glm-models">Building the GLM models<a class="anchor" aria-label="anchor" href="#building-the-glm-models"></a>
 </h3>
-<p>Now, load the necessary packages to run the model building:</p>
+<p>Species density at sampling points were modelled against the
+summarised landscape metrics with generalised linear mixed-effects
+models (GLMMs) using the <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code> function. However,
+owing to the large number of landscape predictors at multiple buffer
+radii generated from the remotely sensed and open data, variable
+selection has to be performed as there is a limit to the number of
+variables <code><a href="https://rdrr.io/pkg/MuMIn/man/dredge.html" class="external-link">MuMIn::dredge</a></code> is allowed to accept.</p>
+<p>First, load the necessary packages to run the model building:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"biodivercity"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ecological-cities/biodivercity" class="external-link">"biodivercity"</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://tidyverse.tidyverse.org" class="external-link">"tidyverse"</a></span><span class="op">)</span> <span class="co"># to process/wrangle data</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-spatial.github.io/sf/" class="external-link">"sf"</a></span><span class="op">)</span> <span class="co"># to process landscape data</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/mtennekes/tmap" class="external-link">"tmap"</a></span><span class="op">)</span>
@@ -692,19 +694,21 @@ can be produced:</p>
 <h2 id="beta-diversity-models">Beta diversity models<a class="anchor" aria-label="anchor" href="#beta-diversity-models"></a>
 </h2>
 <div class="section level3">
-<h3 id="variable-selection">Variable selection<a class="anchor" aria-label="anchor" href="#variable-selection"></a>
+<h3 id="building-the-partial-rda-models">Building the partial RDA models<a class="anchor" aria-label="anchor" href="#building-the-partial-rda-models"></a>
 </h3>
-<p>Similarly, variable selection by random forest was performed on the
-landscape variables prior to beta model building. In the following
-sections, the example variables were selected using the
-<code>randomForestSRC</code> and <code>MultivariateRandomForest</code>
-packages.</p>
-</div>
-<div class="section level3">
-<h3 id="building-the-pca-pcnm-and-rda-models">Building the PCA, PCNM and RDA models<a class="anchor" aria-label="anchor" href="#building-the-pca-pcnm-and-rda-models"></a>
-</h3>
-<p>Load the additional package <code>vegan</code> for beta diversity
-model building:</p>
+<p>Partial RDA models were used to model the relationship between animal
+communities and landscape predictors while considering also the inherent
+spatial structure of the animal communities. Similarly, variable
+selection by random forest was performed on the landscape variables
+prior to beta model building. In the following sections, the example
+variables were selected using the <code>randomForestSRC</code> and
+<code>MultivariateRandomForest</code> packages. After the first round of
+variable selection, the landscape predictors were summerised as
+Principal Component Analysis (PCA) axes while the spatial variation were
+quantified using Principle Coordinates of Neighbourhood Matrices
+(PCNM).</p>
+<p>First, load the additional package <code>vegan</code> for beta
+diversity model building:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://cran.r-project.org" class="external-link">"vegan"</a></span><span class="op">)</span></code></pre></div>
 <p>As before, bird species density and landscape data for sampling
@@ -715,14 +719,18 @@ combined. The variable selection output using random forest is also
 loaded from <code>beta_model_variables</code> to inform the principal
 component analysis (PCA) of the selected landscape variables later.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"beta_model_data.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span> <span class="co">#summarised landscape information per point</span>
-<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span>
-
-<span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"beta_model_variables.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span>
-
+<code class="sourceCode R"><span class="co"># #Before package release:</span>
 <span class="co"># load("../inst/extdata/beta_model_data.Rdata")</span>
 <span class="co"># load("../inst/extdata/beta_model_variables.Rdata")</span>
+<span class="co"># load("../data/animal_observations.rda")</span>
+<span class="co"># load("../data/sampling_points.rda")</span>
+
+<span class="co"># Afrer package release:</span>
+<span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"beta_model_data.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span> <span class="co">#summarised landscape information per point</span>
+<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span>
+
+<span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"beta_model_variables.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span> <span class="co">#variables selected from random forest</span>
+<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_observations"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"sampling_points"</span><span class="op">)</span>
@@ -759,8 +767,8 @@ to summarise total species incidence.</p>
   
 <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">rmspp</span><span class="op">)</span></code></pre></div>
 <p>After the <code>birds</code> dataset has been used to filter
-<code>bird_com</code>, it is further processed to include coordinate
-information for PCNM analysis later.</p>
+<code>bird_com</code>, coordinate information were added for PCNM
+analysis later.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">beta_model_data</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">town</span>, <span class="va">round</span>, <span class="va">priority</span>, <span class="va">sprich</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co">#keep only point_id and landscape variables</span>
@@ -772,21 +780,36 @@ information for PCNM analysis later.</p>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="op">{</span><span class="op">(</span><span class="va">sampling_points</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">beta_model_data</span><span class="op">$</span><span class="va">point_id</span>,<span class="va">sampling_points</span><span class="op">$</span><span class="va">point_id</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">}</span>,
          .after <span class="op">=</span> <span class="va">X</span><span class="op">)</span></code></pre></div>
 <p>Using the variables selected by random forest, principal component
-analysis (PCA) is performed for dimensionality reduction to further
-decrease the number of input variables. <strong>Unsure</strong></p>
+analysis (PCA) is performed to summarise the landscape predictors. Only
+PCA axes with eigenvalues greater than one were retained. This step
+selects for PCA axes that account for more variance than the original
+variables on their own.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">imp_var_birds</span> <span class="op">&lt;-</span> <span class="va">beta_model_variables</span><span class="op">$</span><span class="va">var</span>
+<code class="sourceCode R"><span class="va">pca_birds</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">beta_model_variables</span><span class="op">$</span><span class="va">var</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co">#select impt variables from RF</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="va">.</span>,scale.<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="co">#conduct pca</span>
 
-<span class="va">pca_birds</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">imp_var_birds</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="va">.</span>,scale.<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">pca_selected_birds</span> <span class="op">&lt;-</span> <span class="va">pca_birds</span><span class="op">$</span><span class="va">x</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pca_birds</span><span class="op">$</span><span class="va">sdev</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span>
 
-<span class="fu"><a href="https://rdrr.io/r/stats/biplot.html" class="external-link">biplot</a></span><span class="op">(</span><span class="va">pca_birds</span>, choices<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="build-models_files/figure-html/diagnosis%20by%20PCA-1.png" width="700"></p>
+<span class="co"># biplot(pca_birds, choices=c(1,2))</span></code></pre></div>
+<p>Calculate the PCNM vectors using <code>Vegan::pcnm</code> and fit the
+animal community matrix against these PCNM vectors using
+<code>Vegan::rda</code>. To control for type I error while testing for
+significant predictors, significant PCNM vectors were first selected
+using a backwards, stepwise elimination method until all vectors has
+significance level smaller than the chosen significance level of 0.05
+(Peres-Neto &amp; Legendre, 2010). This was performed using
+<code>Vegan::ordistep</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># view(pca_birds$rotation)</span>
+<code class="sourceCode R"><span class="va">plots.xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">beta_model_data</span><span class="op">$</span><span class="va">X</span>, <span class="va">beta_model_data</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span>
+<span class="va">raw_pcnm_birds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/pcnm.html" class="external-link">pcnm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">plots.xy</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">birds_select</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pca_birds</span><span class="op">$</span><span class="va">sdev</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span>
+<span class="va">pcnm_scores_birds</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/vegan/man/scores.html" class="external-link">scores</a></span><span class="op">(</span><span class="va">raw_pcnm_birds</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">birds_selected</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pca_birds</span><span class="op">$</span><span class="va">x</span><span class="op">[</span>,<span class="va">birds_select</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">X</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+
+<span class="va">birds.pcnm.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">bird_com</span><span class="op">~</span><span class="va">.</span>, data <span class="op">=</span> <span class="va">pcnm_scores_birds</span><span class="op">)</span>
+<span class="va">birds.pcnm.sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/ordistep.html" class="external-link">ordistep</a></span><span class="op">(</span><span class="va">birds.pcnm.all</span>, direction <span class="op">=</span> <span class="st">"backward"</span>, pout <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## </span>
 <span class="co">## Start: bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM6 + PCNM7 +      PCNM8 + PCNM9 + PCNM10 + PCNM11 + PCNM12 + PCNM13 + PCNM14 +      PCNM15 + PCNM16 + PCNM17 + PCNM18 + PCNM19 + PCNM20 + PCNM21 +      PCNM22 + PCNM23 + PCNM24 + PCNM25 + PCNM26 + PCNM27 + PCNM28 +      PCNM29 </span>
 <span class="co">## </span>
@@ -1372,6 +1395,21 @@ decrease the number of input variables. <strong>Unsure</strong></p>
 <span class="co">## - PCNM3   1 233.22 2.1843  0.005 **</span>
 <span class="co">## ---</span>
 <span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></code></pre>
+<p>Perform partial RDA was performed with the selected PCA axes as
+candidate explanatory variables and the significant PCNM vectors as
+covariates. Perform <code>Vegan::ordistep</code> to select for the
+significant PCA axes while accounting for the effects of the covariables
+in the model until all PCA axes has significance level smaller than the
+chosen significance level of 0.05. The final RDA model is fitted with
+the significant PC axes and PCNM vectors.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">birds_selected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pca_selected_birds</span>, <span class="va">pcnm_scores_birds</span><span class="op">)</span>
+
+<span class="va">birds.rda.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">birds.pcnm.sub</span>, 
+                        <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">"~. +"</span>, <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">pca_selected_birds</span><span class="op">)</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">" +"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>, <span class="co">#add selected PCA</span>
+                        data <span class="op">=</span> <span class="va">birds_selected</span><span class="op">)</span>
+
+<span class="va">birds.rda.sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/ordistep.html" class="external-link">ordistep</a></span><span class="op">(</span><span class="va">birds.rda.all</span>, direction <span class="op">=</span> <span class="st">"backward"</span><span class="op">)</span> <span class="co">#assess p-value for dropping</span></code></pre></div>
 <pre><code><span class="co">## </span>
 <span class="co">## Start: bird_com ~ PCNM3 + PCNM5 + PCNM11 + PCNM24 + PC1 + PC2 + PC3 +      PC4 + PC5 + PC6 + PC7 + PC8 </span>
 <span class="co">## </span>
@@ -1438,7 +1476,15 @@ decrease the number of input variables. <strong>Unsure</strong></p>
 <span class="co">## - PC1     1 231.94 9.4946  0.005 **</span>
 <span class="co">## ---</span>
 <span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">birds.rda.sub</span><span class="op">$</span><span class="va">call</span></code></pre></div>
+<pre><code><span class="co">## rda(formula = bird_com ~ PCNM24 + PC1 + PC2 + PC3 + PC4 + PC5 + </span>
+<span class="co">##     PC6 + PC7 + PC8, data = birds_selected)</span></code></pre>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">birds.rda.fin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">bird_com</span> <span class="op">~</span> <span class="va">PC1</span> <span class="op">+</span> <span class="va">PC2</span> <span class="op">+</span> <span class="va">PC4</span> <span class="op">+</span> <span class="va">PC6</span> <span class="op">+</span> <span class="va">PC7</span> <span class="op">+</span> <span class="va">PC8</span> <span class="op">+</span> <span class="fu">Condition</span><span class="op">(</span><span class="va">PCNM1</span> <span class="op">+</span> <span class="va">PCNM2</span> <span class="op">+</span> <span class="va">PCNM3</span> <span class="op">+</span> <span class="va">PCNM4</span> <span class="op">+</span> <span class="va">PCNM5</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">birds_selected</span><span class="op">)</span></code></pre></div>
+<p>The predictive β-diversity model also requires information on the
+average probability of each species occurring across all points.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># fitted_126 &lt;- fitted(birds1.rda.fin, model = "CCA")</span>
 <span class="va">p_hats_birds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">bird_com</span>, <span class="fl">2</span>, <span class="va">mean</span><span class="op">)</span>
 <span class="va">p_hats_birds</span></code></pre></div>
@@ -1562,9 +1608,12 @@ decrease the number of input variables. <strong>Unsure</strong></p>
 <span class="co">##                          0.01                          0.01 </span>
 <span class="co">##                 Mycteria spp. </span>
 <span class="co">##                          0.01</span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<p>The PCA axes, PNCM vectors, final RDA model and probability of
+species occurence are saved out to be applied in the subsequent apply
+model section.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">pca_birds</span>,
-     <span class="va">raw_pcnm_birds</span>, <span class="va">plots.pcnm_birds</span>,
+     <span class="va">raw_pcnm_birds</span>,
      <span class="va">birds.rda.fin</span>, 
      <span class="va">p_hats_birds</span>,
      file <span class="op">=</span> <span class="st">"./your/working/directory/beta_model_birds.Rdata"</span><span class="op">)</span></code></pre></div>
