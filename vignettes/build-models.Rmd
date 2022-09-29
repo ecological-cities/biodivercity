@@ -17,6 +17,7 @@ Following the preparation of collected fauna and landscape data, this article ou
 For this collection of articles, random forest models were first used to select variables based on their relative importance in improving model performance, i.e., averaged variable importance (Arthur et al., 2010; Li et al., 2017). The random forest algorithm is a machine learning technique that can handle and reduce the effects of overfitting, as well as the collinearity and selection bias of predictors (Hothorn et al., 2006). In the following sections, the example variables were for both α-diversity and β-diversity models were selected using the `randomForest` package.
 
 ---
+
 ## Alpha diversity models
 ### Building the GLM models
 
