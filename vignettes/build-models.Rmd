@@ -10,20 +10,20 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Following the preparation of collected fauna and landscape data, this article outlines a workflow to build predictive models of animal diversity. Species density at sampling points were modelled against the summarised landscape metrics with generalised linear mixed-effects models (GLMMs) using the `MuMIn::dredge` function. However, owing to the large number of landscape predictors at multiple buffer radii generated from the remotely
-sensed and open data, variable selection has to be performed as there is a limit to the number of variables `MuMIn::dredge` is allowed to accept.
+Following the preparation of collected fauna and landscape data, this article outlines a workflow to build predictive models of animal diversity. We drew on the community ecology theory and the concept of ‘decomposing’ diversity into α-diversity and β-diversity components. A predictive model was built for each of the diversity components.
 
-### If too many variables are present for `MuMIn::dredge`:
+### If too many variables are present:
 
-For this collection of articles, random forest models were first used to select variables based on their relative importance in improving model performance, i.e., averaged variable importance (Arthur et al., 2010; Li et al., 2017). The random forest algorithm is a machine learning technique that can handle and reduce the effects of overfitting, as well as the collinearity and selection bias of predictors (Hothorn et al., 2006). In the following sections, the example variables were selected using the `randomForest` package.
+For this collection of articles, random forest models were first used to select variables based on their relative importance in improving model performance, i.e., averaged variable importance (Arthur et al., 2010; Li et al., 2017). The random forest algorithm is a machine learning technique that can handle and reduce the effects of overfitting, as well as the collinearity and selection bias of predictors (Hothorn et al., 2006). In the following sections, the example variables were for both α-diversity and β-diversity models were selected using the `randomForest` package.
 
 ---
-
 ## Alpha diversity models
-
 ### Building the GLM models
 
-Now, load the necessary packages to run the model building:
+Species density at sampling points were modelled against the summarised landscape metrics with generalised linear mixed-effects models (GLMMs) using the `MuMIn::dredge` function. However, owing to the large number of landscape predictors at multiple buffer radii generated from the remotely
+sensed and open data, variable selection has to be performed as there is a limit to the number of variables `MuMIn::dredge` is allowed to accept.
+
+First, load the necessary packages to run the model building:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
 library("biodivercity")
@@ -218,14 +218,10 @@ rm(bestmodels_info)
 <br>
 
 ## Beta diversity models
+### Building the partial RDA models
+Partial RDA models were used to model the relationship between animal communities and landscape predictors while considering also the inherent spatial structure of the animal communities. Similarly, variable selection by random forest was performed on the landscape variables prior to beta model building. In the following sections, the example variables were selected using the `randomForestSRC` and `MultivariateRandomForest` packages. After the first round of variable selection, the landscape predictors were summerised as Principal Component Analysis (PCA) axes while the spatial variation were quantified using Principle Coordinates of Neighbourhood Matrices (PCNM).
 
-### Variable selection
-
-Similarly, variable selection by random forest was performed on the landscape variables prior to beta model building. In the following sections, the example variables were selected using the `randomForestSRC` and `MultivariateRandomForest` packages.
-
-### Building the PCA, PCNM and RDA models
-
-Load the additional package `vegan` for beta diversity model building:
+First, load the additional package `vegan` for beta diversity model building:
 
 ```{r load vegan, message = FALSE, warning = FALSE}
 library("vegan")
@@ -234,14 +230,19 @@ library("vegan")
 As before, bird species density and landscape data for sampling points across six areas (towns) in Singapore will be analysed in this example. In this example dataset `beta_model_data`, animal and landscape datasets as processed in the previous two articles were combined. The variable selection output using random forest is also loaded from `beta_model_variables` to inform the principal component analysis (PCA) of the selected landscape variables later. 
 
 ```{r load data, message = FALSE, warning = FALSE}
+
+# #Before package release:
+# load("../inst/extdata/beta_model_data.Rdata")
+# load("../inst/extdata/beta_model_variables.Rdata")
+# load("../data/animal_observations.rda")
+# load("../data/sampling_points.rda")
+
+# Afrer package release:
 filepath <- system.file("extdata", "beta_model_data.Rdata", package="biodivercity") #summarised landscape information per point
 load(filepath)
 
-filepath <- system.file("extdata", "beta_model_variables.Rdata", package="biodivercity")
+filepath <- system.file("extdata", "beta_model_variables.Rdata", package="biodivercity") #variables selected from random forest
 load(filepath)
-
-# load("../inst/extdata/beta_model_data.Rdata")
-# load("../inst/extdata/beta_model_variables.Rdata")
 
 data("animal_observations")
 data("sampling_points")
@@ -283,7 +284,7 @@ bird_com <- bird_com %>%
 rm(rmspp)
 ```
 
-After the `birds` dataset has been used to filter `bird_com`, it is further processed to include coordinate information for PCNM analysis later.
+After the `birds` dataset has been used to filter `bird_com`, coordinate information were added for PCNM analysis later.
 
 ```{r appending spatial information to landscape dataset, message = FALSE, warning = FALSE}
 beta_model_data <- beta_model_data %>% 
@@ -297,47 +298,52 @@ beta_model_data <- beta_model_data %>%
          .after = X)
 ```
 
-Using the variables selected by random forest, principal component analysis (PCA) is performed for dimensionality reduction to further decrease the number of input variables. **Unsure**
+Using the variables selected by random forest, principal component analysis (PCA) is performed to summarise the landscape predictors. Only PCA axes with eigenvalues greater than one were retained. This step selects for PCA axes that account for more variance than the original variables on their own.
 
 ```{r diagnosis by PCA}
-imp_var_birds <- beta_model_variables$var
 
-pca_birds <- beta_model_data %>% select(any_of(imp_var_birds)) %>% prcomp(.,scale.=TRUE)
+pca_birds <- beta_model_data %>% 
+  dplyr::select(any_of(beta_model_variables$var)) %>% #select impt variables from RF
+  prcomp(.,scale.=TRUE) #conduct pca
 
-biplot(pca_birds, choices=c(1,2))
-# view(pca_birds$rotation)
+pca_selected_birds <- pca_birds$x[, which(pca_birds$sdev > 1)]
 
-birds_select <- which(pca_birds$sdev > 1)
-
-birds_selected <- beta_model_data %>% dplyr::select(X) %>% cbind(pca_birds$x[,birds_select]) %>% dplyr::select(-X)
+# biplot(pca_birds, choices=c(1,2))
 ```
 
-```{r PCNM, message = FALSE, warning = FALSE, echo = FALSE}
-plots.xy <- cbind(beta_model_data$X,beta_model_data$Y)
-plots.pcnm_birds <-data.frame(scores(pcnm(dist(plots.xy))))
+Calculate the PCNM vectors using `Vegan::pcnm` and fit the animal community matrix against these PCNM vectors using `Vegan::rda`. To control for type I error while testing for significant predictors, significant PCNM vectors were first selected using a backwards, stepwise elimination method until all vectors has significance level smaller than the chosen significance level of 0.05 (Peres-Neto & Legendre, 2010). This was performed using `Vegan::ordistep`.
+
+```{r PCNM, message = FALSE, warning = FALSE}
+plots.xy <- cbind(beta_model_data$X, beta_model_data$Y)
+raw_pcnm_birds <- pcnm(dist(plots.xy))
+
+pcnm_scores_birds <-data.frame(scores(raw_pcnm_birds))
 
 set.seed(123)
 
-birds.pcnm.all <- rda(bird_com~.,data=plots.pcnm_birds)
-birds.pcnm.sub <- ordistep(birds.pcnm.all, direction = "backward",pout=0.075)
-# birds.pcnm.fin <- update(birds.pcnm.sub, ~. -PCNM7-PCNM19)
-# birds.pcnm.fin$terms
+birds.pcnm.all <- rda(bird_com~., data = pcnm_scores_birds)
+birds.pcnm.sub <- ordistep(birds.pcnm.all, direction = "backward", pout = 0.075)
 
-# plots.pcnm_birds <- plots.pcnm_birds %>% dplyr::select(PCNM1, PCNM2, PCNM3, PCNM4, PCNM5)
-
-raw_pcnm_birds <- pcnm(dist(plots.xy))
 ```
 
-```{r stepwise selection with env vars, message = FALSE, warning = FALSE, echo = FALSE}
-birds_selected <- cbind(birds_selected,plots.pcnm_birds)
+Perform partial RDA was performed with the selected PCA axes as candidate explanatory variables and the significant PCNM vectors as covariates. Perform `Vegan::ordistep` to select for the significant PCA axes while accounting for the effects of the covariables in the model until all PCA axes has significance level smaller than the chosen significance level of 0.05. The final RDA model is fitted with the significant PC axes and PCNM vectors.
 
-birds.rda.all <- update(birds.pcnm.sub, ~. +PC1 +PC2 +PC3 +PC4 +PC5 +PC6 +PC7 +PC8, data = birds_selected) #add landscape variables
+```{r stepwise selection with env vars, message = FALSE, warning = FALSE}
+birds_selected <- cbind(pca_selected_birds, pcnm_scores_birds)
+
+birds.rda.all <- update(birds.pcnm.sub, 
+                        glue::glue("~. +", {paste((colnames(pca_selected_birds)), collapse=" +")}), #add selected PCA
+                        data = birds_selected)
 
 birds.rda.sub <- ordistep(birds.rda.all, direction = "backward") #assess p-value for dropping
 
-birds.rda.fin <- rda(bird_com ~ PC1 + PC2 + PC4 + PC6 + PC7 + PC8 + Condition(PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5), data=birds_selected)#find a cleaner selection for scales?
+birds.rda.sub$call
+
+birds.rda.fin <- rda(bird_com ~ PC1 + PC2 + PC4 + PC6 + PC7 + PC8 + Condition(PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5), data = birds_selected)
 
 ```
+
+The predictive β-diversity model also requires information on the average probability of each species occurring across all points.
 
 ```{r p-hats}
 # fitted_126 <- fitted(birds1.rda.fin, model = "CCA")
@@ -345,9 +351,11 @@ p_hats_birds <- apply(bird_com, 2, mean)
 p_hats_birds
 ```
 
+The PCA axes, PNCM vectors, final RDA model and probability of species occurence are saved out to be applied in the subsequent apply model section.
+
 ```{r save beta model objs, eval = FALSE}
 save(pca_birds,
-     raw_pcnm_birds, plots.pcnm_birds,
+     raw_pcnm_birds,
      birds.rda.fin, 
      p_hats_birds,
      file = "./your/working/directory/beta_model_birds.Rdata")
