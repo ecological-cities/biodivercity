@@ -23,9 +23,9 @@ and practice. Some offer a more holistic view, by including parts of the
 ecosystem (e.g., climate, soil, air, water, landscape structure, genetic
 variation) that may contribute to ‘total biodiversity’ within a given
 region. However, such conceptualisations of ‘biodiversity’ may include
-components with low causal proximity (e.g. indirect effect of the
+components with low causal proximity (e.g., indirect effect of the
 landscape on species diversity), and may be difficult to measure at wide
-spatial scales (e.g. genetic diversity, plant species diversity). In
+spatial scales (e.g., genetic diversity, plant species diversity). In
 decision-making, unnecessary complexity may also risk contributing to
 mistrust or ignorance of the overall assessment.
 

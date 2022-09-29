@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-Many frameworks to assess 'biodiversity' have been proposed in research and practice. Some offer a more holistic view, by including parts of the ecosystem (e.g., climate, soil, air, water, landscape structure, genetic variation) that may contribute to ‘total biodiversity’ within a given region. However, such conceptualisations of 'biodiversity' may include components with low causal proximity (e.g. indirect effect of the landscape on species diversity), and may be difficult to measure at wide spatial scales (e.g. genetic diversity, plant species diversity). In decision-making, unnecessary complexity may also risk contributing to mistrust or ignorance of the overall assessment. 
+Many frameworks to assess 'biodiversity' have been proposed in research and practice. Some offer a more holistic view, by including parts of the ecosystem (e.g., climate, soil, air, water, landscape structure, genetic variation) that may contribute to ‘total biodiversity’ within a given region. However, such conceptualisations of 'biodiversity' may include components with low causal proximity (e.g., indirect effect of the landscape on species diversity), and may be difficult to measure at wide spatial scales (e.g., genetic diversity, plant species diversity). In decision-making, unnecessary complexity may also risk contributing to mistrust or ignorance of the overall assessment. 
 
 `biodivercity` is an R package for assessing the diversity of animal species in urban areas. It provides a way to directly assess the _habitat value_ of urban landscapes, based on their empirical effect on chosen animal groups (e.g., taxa such as birds, butterflies, odonates, amphibians, etc.). The key features include:
 
