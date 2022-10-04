@@ -95,7 +95,7 @@ calc_specific_osm <- function(vector,
         # append to points
         points <- points %>%
           dplyr::left_join(buildings_summarised,
-                           by = c(.data[[point_id]])) %>%
+                           by = point_id) %>%
           dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("r", input$radius[i], "m_osm_buildingVol_m3")), # points with no buildings have a value of 0
                         .fns = ~tidyr::replace_na(., 0)))
         rm(buildings_summarised)
@@ -165,8 +165,8 @@ calc_specific_osm <- function(vector,
 
           dplyr::mutate("r{input$radius[i]}m_osm_buildingAvgLvl" := .data[[paste0("r", input$radius[i], "m_osm_buildingGFA_m2")]] / .data[[paste0("r", input$radius[i], "m_osm_buildingArea_m2")]]) %>%
           dplyr::mutate("r{input$radius[i]}m_osm_buildingFA_ratio" := .data[[paste0("r", input$radius[i], "m_osm_buildingGFA_m2")]] / (pi * as.numeric(input$radius[i]) ^ 2)) %>%
-          dplyr::mutate(dplyr::across(.cols = tidyselect::everything(),
-                        .fns = ~tidyr::replace_na(., 0))) %>%
+          dplyr::mutate(dplyr::across(.cols = -tidyselect::any_of(point_id),
+                                        .fns = ~tidyr::replace_na(., 0))) %>%
           dplyr::select(c(.data[[point_id]], matches(paste0("_osm_", input$metric[i]))))) # only select metric of interest
 
         suppressMessages(points <- points %>%
