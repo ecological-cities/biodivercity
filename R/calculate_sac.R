@@ -41,6 +41,7 @@
 #'@importFrom vegan specaccum
 #'@importFrom rlang .data
 #'@importFrom stats xtabs
+#'@importFrom tibble tibble
 #'
 #'@export
 calculate_sac <- function(observations, survey_ref,
@@ -102,12 +103,12 @@ calculate_sac <- function(observations, survey_ref,
                           gamma = "chao") # extrapolation mtd
 
   # extract data
-  sac_data <- data.frame(area = specify_area,
-                         period = specify_period,
-                         taxon = specify_taxon,
-                         sites = sac$sites,
-                         richness = sac$richness,
-                         sd = sac$sd)
+  sac_data <- tibble::tibble("{area}" := specify_area,
+                             "{period}" := specify_period,
+                             "{taxon}" := specify_taxon,
+                             sites = sac$sites,
+                             richness = sac$richness,
+                             sd = sac$sd)
 
   return(sac_data)
 }
