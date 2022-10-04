@@ -76,7 +76,9 @@ calculate_sac <- function(observations, survey_ref,
 
 
   # run check_taxongrps()
-  rmspp <- check_taxongrps(obs_subset, level = "area")
+  rmspp <- check_taxongrps(obs_subset, level = "area",
+                           species = species, genus = genus, family = family,
+                           area = area, period = period)
 
 
   # overwrite colnames if names are different from default
