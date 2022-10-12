@@ -34,7 +34,7 @@ Many frameworks to assess 'biodiversity' have been proposed in research and prac
 - Generate data summaries of the animals surveyed, at multiple levels of granularity (e.g., areas, periods, animal groups, species)
 - Download and process landscape data within areas of interest (e.g., satellite imagery, OpenStreetMap data)
 - Convert vector data generated from future design scenarios into formats suitable for model predictions
-- Build and validate predictive models to assess _Alpha_ (local), _Beta_ (community) and _Gamma_ (total) diversity for an animal group
+- Build and validate predictive models to assess local (_Alpha_), community (_Beta_) and total (_Gamma_) diversity for an animal group
 - Use models to make pixel-based spatial predictions across new areas and into the future
 - Summarise predictions to benchmark and compare biodiversity 'performance' between planning units across the city
 
@@ -59,7 +59,7 @@ To get a BibTex entry, run `citation("biodivercity")`.
 
 ## Data sources
 
-Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys. 14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant. Awarded to the National University of Singapore (host institution) and the Singapore Housing & Development Board. 
+Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys, 2016–2022. Ministry of National Development Research Fund (MNDRF) Grant. Awarded to the National University of Singapore and the Singapore Housing & Development Board. 
 
 <br>
 

@@ -43,8 +43,8 @@ amphibians, etc.). The key features include:
     satellite imagery, OpenStreetMap data)
 -   Convert vector data generated from future design scenarios into
     formats suitable for model predictions
--   Build and validate predictive models to assess *Alpha* (local),
-    *Beta* (community) and *Gamma* (total) diversity for an animal group
+-   Build and validate predictive models to assess local (*Alpha*),
+    community (*Beta*) and total (*Gamma*) diversity for an animal group
 -   Use models to make pixel-based spatial predictions across new areas
     and into the future
 -   Summarise predictions to benchmark and compare biodiversity
@@ -77,10 +77,9 @@ To get a BibTex entry, run `citation("biodivercity")`.
 ## Data sources
 
 Development of a Biodiversity Index for Residential Towns using
-Biodiversity Field Surveys. 14 June 2016, 6.5 years, Ministry of
-National Development Research Fund (MNDRF) Grant. Awarded to the
-National University of Singapore (host institution) and the Singapore
-Housing & Development Board.
+Biodiversity Field Surveys, 2016–2022. Ministry of National Development
+Research Fund (MNDRF) Grant. Awarded to the National University of
+Singapore and the Singapore Housing & Development Board.
 
 <br>
 

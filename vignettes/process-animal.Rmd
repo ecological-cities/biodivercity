@@ -12,6 +12,15 @@ vignette: >
 
 Animal observations from on-site surveys can be used to build predictive models of animal diversity, or summarised to directly compare animal diversity between different areas or time periods. This article outlines the ways to format, process and check the animal data.
 
+<br>
+
+```{r out.width = "70%", fig.align='center', dpi = 300, echo = FALSE}
+knitr::include_graphics("framework_process-animal.png", dpi = 300)
+```
+<center><b> Figure: Broad overview of the data workflow for a chosen animal group </b></center>
+
+<br>
+
 First, load the necessary packages to run the analysis:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
@@ -24,6 +33,8 @@ devtools::load_all()
 ```
 
 <br>
+
+---
 
 ## Data format
 

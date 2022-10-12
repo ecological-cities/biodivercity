@@ -1,6 +1,6 @@
 ---
 title: "Build Models"
-subtitle: "Build and summarise GLMM models with processed animal and landscape data"
+subtitle: "Train and select the best models that predict animal diversity from landscape data"
 author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -10,31 +10,37 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Following the preparation of collected fauna and landscape data, this article outlines a workflow to build predictive models of animal diversity. We drew on the community ecology theory and the concept of ‘decomposing’ diversity into α-diversity and β-diversity components. A predictive model was built for each of the diversity components.
+This article outlines a workflow to build predictive models of diversity for a chosen animal group. Fauna and landscape data should have already been prepared based on `vignette("process-animal")` and `vignette("process-landscape")`, respectively. Based on community ecology theory, we ‘decompose’ animal diversity into two components: (1) local (_Alpha_) diversity and (2) community (_Beta_) diversity. A predictive model will be built for each component.
 
-### If too many variables are present:
+<br>
 
-For this collection of articles, random forest models were first used to select variables based on their relative importance in improving model performance, i.e., averaged variable importance (Arthur et al., 2010; Li et al., 2017). The random forest algorithm is a machine learning technique that can handle and reduce the effects of overfitting, as well as the collinearity and selection bias of predictors (Hothorn et al., 2006). In the following sections, the example variables were for both α-diversity and β-diversity models were selected using the `randomForest` package.
+```{r out.width = "70%", fig.align='center', dpi = 300, echo = FALSE}
+knitr::include_graphics("framework_build-models.png", dpi = 300)
+```
+<center><b> Figure: Broad overview of the data workflow for a chosen animal group </b></center>
+
+<br>
+
+In the examples below, generalised linear mixed-effects models (GLMMs) are used to build the predictive models, since linear models are generally simpler and provide better interpretability. We first use random forest models to narrow down the list of potential predictor variables, by selecting variables/features based on their relative importance in improving model performance (Arthur et al., 2010; Li et al., 2017). Do note that users may use other types of models/algorithms. 
+ 
+<br>
 
 ---
 
-## Alpha diversity models
-### Building the GLM models
+## 1. Local diversity
 
-Species density at sampling points were modelled against the summarised landscape metrics with generalised linear mixed-effects models (GLMMs) using the `MuMIn::dredge` function. However, owing to the large number of landscape predictors at multiple buffer radii generated from the remotely
-sensed and open data, variable selection has to be performed as there is a limit to the number of variables `MuMIn::dredge` is allowed to accept.
+For a chosen animal group, the local (_Alpha_) diversity is represented by the number of species recorded at sampling point locations (i.e., species density). The response variable specified within the GLMM is the number (count) of species.
 
-First, load the necessary packages to run the model building:
+First, load the necessary packages:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
 library("biodivercity")
 library("tidyverse") # to process/wrangle data
 library("sf") # to process landscape data
-library("tmap")
-library("kableExtra")
+library("tmap") # spatial visualisation
 
-library("lme4")
-library("MuMIn")
+library("lme4") # modelling
+library("MuMIn") # modelling
 ```
 
 ```{r load biodivercity while in dev, include = FALSE}
@@ -42,7 +48,6 @@ devtools::load_all()
 library("tidyverse") 
 library("sf") 
 library("tmap")
-library("kableExtra")
 
 library("lme4")
 library("MuMIn")
@@ -50,9 +55,12 @@ library("MuMIn")
 
 Bird species density and landscape data for sampling points across six areas (towns) in Singapore from the example data `model_data` will be used to demonstrate the model building process in this article. In this example dataset, animal and landscape datasets as processed in the previous two articles were combined. The variable selection output using random forest is also loaded from `model_variables` to inform `MuMIn::dredge`. 
 
-```{r load example data, eval = FALSE}
-system.file("extdata", "model_data", package="biodivercity") # model_data has been filtered to match model_variables 
-system.file("extdata", "model_variables", package="biodivercity")
+```{r load example data}
+filepath <- system.file("extdata", "model_data.Rdata", package="biodivercity") # model_data has been filtered to match model_variables 
+load(filepath)
+
+filepath <- system.file("extdata", "model_variables.Rdata", package="biodivercity")
+load(filepath)
 ```
 
 Before running `MuMIn::dredge`, model constraints have to be considered to avoid combinations of variables that represented similar landscape characteristics. For example, for each land cover class, only one of each metric type could be present in the fitted model, and similar landscape predictors at different buffer radii were not allowed. To do so, `MuMIn::dredge` accepts expressions for the `subset` argument and such an object is automatically created from `model_variables` below.
@@ -178,7 +186,7 @@ to_print <- bestmodels_info %>%
   mutate(across(.cols = everything(), ~ifelse(is.na(.), "-", .)))
 
 knitr::kable(to_print, caption = glue::glue("**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < 2).**")) %>%
-  kable_styling("striped") %>% scroll_box(width = "100%", height = "300px")
+  kableExtra::kable_styling("striped") %>% kableExtra::scroll_box(width = "100%", height = "300px")
 ```
 
 For a visual breakdown of variables in the top models, a plot of the top important variables and their sum of model weights across all models can be produced:
@@ -214,12 +222,13 @@ rm(filepath, to_print, coef, imp)
 rm(bestmodels_info)
 ```
 
----
-
 <br>
 
-## Beta diversity models
-### Building the partial RDA models
+---
+
+## 2. Community diversity
+
+### Partial RDA
 Partial RDA models were used to model the relationship between animal communities and landscape predictors while considering also the inherent spatial structure of the animal communities. Similarly, variable selection by random forest was performed on the landscape variables prior to beta model building. In the following sections, the example variables were selected using the `randomForestSRC` and `MultivariateRandomForest` packages. After the first round of variable selection, the landscape predictors were summerised as Principal Component Analysis (PCA) axes while the spatial variation were quantified using Principle Coordinates of Neighbourhood Matrices (PCNM).
 
 First, load the additional package `vegan` for beta diversity model building:
@@ -362,12 +371,12 @@ save(pca_birds,
      file = "./your/working/directory/beta_model_birds.Rdata")
 ```
 
+<br>
+
 ---
 
 ## References
 
 Arthur AD, Li J, Henry S & Cunningham SA (2010) Influence of woody vegetation on pollinator densities in oilseed Brassica fields in an Australian temperate landscape. _Basic and Applied Ecology_, _11_(5): 406–414.
-
-Hothorn T, Hornik K & Zeileis A (2006) Unbiased recursive partitioning: A conditional inference framework. _Journal of Computational and Graphical Statistics_, _15_(3): 651–674.
 
 Li J, Alvarez B, Siwabessy J, Tran M, Huang Z, Przeslawski R, Radke L, Howard F & Nichol S (2017) Application of random forest and generalised linear model and their hybrid methods with geostatistical techniques to count data: Predicting sponge species richness. _Environmental Modelling and Software_, _97_: 112–129.

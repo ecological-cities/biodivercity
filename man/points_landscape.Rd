@@ -8,9 +8,9 @@
 Dataframe containing landscape predictors (columns).
 }
 \source{
-Development of a Biodiversity Index for Residential Towns using Biodiversity Field Surveys.
-14 June 2016, 6.5 years, Ministry of National Development Research Fund (MNDRF) Grant.
-Awarded to the National University of Singapore (host institution) and the Singapore Housing & Development Board.
+Development of a Biodiversity Index for Residential Towns using
+Biodiversity Field Surveys, 2016–2022. Ministry of National Development Research Fund
+(MNDRF) Grant. Awarded to the National University of Singapore and the Singapore Housing & Development Board.
 }
 \usage{
 data(points_landscape)

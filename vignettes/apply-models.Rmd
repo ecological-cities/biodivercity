@@ -10,7 +10,18 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This article outlines the steps to predict the number of species (species richness) for a particular animal group, across a target landscape. The pixel-based predictions are then visualised in the form of a spatial heatmap. Begin by loading the required packages to run the analysis:
+This article outlines the steps to predict the number of species (species richness) for a particular animal group, across a target landscape. The pixel-based predictions are then visualised in the form of a spatial heatmap. 
+
+<br>
+
+```{r out.width = "70%", fig.align='center', dpi = 300, echo = FALSE}
+knitr::include_graphics("framework_apply-models.png", dpi = 300)
+```
+<center><b> Figure: Broad overview of the data workflow for a chosen animal group </b></center>
+
+<br>
+
+Begin by loading the required packages to run the analysis:
 
 ```{r load required libraries, eval = FALSE, warning = FALSE, message = FALSE}
 library("biodivercity")

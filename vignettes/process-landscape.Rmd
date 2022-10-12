@@ -12,6 +12,15 @@ vignette: >
 
 This article details various ways to download and process landscape data to build predictive models of animal diversity. For example, the landscape data may be derived from (1) remotely sensed satellite imagery, (2) open-source maps, or (3) manually generated sources (e.g., from on-site mapping, design scenarios). We give examples of each in this article.
 
+<br>
+
+```{r out.width = "70%", fig.align='center', dpi = 300, echo = FALSE}
+knitr::include_graphics("framework_process-landscape.png", dpi = 300)
+```
+<center><b> Figure: Broad overview of the data workflow for a chosen animal group </b></center>
+
+<br>
+
 First, load the necessary packages to run the analysis:
 
 ```{r load required libraries, message = FALSE, warning = FALSE, eval = FALSE}
