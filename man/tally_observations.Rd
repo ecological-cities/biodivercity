@@ -7,10 +7,10 @@
 tally_observations(
   observations,
   survey_ref,
-  specify_area,
-  specify_period,
-  specify_taxon,
-  level,
+  level = "point",
+  specify_taxon = NULL,
+  specify_area = NULL,
+  specify_period = NULL,
   survey_id = "survey_id",
   area = "area",
   period = "period",
@@ -29,13 +29,17 @@ It should include columns for \code{survey_id}, \code{area}, \code{period}, \cod
 \item{survey_ref}{Dataframe of all surveys conducted. Values in the column
 \code{survey_id} should correspond to those in the \code{observations}.}
 
-\item{specify_area}{Specify the \code{area} (character).}
+\item{level}{Specify whether to tally by \code{'survey'} or \code{'point'} (character).
+Defaults to \code{'point'}.}
 
-\item{specify_period}{Specify the survey \code{period} (character).}
+\item{specify_taxon}{Specify the \code{taxon} of interest (character).
+Defaults to \code{NULL}, which includes all taxa.}
 
-\item{specify_taxon}{Specify the \code{taxon} of interest (character).}
+\item{specify_area}{Specify the \code{area} (character).
+Defaults to \code{NULL}, which includes all areas.}
 
-\item{level}{Specify whether to tally by \code{'survey'} or \code{'point'} (character).}
+\item{specify_period}{Specify the survey \code{period} (character).
+Defaults to \code{NULL}, which includes all periods.}
 
 \item{survey_id}{Column name of the unique identifier for each survey in \code{observations} and
 \code{survey_ref}. Defaults to \code{survey_id}.}

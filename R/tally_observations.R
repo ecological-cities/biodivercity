@@ -11,10 +11,14 @@
 #'It should include columns for `survey_id`, `area`, `period`, `taxon`, `species` and `abundance`.
 #'@param survey_ref Dataframe of all surveys conducted. Values in the column
 #'  `survey_id` should correspond to those in the `observations`.
-#'@param specify_area Specify the `area` (character).
-#'@param specify_period Specify the survey `period` (character).
-#'@param specify_taxon Specify the `taxon` of interest (character).
 #'@param level Specify whether to tally by `'survey'` or `'point'` (character).
+#'Defaults to `'point'`.
+#'@param specify_taxon Specify the `taxon` of interest (character).
+#'Defaults to `NULL`, which includes all taxa.
+#'@param specify_area Specify the `area` (character).
+#'Defaults to `NULL`, which includes all areas.
+#'@param specify_period Specify the survey `period` (character).
+#'Defaults to `NULL`, which includes all periods.
 #'@param survey_id Column name of the unique identifier for each survey in `observations` and
 #'`survey_ref`. Defaults to `survey_id`.
 #'@param area Column name of the area specified in `observations` and `survey_ref`.
@@ -45,10 +49,12 @@
 #'@importFrom rlang .data
 #'
 #'@export
-tally_observations <- function(observations, survey_ref, specify_area, specify_period,
-    specify_taxon, level, survey_id = "survey_id", area = "area", period = "period",
-    taxon = "taxon", point_id = "point_id", species = "species",
-    genus = "genus", family = "family", abundance = "abundance") {
+tally_observations <-
+  function(observations, survey_ref, level = "point",
+           specify_taxon = NULL, specify_area = NULL, specify_period = NULL,
+           survey_id = "survey_id", area = "area", period = "period",
+           taxon = "taxon", point_id = "point_id", species = "species",
+           genus = "genus", family = "family", abundance = "abundance") {
 
     # Error checking ------------------
 
