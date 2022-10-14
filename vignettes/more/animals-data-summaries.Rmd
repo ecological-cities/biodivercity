@@ -30,7 +30,7 @@ library("ggplot2") # data visualisation
 
 ## Summarise data 
 
-Load the example data. Refer to `help(animal_observations)` and `help(animal_surveys)` for more details on these datasets, as well as `vignette("process-animal")` on how the animal surveys were processed.
+Load the example data. Refer to `help(animal_observations)` and `help(animal_surveys)` for more details on these datasets, as well as `vignette("process-animal")` on how the animal surveys may be processed.
 
 ```{r}
 data("animal_observations")

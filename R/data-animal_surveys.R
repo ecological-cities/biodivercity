@@ -27,6 +27,7 @@
 #' (MNDRF) Grant. Awarded to the National University of Singapore and the Singapore Housing & Development Board.
 #'
 #' @seealso
+#' * [animal_observations] which contain the time-based records of species abundance for each survey.
 #' * [sampling_points] where these animal surveys were conducted.
 #' * [sampling_areas] where the sampling points were generated within.
 #'

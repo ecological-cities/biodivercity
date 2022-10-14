@@ -1,6 +1,6 @@
 ---
 title: "Process Landscape Data"
-subtitle: "Download, process and summarise landscape data at point locations"
+subtitle: "Download and summarise landscape data at point locations"
 author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -207,13 +207,24 @@ rm(lsm)
 A wide variety of landscape metrics can be summarised at point locations of interest, using the function `calc_lsm()`. The following example summarises all 'class-level' metrics for vegetation cover (`veg_classified`), up to `100` and `200` metres away from `points`. This returns a list, with each element corresponding to a particular buffer radius. Column names include a prefix indicating that values are landscape metrics derived from a classified raster (`lsm_`).
 
 ```{r calc_lsm, warning = FALSE, message = FALSE}
-calc_lsm(raster = veg_classified,
-         points = points,
-         buffer_sizes = c(100, 200), # in metres
-         level = c("class"),
-         class_names = c("veg"), # land cover class name
-         class_values = c(1)) # pixel value of class
+lsm_perpoint <- 
+  calc_lsm(raster = veg_classified,
+           points = points,
+           buffer_sizes = c(100, 200), # in metres
+           level = c("class"),
+           class_names = c("veg"), # land cover class name
+           class_values = c(1)) # pixel value of class
+
+lsm_perpoint
 ```
+
+This list object can then be converted into a dataframe, with a new column indicating the radii in which these landscape metrics have been summarised.
+
+```{r warning = FALSE, message = FALSE}
+lsm_perpoint %>% 
+  bind_rows(.id = "radius")
+```
+
 
 <br>
 
@@ -281,12 +292,23 @@ For example, we can calculate building metrics up to `100` and `200` metres away
 
 ```{r calc_osm, warning = FALSE, message = FALSE}
 
-calc_osm(vector = buildings, 
-         points = points,
-         name = "buildings",
-         buffer_sizes = c(100, 200),
-         building_levels = "levels") 
+osm_perpoint <- 
+  calc_osm(vector = buildings, 
+           points = points,
+           name = "buildings",
+           buffer_sizes = c(100, 200),
+           building_levels = "levels") 
 
+osm_perpoint
+```
+
+This list object can then be converted into a dataframe, with a new column indicating the radii in which these building metrics have been summarised.
+
+```{r warning = FALSE, message = FALSE}
+do.call(rbind, # alternative way to convert list to dataframe
+       mapply(transform, osm_perpoint, 
+              radius = names(osm_perpoint), # new column
+              SIMPLIFY = FALSE))
 ```
 
 <br>
@@ -332,9 +354,18 @@ For example, we can summarise the species and count of trees up to `50` metres a
 filepath <- system.file("extdata", "pg_layers.Rdata", package = "biodivercity")
 load(filepath) # example landscape vector data
 
-calc_manual(vector = trees, name = "trees",
-            points = points, buffer_sizes = 50,
-            plant_species = "species")
+manual_perpoint <-
+  calc_manual(vector = trees, name = "trees",
+              points = points, buffer_sizes = 50,
+              plant_species = "species")
 
+manual_perpoint
+```
+
+This list object can then be converted into a dataframe, with a new column indicating the radii in which these metrics have been summarised.
+
+```{r warning = FALSE, message = FALSE}
+manual_perpoint %>% 
+  bind_rows(.id = "radius")
 ```
 

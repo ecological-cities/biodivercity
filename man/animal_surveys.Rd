@@ -37,6 +37,7 @@ head(animal_surveys)
 }
 \seealso{
 \itemize{
+\item \link{animal_observations} which contain the time-based records of species abundance for each survey.
 \item \link{sampling_points} where these animal surveys were conducted.
 \item \link{sampling_areas} where the sampling points were generated within.
 }
