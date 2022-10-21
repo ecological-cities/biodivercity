@@ -21,15 +21,15 @@ knitr::include_graphics("framework_build-models.png", dpi = 300)
 
 <br>
 
-In the examples below, generalised linear mixed-effects models (GLMMs) are used to build the predictive models, since linear models are generally simpler and provide better interpretability. We first use random forest models to narrow down the list of potential predictor variables, by selecting variables/features based on their relative importance in improving model performance (Arthur et al., 2010; Li et al., 2017). Do note that users may use other types of models/algorithms. 
+In the examples below, generalised linear mixed-effects models (GLMMs) are used, since linear models are generally simpler and provide better interpretability. Do note that users may use other types of models/algorithms, or first narrow down the list of potential predictor variables. For example, random forest models may be used to select variables/features based on their relative importance in improving model performance (Arthur et al., 2010; Li et al., 2017). 
  
 <br>
 
 ---
 
-## 1. Local diversity
+## 1. Local (_Alpha_) diversity
 
-For a chosen animal group, the local (_Alpha_) diversity is represented by the number of species recorded at sampling point locations (i.e., species density). The response variable specified within the GLMM is the number (count) of species.
+For a chosen animal group, local (_Alpha_) diversity is represented by the number of species recorded at sampling point locations (i.e., species density). The response variable specified within the GLMM is the number (count) of species.
 
 First, load the necessary packages:
 
@@ -39,8 +39,8 @@ library("tidyverse") # to process/wrangle data
 library("sf") # to process landscape data
 library("tmap") # spatial visualisation
 
-library("lme4") # modelling
-library("MuMIn") # modelling
+library("lme4") # mixed-effects modelling
+library("MuMIn") # model selection & averaging
 ```
 
 ```{r load biodivercity while in dev, include = FALSE}
@@ -53,158 +53,116 @@ library("lme4")
 library("MuMIn")
 ```
 
-Bird species density and landscape data for sampling points across six areas (towns) in Singapore from the example data `model_data` will be used to demonstrate the model building process in this article. In this example dataset, animal and landscape datasets as processed in the previous two articles were combined. The variable selection output using random forest is also loaded from `model_variables` to inform `MuMIn::dredge`. 
+Load the example datasets for birds (animal group 'Aves') recorded at sampling points across Singapore. `birds` is a dataframe containing the number of species aggregated across multiple surveys (i.e., species richness; column '`sprich`'), and `landscape` is a dataframe containing landscape predictors summarised within specified buffer radii. See `data(animal_surveys)` and `data(points_landscape)` for more details on the animal and landscape data, respectively.
 
 ```{r load example data}
-filepath <- system.file("extdata", "model_data.Rdata", package="biodivercity") # model_data has been filtered to match model_variables 
-load(filepath)
-
-filepath <- system.file("extdata", "model_variables.Rdata", package="biodivercity")
+filepath <- system.file("extdata", "build-models_alpha-diversity.Rdata", package="biodivercity")
 load(filepath)
 ```
 
-Before running `MuMIn::dredge`, model constraints have to be considered to avoid combinations of variables that represented similar landscape characteristics. For example, for each land cover class, only one of each metric type could be present in the fitted model, and similar landscape predictors at different buffer radii were not allowed. To do so, `MuMIn::dredge` accepts expressions for the `subset` argument and such an object is automatically created from `model_variables` below.
+Pivot the `landscape_data` to wide format, with the prefix `r<radius>m_` (representing the radius size) appended to the column names of predictors:
 
-```{r subset remote vars, eval = FALSE}
+```{r transform and combine data, message = FALSE}
+landscape <- landscape %>% 
+  pivot_longer(cols = c(starts_with("osm_"), starts_with("lsm_")),
+               names_to = 'metric') %>% 
+  pivot_wider(id_cols = c("town", "point_id"),
+              names_from = c("radius_m", "metric"), 
+              values_from = "value",
+              names_glue = "r{radius_m}m_{metric}")
 
-var_comb <- combn(model_variables$variable, 2) %>% # unique combinations of variables
+# join to the bird data, then scale and centre predictors
+birds <- birds %>% 
+  inner_join(landscape) %>% 
+  mutate(across(.cols = where(is.numeric) & !sprich, scale))
+
+head(birds) # view combined data
+```
+
+To fit the model as a GLMM, the function `MuMIn::dredge()` will be used. The function includes customisation options; for instance, the `subset` argument allows the user to exclude certain combinations of variables within the fitted model (i.e., apply constraints to possible models that may be built). In the following example, we do not allow the same landscape predictor summarised within multiple buffer radii to be present in the same model.
+
+```{r create object to be supplied to function argument}
+
+# get predictor names
+predictors <- grep("^r[0-9]+m_",  colnames(birds), value = TRUE)
+
+# get rows with same predictors but different radii
+var_comb <- combn(predictors, 2) %>% # unique combinations
   t() %>% 
-  as.data.frame() %>% 
-  arrange(V1) %>%
-  mutate(subset = paste(V1, "&", V2))
-  
-# unique combinations of landscape metrics by type
-lsm_comb <- landscapemetrics::list_lsm() %>% 
-  dplyr::select(metric, type) %>% 
-  unique() %>% 
-  mutate(metric = paste0("_", metric)) %>% 
-  # group_by(type) %>% 
-  pivot_wider(names_from = "type", values_from = "metric") %>% 
-  apply(MARGIN = 2, FUN = function(x) combn(x[[1]], 2)) %>% 
-  as.data.frame() %>% 
-  t() %>% 
-  as.data.frame()
+  as.data.frame() %>%  # separate radii & predictors
+  separate(V1, c("V1_radius", "V1_predictor"),
+           sep = "(?<=[0-9])m_(?=[A-Za-z]*)", remove = FALSE) %>% 
+  separate(V2, c("V2_radius", "V2_predictor"),
+           sep = "(?<=[0-9])m_(?=[A-Za-z]*)", remove = FALSE) %>%
+  rowwise() %>% 
+  mutate(similar = grepl(V1_predictor, V2_predictor)) %>% 
+  filter(isTRUE(similar))
 
-# get unique landscape classes
-lsm_classes <- 
-  str_extract(model_variables$predictor, "(?<=lsm_)([^_]*)_") %>% 
-  str_remove("_") %>% 
-  unique() %>% na.omit()
-  
-subset_vec <- c()
-for(i in 1:nrow(lsm_comb)){ # extract combinations in var_comb that match rows in lsm_comb
+# create object to be supplied to function argument
+subset_vect <- paste(var_comb$V1, "&", var_comb$V2)
+subset_exp <- parse(text = paste0("!(", paste(subset_vect, collapse = ") & !("), ")")) # function argument requires an expression
 
-  for(j in seq_along(lsm_classes)){
-
-    to_subset <-
-      with(var_comb,
-           var_comb[grepl(glue::glue("{lsm_classes[j]}{lsm_comb$V1[i]}"), V1) &
-                      grepl(glue::glue("{lsm_classes[j]}{lsm_comb$V2[i]}"), V2), ])
-
-    to_subset_inverted <- # if the combination is the other way round
-      with(var_comb,
-           var_comb[grepl(glue::glue("{lsm_classes[j]}{lsm_comb$V2[i]}"), V1) &
-                      grepl(glue::glue("{lsm_classes[j]}{lsm_comb$V1[i]}"), V2), ])
-
-    if(!is.null(to_subset)){
-      subset_vec <- c(subset_vec, paste(to_subset$subset))
-    }
-
-    if(!is.null(to_subset_inverted)){
-      subset_vec <- c(subset_vec, paste(to_subset_inverted$subset))
-    }
-
-  }
-  rm(to_subset, i, j)
-}
-
-subset_exp <- parse(text = paste0("!(", paste(subset_vec, collapse = ") & !("), ")")) # returns exp - subset doesn't accept paste
 ```
 
-Model data should then be scaled before building the models.
-
-```{r scale model_data, eval = FALSE}
-# scale/center model_data
-
-model_data <- model_data %>% 
-  mutate(across(.cols = where(is.numeric) & 
-                  !sprich, 
-                scale))
+```{r include = FALSE}
+rm(filepath, landscape,
+   var_comb, subset_vect)
 ```
 
-For the `MuMIn::dredge` function, a global model has to be fitted as a primary input. A null model is also fitted for the `extra` argument to calculate a delta-AIC value for model selection.
+Next, we fit both a global (maximal) model and null model, in order to calculate the difference in Akaike Information Criterion (AIC) value within the function `MuMIn::dredge()`. In the example data, the '`town`' is specified as the random effect. The argument '`family`' is specified as `"poisson"`, since the response variable is count data. See the function `lme4::glmer()` for more details and information on its arguments.
 
-```{r example dredge - global and null, eval = FALSE}
-model_global <- glmer(paste("sprich", "~", paste(model_variables$variable, collapse = " + "), "+ (1|town) "),
-                      family = poisson,
-                      data = model_data,
-                      na.action = "na.fail",
-                      control = lme4::glmerControl(optimizer = "bobyqa"))
+```{r global and null model}
+model_global <- 
+  glmer(paste("sprich", "~", paste(predictors, collapse = " + "), 
+              "+ (1|town) "),
+        family = "poisson",
+        na.action = "na.fail",
+        control = lme4::glmerControl(optimizer = "bobyqa"),
+        data = birds)
 
-model_null <- glmer(sprich ~ 1 + (1|town),
-                    family = poisson, data = model_data)
+model_null <- 
+  glmer(sprich ~ 1 + (1|town), family = "poisson", data = birds)
 ```
 
-The `MuMIn::dredge` function is then run with `model_global`, `subset = subset_exp` and `m.lim=c(NA,9)` as model combination constraints. 
+Automated model selection is performed using the function `MuMIn::dredge()`. Models are ranked based on their `AICc` value (AIC adjusted for small sample sizes). Model constraints are specified in the argument `subset = subset_exp`. To avoid a long runtime in this demonstration, we also limit the number of predictor variables in each model to four (`m.lim = c(NA,4)`).
 
-```{r example dredge - dredge, eval = FALSE}
+```{r example dredge - dredge, message = FALSE, warning = FALSE}
 model_glm <- dredge(model_global,
                     subset= subset_exp,
-                    m.lim=c(NA,9), # max of 9 variables
-                    rank="AICc",
-                    extra = list(R2 = function(x) r.squaredGLMM(x, model_null)["delta", ]))
-
-# reduce size of huge object - subset only top models 
-model_glm <- subset(model_glm, 
-                   delta < 8,
-                   recalc.weights=TRUE)
+                    m.lim=c(NA,4), # max of 4 variables
+                    rank="AICc")
 ```
 
-```{r load dredge model object, include = FALSE}
-filepath <- system.file("extdata", "models-remote-post-rf_sample.Rdata", package = "biodivercity")
-load(filepath)
+The resulting object contains a model selection table, with each row representing a model that was fit. It is arranged in ascending order, based on AIC value (lower AIC value represents a 'better' model). A summary of the top models with values of ΔAIC < 2 can be viewed:
 
-filepath <- system.file("extdata", "model_data.Rdata", package = "biodivercity")
-load(filepath)
-
-model_data <- model_data %>% 
-  dplyr::mutate(across(.cols = where(is.numeric) & !sprich, 
-                scale))
-```
-
-The resulting `model_glm` object contains all of the top models with values of ΔAIC < 8. Here, a summary of the top models with values of ΔAIC < 2 can be viewed:
-
-```{r table of best models, echo = FALSE}
+```{r table of best models}
 bestmodels_info <- subset(model_glm, 
-                         delta < 2,
+                         delta < 2, 
                          recalc.weights=FALSE)
 
-to_print <- bestmodels_info %>% 
-  as.data.frame() %>% 
-  dplyr::select(where(function(x) any(!is.na(x)))) %>% 
-  mutate(across(.cols = !df, ~round(., 3))) %>% 
-  mutate(across(.cols = everything(), ~ifelse(is.na(.), "-", .)))
-
-knitr::kable(to_print, caption = glue::glue("**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < 2).**")) %>%
+knitr::kable(bestmodels_info, caption = glue::glue("**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < 2).**")) %>%
   kableExtra::kable_styling("striped") %>% kableExtra::scroll_box(width = "100%", height = "300px")
 ```
+We can also visualise the importance (based on sum-of-weights) and effect direction (based on coefficient value) for each variable within the top models:
 
-For a visual breakdown of variables in the top models, a plot of the top important variables and their sum of model weights across all models can be produced:
+```{r plot important variables, message = FALSE, dpi = 300, fig.width=5, fig.height=4, fig.align='center', out.width="100%"}
 
-```{r plot of coefs, message = FALSE}
-coef <- data.frame(coef(bestmodels_info)[,-1]) %>% 
+# average the effect of each predictor
+effects <- data.frame(coef(bestmodels_info)[,-1]) %>% 
   summarise(across(everything(), ~ mean(.x, na.rm = TRUE))) %>% 
   pivot_longer(everything(), names_to = "var") %>% 
   mutate(effect = ifelse(value > 0, "Positive", "Negative"))
 
-imp <- data.frame(MuMIn::sw(bestmodels_info)) %>% 
+# get importance of each predictor
+importances <- data.frame(MuMIn::sw(bestmodels_info)) %>% 
   rename(imp = MuMIn..sw.bestmodels_info.) %>% 
   rownames_to_column("var") %>% 
-  left_join(coef, by = "var") %>% 
+  left_join(effects, by = "var") %>% # join with effects
   mutate(effect = ifelse(is.na(effect), "Mixed (factor)", effect)) %>%
   mutate(effect = factor(effect, levels = c("Positive", "Negative", "Mixed (factor)")))
 
-ggplot(data=imp, aes(x = imp, y = reorder(var, imp), 
+# plot
+ggplot(data=importances, aes(x = imp, y = reorder(var, imp), 
                      fill = effect)) + 
   geom_bar(stat = "identity") +
   labs(x = "Sum of weights", y = "Variables") +
@@ -213,22 +171,28 @@ ggplot(data=imp, aes(x = imp, y = reorder(var, imp),
 
 ```
 
+Finally, we can extract the list of best model object(s) for future use:
+
+```{r}
+bestmodels <- MuMIn::get.models(bestmodels_info, subset = TRUE)
+```
+
+
 ```{r, include = FALSE}
-rm(filepath, to_print, coef, imp)
-
-# bestmodels <- MuMIn::get.models(bestmodels_info, subset = TRUE)
-# performance::check_model(bestmodels[[1]])
-
-rm(bestmodels_info)
+rm(birds, predictors, subset_exp,
+   model_glm, model_global, model_null, 
+   effects, importances,
+   bestmodels, bestmodels_info)
 ```
 
 <br>
 
 ---
 
-## 2. Community diversity
+## 2. Community (_Beta_) diversity
 
 ### Partial RDA
+
 Partial RDA models were used to model the relationship between animal communities and landscape predictors while considering also the inherent spatial structure of the animal communities. Similarly, variable selection by random forest was performed on the landscape variables prior to beta model building. In the following sections, the example variables were selected using the `randomForestSRC` and `MultivariateRandomForest` packages. After the first round of variable selection, the landscape predictors were summerised as Principal Component Analysis (PCA) axes while the spatial variation were quantified using Principle Coordinates of Neighbourhood Matrices (PCNM).
 
 First, load the additional package `vegan` for beta diversity model building:

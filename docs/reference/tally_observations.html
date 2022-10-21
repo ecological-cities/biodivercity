@@ -96,10 +96,10 @@ must be provided.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tally_observations</span><span class="op">(</span>
   <span class="va">observations</span>,
   <span class="va">survey_ref</span>,
-  <span class="va">specify_area</span>,
-  <span class="va">specify_period</span>,
-  <span class="va">specify_taxon</span>,
-  <span class="va">level</span>,
+  level <span class="op">=</span> <span class="st">"point"</span>,
+  specify_taxon <span class="op">=</span> <span class="cn">NULL</span>,
+  specify_area <span class="op">=</span> <span class="cn">NULL</span>,
+  specify_period <span class="op">=</span> <span class="cn">NULL</span>,
   survey_id <span class="op">=</span> <span class="st">"survey_id"</span>,
   area <span class="op">=</span> <span class="st">"area"</span>,
   period <span class="op">=</span> <span class="st">"period"</span>,
@@ -120,14 +120,18 @@ It should include columns for <code>survey_id</code>, <code>area</code>, <code>p
 <dt>survey_ref</dt>
 <dd><p>Dataframe of all surveys conducted. Values in the column
 <code>survey_id</code> should correspond to those in the <code>observations</code>.</p></dd>
-<dt>specify_area</dt>
-<dd><p>Specify the <code>area</code> (character).</p></dd>
-<dt>specify_period</dt>
-<dd><p>Specify the survey <code>period</code> (character).</p></dd>
-<dt>specify_taxon</dt>
-<dd><p>Specify the <code>taxon</code> of interest (character).</p></dd>
 <dt>level</dt>
-<dd><p>Specify whether to tally by <code>'survey'</code> or <code>'point'</code> (character).</p></dd>
+<dd><p>Specify whether to tally by <code>'survey'</code> or <code>'point'</code> (character).
+Defaults to <code>'point'</code>.</p></dd>
+<dt>specify_taxon</dt>
+<dd><p>Specify the <code>taxon</code> of interest (character).
+Defaults to <code>NULL</code>, which includes all taxa.</p></dd>
+<dt>specify_area</dt>
+<dd><p>Specify the <code>area</code> (character).
+Defaults to <code>NULL</code>, which includes all areas.</p></dd>
+<dt>specify_period</dt>
+<dd><p>Specify the survey <code>period</code> (character).
+Defaults to <code>NULL</code>, which includes all periods.</p></dd>
 <dt>survey_id</dt>
 <dd><p>Column name of the unique identifier for each survey in <code>observations</code> and
 <code>survey_ref</code>. Defaults to <code>survey_id</code>.</p></dd>

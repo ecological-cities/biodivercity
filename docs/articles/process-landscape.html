@@ -101,11 +101,11 @@
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Process Landscape Data</h1>
-            <h3 data-toc-skip class="subtitle">Download, process and
-summarise landscape data at point locations</h3>
+            <h3 data-toc-skip class="subtitle">Download and summarise
+landscape data at point locations</h3>
                         <h4 data-toc-skip class="author">Edwin Tan</h4>
             
-            <h4 data-toc-skip class="date">2022-10-12</h4>
+            <h4 data-toc-skip class="date">2022-10-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/process-landscape.Rmd" class="external-link"><code>vignettes/process-landscape.Rmd</code></a></small>
       <div class="d-none name"><code>process-landscape.Rmd</code></div>
@@ -1497,12 +1497,15 @@ list, with each element corresponding to a particular buffer radius.
 Column names include a prefix indicating that values are landscape
 metrics derived from a classified raster (<code>lsm_</code>).</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/calc_lsm.html">calc_lsm</a></span><span class="op">(</span>raster <span class="op">=</span> <span class="va">veg_classified</span>,
-         points <span class="op">=</span> <span class="va">points</span>,
-         buffer_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>, <span class="co"># in metres</span>
-         level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"class"</span><span class="op">)</span>,
-         class_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"veg"</span><span class="op">)</span>, <span class="co"># land cover class name</span>
-         class_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># pixel value of class</span></code></pre></div>
+<code class="sourceCode R"><span class="va">lsm_perpoint</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/calc_lsm.html">calc_lsm</a></span><span class="op">(</span>raster <span class="op">=</span> <span class="va">veg_classified</span>,
+           points <span class="op">=</span> <span class="va">points</span>,
+           buffer_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>, <span class="co"># in metres</span>
+           level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"class"</span><span class="op">)</span>,
+           class_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"veg"</span><span class="op">)</span>, <span class="co"># land cover class name</span>
+           class_values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># pixel value of class</span>
+
+<span class="va">lsm_perpoint</span></code></pre></div>
 <pre><code><span class="co">## $`100`</span>
 <span class="co">## <span style="color: #949494;"># A tibble: 3 × 57</span></span>
 <span class="co">##   point_id percentage_inside lsm_veg_ai lsm_veg_area_cv lsm_veg_area_mn</span>
@@ -1532,6 +1535,28 @@ metrics derived from a classified raster (<code>lsm_</code>).</p>
 <span class="co">## <span style="color: #949494;">#   lsm_veg_contig_mn &lt;dbl&gt;, lsm_veg_contig_sd &lt;dbl&gt;, lsm_veg_core_cv &lt;dbl&gt;,</span></span>
 <span class="co">## <span style="color: #949494;">#   lsm_veg_core_mn &lt;dbl&gt;, lsm_veg_core_sd &lt;dbl&gt;, lsm_veg_cpland &lt;dbl&gt;,</span></span>
 <span class="co">## <span style="color: #949494;">#   lsm_veg_dcad &lt;dbl&gt;, lsm_veg_dcore_cv &lt;dbl&gt;, lsm_veg_dcore_mn &lt;dbl&gt;, …</span></span></code></pre>
+<p>This list object can then be converted into a dataframe, with a new
+column indicating the radii in which these landscape metrics have been
+summarised.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">lsm_perpoint</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span>.id <span class="op">=</span> <span class="st">"radius"</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 6 × 58</span></span>
+<span class="co">##   radius point_id percentage_inside lsm_veg_ai lsm_veg_area_cv lsm_veg_area_mn</span>
+<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">## <span style="color: #BCBCBC;">1</span> 100    1                     99.7       78.1           217.           0.142 </span>
+<span class="co">## <span style="color: #BCBCBC;">2</span> 100    2                     99.4       61              95.2          0.072<span style="text-decoration: underline;">5</span></span>
+<span class="co">## <span style="color: #BCBCBC;">3</span> 100    3                    100.        80             131.           0.14  </span>
+<span class="co">## <span style="color: #BCBCBC;">4</span> 200    1                     80.0       72.6           299.           0.169 </span>
+<span class="co">## <span style="color: #BCBCBC;">5</span> 200    2                     99.9       68.4           169.           0.183 </span>
+<span class="co">## <span style="color: #BCBCBC;">6</span> 200    3                    100.        74.7           157.           0.264 </span>
+<span class="co">## <span style="color: #949494;"># … with 52 more variables: lsm_veg_area_sd &lt;dbl&gt;, lsm_veg_ca &lt;dbl&gt;,</span></span>
+<span class="co">## <span style="color: #949494;">#   lsm_veg_cai_cv &lt;dbl&gt;, lsm_veg_cai_mn &lt;dbl&gt;, lsm_veg_cai_sd &lt;dbl&gt;,</span></span>
+<span class="co">## <span style="color: #949494;">#   lsm_veg_circle_cv &lt;dbl&gt;, lsm_veg_circle_mn &lt;dbl&gt;, lsm_veg_circle_sd &lt;dbl&gt;,</span></span>
+<span class="co">## <span style="color: #949494;">#   lsm_veg_clumpy &lt;dbl&gt;, lsm_veg_cohesion &lt;dbl&gt;, lsm_veg_contig_cv &lt;dbl&gt;,</span></span>
+<span class="co">## <span style="color: #949494;">#   lsm_veg_contig_mn &lt;dbl&gt;, lsm_veg_contig_sd &lt;dbl&gt;, lsm_veg_core_cv &lt;dbl&gt;,</span></span>
+<span class="co">## <span style="color: #949494;">#   lsm_veg_core_mn &lt;dbl&gt;, lsm_veg_core_sd &lt;dbl&gt;, lsm_veg_cpland &lt;dbl&gt;,</span></span>
+<span class="co">## <span style="color: #949494;">#   lsm_veg_dcad &lt;dbl&gt;, lsm_veg_dcore_cv &lt;dbl&gt;, lsm_veg_dcore_mn &lt;dbl&gt;, …</span></span></code></pre>
 <p><br></p>
 <hr>
 </div>
@@ -1548,7 +1573,7 @@ snapshot date present within the <a href="https://download.geofabrik.de" class="
 latest data will be downloaded. In this example, we download these urban
 elements for the date 1 Jan 2021 and view them as an interactive
 map:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"/osm"</span><span class="op">)</span><span class="op">)</span> <span class="co"># create sub-directory for raw data</span>
 
 <span class="va">buildings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_buildings_osm.html">get_buildings_osm</a></span><span class="op">(</span>place <span class="op">=</span> <span class="va">sampling_areas</span>,
@@ -1608,12 +1633,15 @@ and <code>200</code> metres away from <code>points</code>. This returns
 a list, with each element corresponding to a particular buffer radius.
 Column names include a prefix indicating that values are from
 OpenStreetMap (<code>osm_</code>).</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/calc_osm.html">calc_osm</a></span><span class="op">(</span>vector <span class="op">=</span> <span class="va">buildings</span>, 
-         points <span class="op">=</span> <span class="va">points</span>,
-         name <span class="op">=</span> <span class="st">"buildings"</span>,
-         buffer_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>,
-         building_levels <span class="op">=</span> <span class="st">"levels"</span><span class="op">)</span> </code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">osm_perpoint</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/calc_osm.html">calc_osm</a></span><span class="op">(</span>vector <span class="op">=</span> <span class="va">buildings</span>, 
+           points <span class="op">=</span> <span class="va">points</span>,
+           name <span class="op">=</span> <span class="st">"buildings"</span>,
+           buffer_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>,
+           building_levels <span class="op">=</span> <span class="st">"levels"</span><span class="op">)</span> 
+
+<span class="va">osm_perpoint</span></code></pre></div>
 <pre><code><span class="co">## $`100`</span>
 <span class="co">## Simple feature collection with 3 features and 6 fields</span>
 <span class="co">## Geometry type: POINT</span>
@@ -1643,6 +1671,33 @@ OpenStreetMap (<code>osm_</code>).</p>
 <span class="co">## 1           5.657429             1.354830 POINT (378568.6 154093.9)</span>
 <span class="co">## 2          12.041015             3.362187 POINT (378843.9 154203.7)</span>
 <span class="co">## 3           9.944292             1.207745 POINT (377261.2 155606.9)</span></code></pre>
+<p>This list object can then be converted into a dataframe, with a new
+column indicating the radii in which these building metrics have been
+summarised.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="co"># alternative way to convert list to dataframe</span>
+       <span class="fu"><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply</a></span><span class="op">(</span><span class="va">transform</span>, <span class="va">osm_perpoint</span>, 
+              radius <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">osm_perpoint</span><span class="op">)</span>, <span class="co"># new column</span>
+              SIMPLIFY <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## Simple feature collection with 6 features and 7 fields</span>
+<span class="co">## Geometry type: POINT</span>
+<span class="co">## Dimension:     XY</span>
+<span class="co">## Bounding box:  xmin: 377261.2 ymin: 154093.9 xmax: 378843.9 ymax: 155606.9</span>
+<span class="co">## Projected CRS: WGS 84 / UTM zone 48N</span>
+<span class="co">##       point_id osm_buildingVol_m3 osm_buildingArea_m2 osm_buildingGFA_m2</span>
+<span class="co">## 100.1        1                 NA           11625.365           19716.97</span>
+<span class="co">## 100.2        2                 NA            6897.017           98054.42</span>
+<span class="co">## 100.3        3                 NA            3363.276           46360.45</span>
+<span class="co">## 200.1        1                 NA           30093.706          170253.01</span>
+<span class="co">## 200.2        2                 NA           35088.810          422504.89</span>
+<span class="co">## 200.3        3                 NA           15261.987          151769.65</span>
+<span class="co">##       osm_buildingAvgLvl osm_buildingFA_ratio radius                         x</span>
+<span class="co">## 100.1           1.696030            0.6276107    100 POINT (378568.6 154093.9)</span>
+<span class="co">## 100.2          14.216932            3.1211690    100 POINT (378843.9 154203.7)</span>
+<span class="co">## 100.3          13.784311            1.4756989    100 POINT (377261.2 155606.9)</span>
+<span class="co">## 200.1           5.657429            1.3548304    200 POINT (378568.6 154093.9)</span>
+<span class="co">## 200.2          12.041015            3.3621871    200 POINT (378843.9 154203.7)</span>
+<span class="co">## 200.3           9.944292            1.2077445    200 POINT (377261.2 155606.9)</span></code></pre>
 <p><br></p>
 <hr>
 </div>
@@ -1722,13 +1777,16 @@ with species name must be present</em>
 <p>For example, we can summarise the species and count of trees up to
 <code>50</code> metres away from <code>points</code>. This returns a
 list, with each element corresponding to a particular buffer radius.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pg_layers.Rdata"</span>, package <span class="op">=</span> <span class="st">"biodivercity"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span> <span class="co"># example landscape vector data</span>
 
-<span class="fu"><a href="../reference/calc_manual.html">calc_manual</a></span><span class="op">(</span>vector <span class="op">=</span> <span class="va">trees</span>, name <span class="op">=</span> <span class="st">"trees"</span>,
-            points <span class="op">=</span> <span class="va">points</span>, buffer_sizes <span class="op">=</span> <span class="fl">50</span>,
-            plant_species <span class="op">=</span> <span class="st">"species"</span><span class="op">)</span></code></pre></div>
+<span class="va">manual_perpoint</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/calc_manual.html">calc_manual</a></span><span class="op">(</span>vector <span class="op">=</span> <span class="va">trees</span>, name <span class="op">=</span> <span class="st">"trees"</span>,
+              points <span class="op">=</span> <span class="va">points</span>, buffer_sizes <span class="op">=</span> <span class="fl">50</span>,
+              plant_species <span class="op">=</span> <span class="st">"species"</span><span class="op">)</span>
+
+<span class="va">manual_perpoint</span></code></pre></div>
 <pre><code><span class="co">## $`50`</span>
 <span class="co">## Simple feature collection with 3 features and 3 fields</span>
 <span class="co">## Geometry type: POINT</span>
@@ -1739,6 +1797,21 @@ list, with each element corresponding to a particular buffer radius.</p>
 <span class="co">## 1        1               1              2 POINT (378568.6 154093.9)</span>
 <span class="co">## 2        2              20            100 POINT (378843.9 154203.7)</span>
 <span class="co">## 3        3               0              0 POINT (377261.2 155606.9)</span></code></pre>
+<p>This list object can then be converted into a dataframe, with a new
+column indicating the radii in which these metrics have been
+summarised.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">manual_perpoint</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span>.id <span class="op">=</span> <span class="st">"radius"</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## Simple feature collection with 3 features and 4 fields</span>
+<span class="co">## Geometry type: POINT</span>
+<span class="co">## Dimension:     XY</span>
+<span class="co">## Bounding box:  xmin: 377261.2 ymin: 154093.9 xmax: 378843.9 ymax: 155606.9</span>
+<span class="co">## Projected CRS: WGS 84 / UTM zone 48N</span>
+<span class="co">##   radius point_id man_tree_sprich man_tree_count                         x</span>
+<span class="co">## 1     50        1               1              2 POINT (378568.6 154093.9)</span>
+<span class="co">## 2     50        2              20            100 POINT (378843.9 154203.7)</span>
+<span class="co">## 3     50        3               0              0 POINT (377261.2 155606.9)</span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
