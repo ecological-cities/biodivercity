@@ -32,9 +32,9 @@ devtools::load_all() #knit manually with latest changes to circumvent library("b
 
 ---
 
-## Pre-survey preparations
+## 1. Pre-survey preparations
 
-### Generate sampling points - New
+### Generate new sampling points
 
 Before surveys can begin, survey points have to be randomly generated within the area of interest. If necessary, stratified random sampling can be performed to ensure sufficient representation between sub-areas of interest. 
 
@@ -93,7 +93,7 @@ ggplot(data = queenstown) +
 
 <br>
 
-### Generate sampling points - Retained
+### Retain sampling points
 
 If surveys are conducted across multiple periods (e.g. years), there may be a need to retain sampling points from a previous period, for example, for long-term monitoring at the same location. If this is the case, new points can be generated while ensuring that a certain proportion of these points are similar to those from a previous period. Note that the column `type` must also exist in the old dataset, with the value of either `Normal` or `Sub-area`. For example, we can choose to retain points in Queenstown from Survey Period `1`, which we assign to the variable `queenstown_retain`:
 
@@ -144,7 +144,7 @@ Finally, surveyors can proceed to assess the sampling points and their surroundi
 
 ---
 
-## Animal surveys
+## 2. Animal surveys
 
 ### Data format
 

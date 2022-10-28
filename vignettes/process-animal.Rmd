@@ -10,7 +10,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Animal observations from on-site surveys can be used to build predictive models of animal diversity, or summarised to directly compare animal diversity between different areas or time periods. This article outlines the ways to format, check and process the animal data to build the predictive models.
+Animal observations from on-site surveys can be used to build predictive models of animal diversity, or summarised to directly compare animal diversity between different areas or time periods. This article outlines the ways to format, check and process the animal data.
 
 <br>
 
