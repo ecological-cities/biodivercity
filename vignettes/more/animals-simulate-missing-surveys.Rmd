@@ -64,7 +64,7 @@ knitr::kable(head(scenarios), caption = "**First few rows of the object `scenari
 
 <br>
 
-## Visualise reuslts
+## Visualise results
 
 These 100 bootstrapped scenarios may be used in further analyses, or visualised to observe the variation in species richness within the sampled area of interest (Punggol): 
 

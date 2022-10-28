@@ -1036,7 +1036,7 @@ selection by random forest was performed on the landscape variables
 prior to beta model building. In the following sections, the example
 variables were selected using the <code>randomForestSRC</code> and
 <code>MultivariateRandomForest</code> packages. After the first round of
-variable selection, the landscape predictors were summerised as
+variable selection, the landscape predictors were summarised as
 Principal Component Analysis (PCA) axes while the spatial variation were
 quantified using Principle Coordinates of Neighbourhood Matrices
 (PCNM).</p>
@@ -1815,8 +1815,9 @@ the significant PC axes and PCNM vectors.</p>
 <span class="co">##     PC6 + PC7 + PC8, data = birds_selected)</span></code></pre>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">birds.rda.fin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">bird_com</span> <span class="op">~</span> <span class="va">PC1</span> <span class="op">+</span> <span class="va">PC2</span> <span class="op">+</span> <span class="va">PC4</span> <span class="op">+</span> <span class="va">PC6</span> <span class="op">+</span> <span class="va">PC7</span> <span class="op">+</span> <span class="va">PC8</span> <span class="op">+</span> <span class="fu">Condition</span><span class="op">(</span><span class="va">PCNM1</span> <span class="op">+</span> <span class="va">PCNM2</span> <span class="op">+</span> <span class="va">PCNM3</span> <span class="op">+</span> <span class="va">PCNM4</span> <span class="op">+</span> <span class="va">PCNM5</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">birds_selected</span><span class="op">)</span></code></pre></div>
-<p>The predictive β-diversity model also requires information on the
-average probability of each species occurring across all points.</p>
+<p>The predictive <em>Beta</em>-diversity model also requires
+information on the average probability of each species occurring across
+all points.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># fitted_126 &lt;- fitted(birds1.rda.fin, model = "CCA")</span>
 <span class="va">p_hats_birds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">bird_com</span>, <span class="fl">2</span>, <span class="va">mean</span><span class="op">)</span>
@@ -1941,8 +1942,8 @@ average probability of each species occurring across all points.</p>
 <span class="co">##                          0.01                          0.01 </span>
 <span class="co">##                 Mycteria spp. </span>
 <span class="co">##                          0.01</span></code></pre>
-<p>The PCA axes, PNCM vectors, final RDA model and probability of
-species occurence are saved out to be applied in the subsequent apply
+<p>The PCA axes, PCNM vectors, final RDA model and probability of
+species occurrence are saved out to be applied in the subsequent apply
 model section.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">pca_birds</span>,
