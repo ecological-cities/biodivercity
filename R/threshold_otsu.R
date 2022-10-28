@@ -28,6 +28,7 @@
 #'
 #'
 #'@import checkmate
+#'@importFrom graphics hist
 #'@importFrom terra rast minmax nlyr values
 #'
 #'@examples
@@ -78,8 +79,8 @@ threshold_otsu <- function(image,
   breaks <- seq(floor(range[1]*1000)/1000,  # ceiling/floor with decimal places
                 ceiling(range[2]*1000)/1000,
                 length.out = levels + 1)
-  hist_object <- hist.default(terra::values(image),  # just get the array
-                              breaks = breaks, plot = FALSE)
+  hist_object <- graphics::hist(terra::values(image),  # just get the array
+                                breaks = breaks, plot = FALSE)
   counts <- as.double(hist_object$counts)
   mids <- as.double(hist_object$mids)
 
