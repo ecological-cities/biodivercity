@@ -1,6 +1,6 @@
 ---
 title: "Build Models"
-subtitle: "Train and select the best models that predict animal diversity from landscape data"
+subtitle: "Train models that predict animal diversity from landscape data"
 author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -21,7 +21,7 @@ knitr::include_graphics("framework_build-models.png", dpi = 300)
 
 <br>
 
-In the examples below, generalised linear mixed-effects models (GLMMs) are used, since linear models are generally simpler and provide better interpretability. Do note that users may use other types of models/algorithms, or first narrow down the list of potential predictor variables. For example, random forest models may be used to select variables/features based on their relative importance in improving model performance (Arthur et al., 2010; Li et al., 2017). 
+In the examples below, generalised linear mixed-effects models (GLMMs) are used, since linear models are generally simpler and provide better interpretability. Do note that other types of models/algorithms may also be used instead. Also, the full list of potential predictor variables may first be narrowed down; for example, random forest models may be used to select variables based on their relative importance in improving model performance (Arthur et al., 2010; Li et al., 2017). 
  
 <br>
 
@@ -71,20 +71,20 @@ landscape <- landscape %>%
               values_from = "value",
               names_glue = "r{radius_m}m_{metric}")
 
-# join to the bird data, then scale and centre predictors
+# combine bird and landscape data, then then scale/center variables
 birds <- birds %>% 
-  inner_join(landscape) %>% 
+  inner_join(landscape, by = c("town", "point_id")) 
+birds_scaled <- birds %>% 
   mutate(across(.cols = where(is.numeric) & !sprich, scale))
 
-head(birds) # view combined data
+head(birds_scaled) # view combined data
 ```
 
 To fit the model as a GLMM, the function `MuMIn::dredge()` will be used. The function includes customisation options; for instance, the `subset` argument allows the user to exclude certain combinations of variables within the fitted model (i.e., apply constraints to possible models that may be built). In the following example, we do not allow the same landscape predictor summarised within multiple buffer radii to be present in the same model.
 
 ```{r create object to be supplied to function argument}
 
-# get predictor names
-predictors <- grep("^r[0-9]+m_",  colnames(birds), value = TRUE)
+predictors <- grep("^r[0-9]+m_",  colnames(birds_scaled), value = TRUE) # get predictor names
 
 # get rows with same predictors but different radii
 var_comb <- combn(predictors, 2) %>% # unique combinations
@@ -118,13 +118,13 @@ model_global <-
         family = "poisson",
         na.action = "na.fail",
         control = lme4::glmerControl(optimizer = "bobyqa"),
-        data = birds)
+        data = birds_scaled)
 
 model_null <- 
-  glmer(sprich ~ 1 + (1|town), family = "poisson", data = birds)
+  glmer(sprich ~ 1 + (1|town), family = "poisson", data = birds_scaled)
 ```
 
-Automated model selection is performed using the function `MuMIn::dredge()`. Models are ranked based on their `AICc` value (AIC adjusted for small sample sizes). Model constraints are specified in the argument `subset = subset_exp`. To avoid a long runtime in this demonstration, we also limit the number of predictor variables in each model to four (`m.lim = c(NA,4)`).
+Automated model selection is performed using the function `MuMIn::dredge()`. Models are ranked based on their `AICc` value (AIC adjusted for small sample sizes). Model constraints are specified in the argument `subset`. To avoid a long runtime in this demonstration, we also limit the number of predictor variables in each model to four (argument `m.lim`).
 
 ```{r example dredge - dredge, message = FALSE, warning = FALSE}
 model_glm <- dredge(model_global,
@@ -171,18 +171,33 @@ ggplot(data=importances, aes(x = imp, y = reorder(var, imp),
 
 ```
 
-Finally, we can extract the list of best model object(s) for future use:
+Finally, we can extract the models and `recipes::recipe()` objects for future use:
 
 ```{r}
+
+# get list of best models
 bestmodels <- MuMIn::get.models(bestmodels_info, subset = TRUE)
+
+# create recipes object only with predictors within best models
+predictors_best <- colnames(coef(bestmodels_info)[,-1])
+
+birds <- birds %>% # original unscaled dataset
+  dplyr::select(sprich, town, all_of(predictors_best)) # remove unnecessary columns
+
+recipe_birds <- recipes::recipe(birds) %>% 
+  recipes::update_role(sprich, new_role = "outcome") %>%
+  recipes::update_role(town, new_role = "id") %>%
+  recipes::update_role_requirements("id", bake = FALSE) %>%
+  recipes::step_normalize(all_of(predictors_best)) %>% 
+  recipes::prep()
 ```
 
 
 ```{r, include = FALSE}
-rm(birds, predictors, subset_exp,
+rm(birds, birds_scaled, predictors, subset_exp,
    model_glm, model_global, model_null, 
    effects, importances,
-   bestmodels, bestmodels_info)
+   bestmodels, bestmodels_info, predictors_best, recipe_birds)
 ```
 
 <br>
@@ -190,8 +205,6 @@ rm(birds, predictors, subset_exp,
 ---
 
 ## 2. Community (_Beta_) diversity
-
-### Partial RDA
 
 Partial RDA models were used to model the relationship between animal communities and landscape predictors while considering also the inherent spatial structure of the animal communities. Similarly, variable selection by random forest was performed on the landscape variables prior to beta model building. In the following sections, the example variables were selected using the `randomForestSRC` and `MultivariateRandomForest` packages. After the first round of variable selection, the landscape predictors were summerised as Principal Component Analysis (PCA) axes while the spatial variation were quantified using Principle Coordinates of Neighbourhood Matrices (PCNM).
 
