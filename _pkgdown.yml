@@ -53,7 +53,7 @@ footer:
 navbar:
   structure:
     left:  [intro, articles, more, reference, news]
-    right: [about, github]
+    right: [github]
   components:
     articles:
       text: Articles
@@ -81,17 +81,12 @@ navbar:
         href: articles/more/animals-simulate-missing-surveys.html
       - text: Models - Test accuracy
         href: articles/more/test-models.html
-      - text: Models - Future updates
-        href:
     reference:
       text: Functions
       href: reference/index.html
     news:
       text: News
       href: news/index.html
-    about:
-      text: About
-      href: https://xp-song.github.io/project/birt/
 
 reference:
 - title: "Data"
