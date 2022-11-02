@@ -1,33 +1,35 @@
 Package: biodivercity
-Title: Spatial predictions of biodiversity across urban landscapes
+Title: Spatial predictions of biodiversity across city landscapes
 Version: 0.0.0.9000
 Authors@R: 
-    c(person(given = "Edwin",
-           family = "Tan",
-           role = c("aut", "cre"),
-           email = "dbsetyw@nus.edu.sg",
-           comment = c("Package development, input on geospatial analysis, data collection/curation, methodology")),
-      person(given = "Xiao Ping",
+    c(person(given = "Xiao Ping",
              family = "Song",
              role = c("aut"),
-             email = "xp.song@u.nus.edu",
-             comment = c("Project/issue management and data workflow, package development, input on geospatial analysis, methodology",
+             comment = c("Project management, methodology and data workflow, geospatial analysis",
                          ORCID = "0000-0002-8825-195X")),
+      person(given = "Edwin",
+           family = "Tan",
+           role = c("aut", "cre"),
+           comment = c("Data collection/curation, methodology, input on geospatial analysis")),                   
+      person(given = "Rachel",
+             family = "Lee",
+             role = c("aut"),
+             comment = c("Methodology, data collection/curation, input on community diversity")), 
       person(given = "Hong Jhun",
              family = "Sim",
              role = c("aut"),
-             comment = c("Input on community diversity, methodology, data collection")), 
+             comment = c("Methodology, data collection, input on community diversity")), 
       person(given = "Justin",
              family = "Nai",
              role = c("aut"),
-             comment = c("Data curation of species-level attributes, data collection, methodology")),  
+             comment = c("Data collection/curation, methodology")),  
       person(given = "Kwek Yan",
              family = "Chong",
              role = "aut",
              comment = c("Conceptualisation, funding acquisition, methodology, supervision",
                          ORCID = "0000-0003-4754-8957"))
      )
-Description: Assess the diversity of animal species in urban areas.
+Description: An R package for spatial assessment of biodiversity across city landscapes
 License: GPL (>= 3)
 URL: https://github.com/ecological-cities/biodivercity
 BugReports: https://github.com/ecological-cities/biodivercity/issues

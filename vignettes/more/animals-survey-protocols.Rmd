@@ -1,7 +1,6 @@
 ---
 title: "Animals: Survey Protocols"
 subtitle: "Systematically sample and record animal observations at point locations"
-author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

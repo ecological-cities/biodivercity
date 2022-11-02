@@ -1,7 +1,6 @@
 ---
 title: "Build Models"
 subtitle: "Train models that predict animal diversity from landscape data"
-author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Spatial predictions of biodiversity across urban landscapes
+# Spatial predictions of biodiversity across city landscapes
 
 <!-- badges: start -->
 
@@ -40,13 +40,11 @@ amphibians, etc.). The key features include:
 -   Generate data summaries of the animals surveyed, at multiple levels
     of granularity (e.g., areas, periods, animal groups, species)
 -   Download and process landscape data within areas of interest (e.g.,
-    satellite imagery, OpenStreetMap data)
--   Convert vector data generated from future design scenarios into
-    formats suitable for model predictions
--   Build and validate predictive models to assess local (*Alpha*),
-    community (*Beta*) and total (*Gamma*) diversity for an animal group
+    remotely sensed data, OpenStreetMap data, manually mapped data)
+-   Build predictive models to assess local (*Alpha*), community
+    (*Beta*) and total (*Gamma*) diversity for an animal group
 -   Use models to make pixel-based spatial predictions across new areas
-    and into the future
+    and time periods
 -   Summarise predictions to benchmark and compare biodiversity
     ‘performance’ between planning units across the city
 
@@ -65,9 +63,9 @@ group </b>
 To cite `biodivercity` or acknowledge its use, please cite the
 following:
 
-*Tan, E. Y. W., Song, X. P., Sim, H. J., Nai, J., Chong, K. Y. (2022).
-biodivercity: An R package to assess the diversity of animal species in
-urban areas. R package version 0.0.1 (unreleased).
+*Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong,
+K. Y. (2022). biodivercity: An R package for spatial assessment of
+biodiversity across city landscapes. R Package version 0.1.0.
 <https://github.com/ecological-cities/biodivercity>.*
 
 To get a BibTex entry, run `citation("biodivercity")`.

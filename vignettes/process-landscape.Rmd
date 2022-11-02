@@ -1,7 +1,6 @@
 ---
 title: "Process Landscape Data"
 subtitle: "Download and summarise landscape data at point locations"
-author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

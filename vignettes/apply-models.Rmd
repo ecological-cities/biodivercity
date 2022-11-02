@@ -1,7 +1,6 @@
 ---
 title: "Apply Models"
 subtitle: "Generate spatial predictions across a landscape"
-author: "Hong Jhun Sim"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

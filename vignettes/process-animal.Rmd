@@ -1,7 +1,6 @@
 ---
 title: "Process Animal Data"
 subtitle: "Format, check and summarise data from animal surveys conducted at point locations"
-author: "Edwin Tan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

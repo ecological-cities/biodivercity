@@ -2,15 +2,15 @@ citHeader("To cite biodivercity in publications use:")
 
 citEntry(
   entry    = "Manual",
-  title    = "biodivercity: An R package to assess the diversity of animal species in urban areas",
-  author   = "Edwin YW Tan, Xiao Ping Song, Hong Jhun Sim, Justin Nai, Kwek Yan Chong",
+  title    = "{biodivercity}: An R package for spatial assessment of biodiversity across city landscapes",
+  author   = "Xiao Ping Song, Edwin YW Tan, Rachel SK Lee, Hong Jhun Sim, Justin Nai, Kwek Yan Chong",
   journal  = " ",
   year     = "2022",
   volume   = " ",
   number   = " ",
   pages    = "",
   url      = "https://github.com/ecological-cities/biodivercity",
-  note     = "R package version 0.0.1 (unreleased)",
+  note     = "R package version 0.1.0",
   doi      = " ",
-  textVersion = paste("Tan, E. Y. W., Song, X. P., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package to assess the diversity of animal species in urban areas. R Package version 0.0.1 (unreleased). https://github.com/ecological-cities/biodivercity.")
+  textVersion = paste("Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package for spatial assessment of biodiversity across city landscapes. R Package version 0.1.0. https://github.com/ecological-cities/biodivercity.")
 )

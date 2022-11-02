@@ -1,7 +1,6 @@
 ---
 title: "Model Use Cases"
 subtitle: "Quantitative comparisons of animal diversity across space and time"
-author: "Song, Xiao Ping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

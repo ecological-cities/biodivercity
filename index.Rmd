@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Spatial predictions of biodiversity across urban landscapes
+# Spatial predictions of biodiversity across city landscapes
 
 <!-- badges: start -->
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -32,10 +32,9 @@ Many frameworks to assess 'biodiversity' have been proposed in research and prac
 
 - Step-by-step protocols for random point sampling of an animal group within areas of interest
 - Generate data summaries of the animals surveyed, at multiple levels of granularity (e.g., areas, periods, animal groups, species)
-- Download and process landscape data within areas of interest (e.g., satellite imagery, OpenStreetMap data)
-- Convert vector data generated from future design scenarios into formats suitable for model predictions
-- Build and validate predictive models to assess local (_Alpha_), community (_Beta_) and total (_Gamma_) diversity for an animal group
-- Use models to make pixel-based spatial predictions across new areas and into the future
+- Download and process landscape data within areas of interest (e.g., remotely sensed data, OpenStreetMap data, manually mapped data)
+- Build predictive models to assess local (_Alpha_), community (_Beta_) and total (_Gamma_) diversity for an animal group
+- Use models to make pixel-based spatial predictions across new areas and time periods
 - Summarise predictions to benchmark and compare biodiversity 'performance' between planning units across the city
 
 <br>
@@ -51,7 +50,7 @@ knitr::include_graphics("man/figures/framework.png", dpi = 300)
 
 To cite `biodivercity` or acknowledge its use, please cite the following:
 
-*Tan, E. Y. W., Song, X. P., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package to assess the diversity of animal species in urban areas. R package version 0.0.1 (unreleased). https://github.com/ecological-cities/biodivercity.*  
+*Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package for spatial assessment of biodiversity across city landscapes. R Package version 0.1.0. https://github.com/ecological-cities/biodivercity.*  
 
 To get a BibTex entry, run `citation("biodivercity")`.
 
