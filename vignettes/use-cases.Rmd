@@ -30,7 +30,7 @@ sg_subzones <-
   read_sf() %>% 
   relocate("subzone_n")
 
-heatmap_dragons <- 
+bird_heatmap <- 
   system.file("extdata", "alpha-diversity_birds_delta-aic-2_subzones_500m.tif", package="biodivercity") %>% 
   terra::rast()
 
@@ -40,7 +40,7 @@ tm_basemap(c("CartoDB.Positron")) +
   tm_shape(sg_subzones) +
     tm_polygons(group = "Singapore Subzones",
                 alpha = 0) +
-  tm_shape(heatmap_dragons, raster.downsample = FALSE) +
+  tm_shape(bird_heatmap, raster.downsample = FALSE) +
     tm_raster(group = "Local diversity: Birds",
               title = "Number of bird species",
               style = "fisher",
@@ -52,7 +52,7 @@ tm_basemap(c("CartoDB.Positron")) +
 ```
 
 <center>
-**Map: Spatial predictions of local (_Alpha_) diversity of birds across subzones in Singapore.** The pixel resolution used for predictions in this example is 500 km x 500 km.
+**Map: Spatial predictions of local (_Alpha_) diversity of birds across subzones in Singapore.** The pixel resolution used for predictions in this example is 500 m x 500 m.
 </center>
 
 <br>
@@ -70,6 +70,11 @@ If spatial predictions were made for multiple snapshots in time, benchmarking co
 
 Finally, it is worth noting that full customisation of both the pixel size and boundaries within which to summarise the pixel values can be done. This provides flexibility according to the level of analysis (e.g., geographical scale) required by the user. By summarising pixel values within zones used in city planning, animal diversity may be assessed alongside other indices also summarised at the level of these planning units, thus providing a more comprehensive view of components related to biodiversity and beyond.  
 
+```{r include = FALSE}
+rm(bird_heatmap, sg_subzones)
+```
+
+
 <br>
 
 ---
@@ -78,7 +83,7 @@ Finally, it is worth noting that full customisation of both the pixel size and b
 
 Other than monitoring changes in biodiversity, there is also a need to assess future urban developments, for instance, to see if proposed designs can effectively mitigate the loss of biodiversity. But since such landscapes do not exist, snapshots of remotely sensed data can not be used. It is therefore important to carefully consider data compatibility between these different use cases when building and using the predictive models.
 
-Urban design and planning involves the consideration of multiple design scenarios. Manually generated landscape elements (e.g., vector data for vegetation and water) may be produced from prospective designs, but the format and types of such data must be compatible with those used in the predictive models. For instance, when selecting landscape predictors to build the models, land cover classification as discrete rasters would be more compatible with manually generated data, compared to continuous rasters that cannot be feasibly calculated (e.g., spectral indices such as NDVI). Vegetation generated in design scenarios can be rasterized into discrete land cover-types (Figure 2), and used to replace the remotely sensed data within regions of interest (Figure 3). Such amendments to landscape data can be made across a site slated for urban development, and then used to make spatial predictions for that particular design scenario.
+Urban design and planning involves the consideration of multiple design scenarios. Manually generated landscape elements (e.g., vector data for vegetation) may be produced from prospective designs, but the format and types of such data must be compatible with those used in the predictive models. For instance, when selecting landscape predictors to build the models, land cover classification as discrete rasters would be more compatible with manually generated data, compared to continuous rasters that cannot be feasibly calculated (e.g., spectral indices such as NDVI). Vegetation generated in design scenarios can be rasterized into discrete land cover-types (Figure 2), and used to replace the remotely sensed data within regions of interest (see Map below). Such amendments to landscape data can be made across a site slated for urban development, and then used to make spatial predictions for that particular design scenario.
 
 ```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 2: Example showing how manually generated vector data of vegetation can be converted into a classified raster of vegetation types used in the predictive models.**"}
 knitr::include_graphics("data-compatibility-rasterize.png", dpi = 300)
@@ -86,20 +91,288 @@ knitr::include_graphics("data-compatibility-rasterize.png", dpi = 300)
 
 <br>
 
-```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 3: Example showing how a classified raster of remotely sensed vegetation can be amended with the manually generated vector data (rasterised).**"}
-knitr::include_graphics("data-compatibility-amend.png", dpi = 300)
+To demonstrate this, we can import remotely-sensed data within the Punggol (PG) area in Singapore. The following code are very similar to the examples shown in `vignette("apply-models")`.
+
+```{r import remotely sensed data}
+
+# load polygon of punggol boundaries
+data(sampling_areas)
+punggol <- sampling_areas %>%
+   filter(area == "PG")
+
+# get landscape data ready
+filepath <- system.file("extdata", "osm_data.Rdata", package = "biodivercity")
+load(filepath)
+
+ndvi_mosaic <- system.file("extdata", "ndvi_mosaic.tif", package="biodivercity") %>% 
+  terra::rast()
+veg_remote <- classify_image_binary(ndvi_mosaic, threshold = "otsu")
+```
+
+Next, import landscape vectors (points, polygons, lines) mapped manually within a site in PG (Chong et al., 2014, 2019). These represent manually generated data from a design scenario. Further details and a visualisation of these vector data are available in `vignette("process-landscape")`.
+
+```{r import manually mapped vector data, message=FALSE}
+filepath <- system.file("extdata", "landscape-vectors_mapped.Rdata", package = "biodivercity") # load example data
+load(filepath) 
+```
+
+With the remotely sensed data across the broader PG area and manually generated data within the site of interest, we can replace (amend) the original data within the site with the (rasterised) vector data. In this simple demonstration, we project the canopy area of each tree (point) based on a 5m radius, and combine all manually mapped vegetation into a single class (category). 
+
+```{r replace remotely sensed vegetation with manually generated vegetation vectors}
+
+# combine all veg vectors
+veg <- trees %>% 
+  st_buffer(dist = 5) %>%  # 5m radius for tree canopies
+  bind_rows(natveg) %>% 
+  bind_rows(shrubs) %>% 
+  bind_rows(turf)
+
+# rasterise veg vectors
+veg_rasterised <- 
+  terra::rasterize(terra::vect(veg),
+                   veg_remote, # use remotely sensed vegetation as reference raster
+                   background = 0) 
+
+# mask away rasterised veg not within site boundaries
+veg_rasterised <- 
+       terra::mask(veg_rasterised, 
+                   vect(bound))
+
+# mask away the site from remotely sensed veg
+veg_amended <- terra::mask(veg_remote, vect(bound), inverse = TRUE)
+  
+# fill in amended veg raster with rasterised veg
+veg_amended <- terra::merge(veg_amended, veg_rasterised)
+
+```
+
+Similarly, building and roads within the site boundaries are replaced (amended).
+
+```{r replace osm buildings/roads with manually generated ones, warning = FALSE}
+
+# buildings
+buildings_amended <- buildings_osm %>% 
+  sf::st_difference(sf::st_union(bound)) %>% # remove osm buildings within site boundaries
+  dplyr::mutate(source = "osm") %>% # add column indicating data source
+  bind_rows(buildings %>% # append manually generate buildings
+              mutate(source = "generated"))
+
+# roads
+roads_amended <- roads_osm %>% 
+  sf::st_difference(sf::st_union(bound)) %>% # remove osm roads within site boundaries
+  mutate(lanes = as.numeric(lanes)) %>% 
+  dplyr::mutate(source = "osm") %>% # add column indicating data source
+  bind_rows(roads %>% # append manually generate buildings
+              mutate(source = "generated"))
+
+```
+
+Here's map showing both the original and amended rasters for classified vegetation:
+
+```{r plot original and amended data for punggol area, out.width="100%", message = FALSE, warning = FALSE, echo = FALSE}
+
+tmap_mode("view")
+tm <- tm_basemap(c("CartoDB.Positron")) +
+  tm_shape(punggol) + tm_borders() +
+  tm_shape(bound) + tm_borders(lwd = 3.0, col = "red") +
+  # tm_shape(buildings_osm) + tm_polygons(col = "levels") +
+  # tm_shape(buildings_amended) + tm_polygons(col = "levels") +
+  # tm_shape(roads_osm) + tm_lines(col = "lanes", palette = "YlOrRd") +
+  # tm_shape(roads_amended) + tm_lines(col = "lanes", palette = "YlOrRd") +
+  tm_shape(veg_remote) +
+    tm_raster(style = "cat", palette = c("grey", "darkgreen")) +
+  tm_shape(veg_amended) +
+    tm_raster(style = "cat", palette = c("grey", "darkgreen"))
+  
+tm %>% 
+  tmap_leaflet() %>%
+  # leaflet::hideGroup("buildings_amended") %>%
+  # leaflet::hideGroup("roads_amended") %>%
+  leaflet::hideGroup("veg_amended")
+rm(tm)
+```
+
+<center>
+**Map: Example showing how a classified raster of remotely sensed vegetation can be amended with the manually generated (rasterised) vector data at a site (red boundaries) within Punggol, Singapore.** Toggle the map layers to view the amended raster layer.
+</center>
+
+```{r include = FALSE}
+rm(sampling_areas, filepath, 
+   veg, trees, natveg, shrubs, turf, water, buildings, roads,
+   ndvi_mosaic, veg_rasterised)
 ```
 
 <br>
 
+Following similar code in `vignette("apply-models")`, these amended data for vegetation, buildings and roads can then be used to make spatial predictions of animal diversity across the site of interest. In the example below, we show how local (_Alpha_) bird diversity can be predicted for the original and amended scenario. The process within this vignette can be repeated accordingly if there are multiple design scenarios.
 
-While such data conversions may allow similar predictors (and hence models) to be used for different use cases, it should be noted that potential mismatches between different data sources may result in inaccurate predictions. Reducing the mismatch between remotely sensed and manually generated data is an important gap that should be addressed. For instance, the level of detail in design scenarios may not include the exact locations of planted trees, and their estimated canopy projection areas may vary greatly from reality after planting. Furthermore, the remotely sensed data represents a top-down view of the landscape, and the effect of multi-tiered planting is not accounted for within the landscape predictors. Collaboration between researchers and practitioners is needed to ensure that model workflows align with the data formats and outputs used in design practice, and that suitable methods are used to ensure that artificially generated datasets are both compatible and accurate to reality after implementation.
+
+Process the model data and generate a regular grid across the site of interest:
+
+```{r load alpha diversity model and generate grid, message = FALSE, warning = FALSE}
+
+filepath <- system.file("extdata", "apply-models_alpha-diversity.Rdata", package="biodivercity")
+load(filepath)
+
+# landscape predictors
+predictors <- colnames(coef(bestmodels_info)[,-1])
+
+# generate regular grid within site boundaries
+grid_points <- generate_grid(target_areas = bound, 
+                             pixelsize_m = 50,
+                             innerbuffer_m = 0) %>%
+  rownames_to_column("point_id") # add unique identifier 
+```
+
+Make predictions for the original dataset:
+
+```{r summarise and predict for original data, message = FALSE, warning = FALSE}
+# vegetation cover
+predictors_veg <- stringr::str_subset(predictors, "lsm_veg_.*$")
+results_veg <- 
+  calc_specific_lsm(raster = veg_remote,
+                    predictors_lsm = predictors_veg,
+                    class_names = c("veg"),
+                    class_values = c(1),
+                    points = grid_points,
+                    na_threshold = 0) # reduce no. of NA pixels, since original & amended scenarios have no data outside the site boundaries 
+
+# osm buildings
+predictors_buildings <- stringr::str_subset(predictors, "osm_building.*$")
+results_buildings <-
+      calc_specific_osm(vector = buildings_osm,
+                        predictors_osm = predictors_buildings,
+                        building_levels = "levels",
+                        building_height = "height",
+                        points = grid_points)
+
+# osm roads
+predictors_roads <- stringr::str_subset(predictors, "osm_lane.*$")
+results_roads <-
+      calc_specific_osm(vector = roads_osm,
+                        predictors_osm = predictors_roads,
+                        road_lanes = "lanes",
+                        points = grid_points)
+
+# combine results and overwrite 'grid_points' variable 
+grid_points_original <- results_veg %>% 
+  full_join(results_buildings %>% st_set_geometry(NULL)) %>% 
+  full_join(results_roads %>% st_set_geometry(NULL))
+
+# make predictions
+bird_heatmap <- 
+  predict_heatmap(models = bestmodels, 
+                  recipe_data = recipe_birds,
+                  points_topredict = grid_points_original, 
+                  pixelsize_m = 50) 
+```
+
+Make predictions for the amended dataset:
+
+```{r summarise and predict for amended data, message = FALSE, warning = FALSE}
+
+# vegetation cover
+predictors_veg <- stringr::str_subset(predictors, "lsm_veg_.*$")
+results_veg_amended <- 
+  calc_specific_lsm(raster = veg_amended,
+                    predictors_lsm = predictors_veg,
+                    class_names = c("veg"),
+                    class_values = c(1),
+                    points = grid_points,
+                    na_threshold = 0) # reduce no. of NA pixels, since original & amended scenarios have no data outside the site boundaries 
+
+# osm buildings
+predictors_buildings <- stringr::str_subset(predictors, "osm_building.*$")
+results_buildings_amended <-
+      calc_specific_osm(vector = buildings_amended,
+                        predictors_osm = predictors_buildings,
+                        building_levels = "levels",
+                        building_height = "height",
+                        points = grid_points)
+
+# osm roads
+predictors_roads <- stringr::str_subset(predictors, "osm_lane.*$")
+results_roads_amended <-
+      calc_specific_osm(vector = roads_amended,
+                        predictors_osm = predictors_roads,
+                        road_lanes = "lanes",
+                        points = grid_points)
+
+# combine results and overwrite 'grid_points' variable 
+grid_points_amended <- results_veg_amended %>% 
+  full_join(results_buildings_amended %>% st_set_geometry(NULL)) %>% 
+  full_join(results_roads_amended %>% st_set_geometry(NULL))
+
+# make predictions
+bird_heatmap_amended <- 
+  predict_heatmap(models = bestmodels, 
+                  recipe_data = recipe_birds,
+                  points_topredict = grid_points_amended, 
+                  pixelsize_m = 50) 
+
+```
+
+The predictions for both scenarios are shown below as heat maps. Toggle the map layers to view predictions based on the amended landscape data.
+
+```{r plot original and amended heatmap, message = FALSE, warning = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%", echo = FALSE}
+
+tmap_options(max.raster = c(view = 1e8)) # increase max resolution to be visualised
+
+tm <- tm_basemap(c("CartoDB.Positron", "OpenStreetMap")) +
+  tm_shape(punggol) + tm_borders() +
+  tm_shape(bound) + tm_borders(lwd = 3.0, col = "red") +
+  tm_shape(bird_heatmap, raster.downsample = FALSE) +
+  tm_raster(title = "Number of bird species",
+            style = "jenks",
+            n = 6,
+            palette = "YlOrRd",
+            alpha = 0.6) +
+  tm_shape(bird_heatmap_amended, raster.downsample = FALSE) +
+  tm_raster(title = "Number of bird species",
+            style = "jenks",
+            n = 6,
+            palette = "YlOrRd",
+            alpha = 0.6) 
+  
+tm %>% 
+  tmap_leaflet() %>%
+  leaflet::hideGroup("bird_heatmap_amended") 
+```
+
+<center>
+**Map: Spatial predictions of local (_Alpha_) diversity of birds at a site (red boundaries) within Punggol, Singapore.** The pixel resolution used for predictions in this example is 10 m x 10 m. The color palettes were binned based on the Jenks natural breaks classification.
+</center>
+
+```{r include = FALSE}
+rm(filepath, punggol, bound,
+   roads_osm, buildings_osm, veg_remote,
+   roads_amended, buildings_amended, veg_amended, 
+   predictors, max_radius, bestmodels, bestmodels_info, recipe_birds,
+   predictors_buildings, predictors_roads, predictors_veg,
+   results_buildings, results_buildings_amended, 
+   results_roads, results_roads_amended, 
+   results_veg, results_veg_amended,
+   grid_points, grid_points_original, grid_points_amended,
+   bird_heatmap, bird_heatmap_amended,
+   tm)
+```
+
+
 
 <br>
+
+To conclude, while such data conversions may allow similar predictors (and hence models) to be used for different use cases, it should be noted that potential mismatches between different data sources may result in inaccurate predictions. Reducing the mismatch between remotely sensed and manually generated data is an important gap that should be addressed. For instance, the level of detail in design scenarios may not include the exact locations of planted trees, and their estimated canopy projection areas may vary greatly from reality after planting. Furthermore, the remotely sensed data represents a top-down view of the landscape, and the effect of multi-tiered planting is not accounted for within the landscape predictors. Communication with practitioners is needed to ensure that model workflows align with the data formats and outputs used in design practice, and that suitable methods are used to ensure that artificially generated datasets are both compatible and accurate to reality after implementation.
+
+<br>
+
 
 ---
 
 ## References
+
+Chong KY, Teo S, Kurukulasuriya B, Chung YF, Giam X & Tan HTW (2019) The effects of landscape scale on greenery and traffic relationships with urban birds and butterflies. _Urban Ecosystems_, _22_(5): 917–926.
+
+Chong KY, Teo S, Kurukulasuriya B, Chung YF, Rajathurai S & Tan HTW (2014) Not all green is as good: Different effects of the natural and cultivated components of urban vegetation on bird and butterfly diversity. _Biological Conservation_, _171_: 299–309.
 
 Government of Singapore (2020). [Master Plan 2019 Subzone Boundary (No Sea)](https://data.gov.sg/dataset/master-plan-2019-subzone-boundary-no-sea). _data.gov.sg_
 Released under the terms of the [Singapore Open Data Licence version 1.0](https://data.gov.sg/open-data-licence).
