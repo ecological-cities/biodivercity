@@ -237,11 +237,11 @@ Landscape elements can be retrieved from the open-source maps such as OpenStreet
 
 dir.create(paste0(output_dir, "/osm")) # create sub-directory for raw data (avoid re-downloading each time)
 
-buildings <- get_buildings_osm(place = sampling_areas,
+buildings_osm <- get_buildings_osm(place = sampling_areas,
                                date = as.Date("2021-01-01"),
                                dir_raw = paste0(output_dir, "/osm"))
 
-roads <- get_roads_osm(sampling_areas,
+roads_osm <- get_roads_osm(sampling_areas,
                        date = as.Date("2021-01-01"),
                        dir_raw = paste0(output_dir, "/osm"))
 
@@ -252,8 +252,8 @@ load(filepath)
 # plot
 tm_basemap(c("CartoDB.Positron")) +
   tm_shape(sampling_areas) + tm_borders() +
-  tm_shape(buildings) + tm_polygons(col = "levels") +
-  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")+
+  tm_shape(buildings_osm) + tm_polygons(col = "levels") +
+  tm_shape(roads_osm) + tm_lines(col = "lanes", palette = "YlOrRd")+
   tm_shape(points) + tm_dots()
 ```
 
@@ -265,8 +265,8 @@ load(filepath)
 tmap_mode("view")
 tm_basemap(c("CartoDB.Positron")) +
   tm_shape(sampling_areas) + tm_borders() +
-  tm_shape(buildings) + tm_polygons(col = "levels") +
-  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")+
+  tm_shape(buildings_osm) + tm_polygons(col = "levels") +
+  tm_shape(roads_osm) + tm_lines(col = "lanes", palette = "YlOrRd")+
   tm_shape(points) + tm_dots()
 ```
 
@@ -292,7 +292,7 @@ For example, we can calculate building metrics up to `200` and `400` metres away
 ```{r calc_osm, warning = FALSE, message = FALSE}
 
 osm_perpoint <- 
-  calc_osm(vector = buildings, 
+  calc_osm(vector = buildings_osm, 
            points = points,
            name = "buildings",
            buffer_sizes = c(200, 400),

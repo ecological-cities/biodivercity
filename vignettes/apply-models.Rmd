@@ -60,8 +60,8 @@ veg_classified <- classify_image_binary(ndvi_mosaic, threshold = "otsu")
 tmap_mode("view")
 tm_basemap(c("CartoDB.Positron")) +
   tm_shape(punggol) + tm_borders() +
-  tm_shape(buildings) + tm_polygons(col = "levels") +
-  tm_shape(roads) + tm_lines(col = "lanes", palette = "YlOrRd")+
+  tm_shape(buildings_osm) + tm_polygons(col = "levels") +
+  tm_shape(roads_osm) + tm_lines(col = "lanes", palette = "YlOrRd")+
   tm_shape(veg_classified) +
     tm_raster(style = "cat",
             palette = c("grey", "darkgreen"))
@@ -120,7 +120,7 @@ results_veg <-
 # osm buildings
 predictors_buildings <- stringr::str_subset(predictors, "osm_building.*$")
 results_buildings <-
-      calc_specific_osm(vector = buildings,
+      calc_specific_osm(vector = buildings_osm,
                         predictors_osm = predictors_buildings,
                         building_levels = "levels",
                         building_height = "height",
@@ -129,7 +129,7 @@ results_buildings <-
 # osm roads
 predictors_roads <- stringr::str_subset(predictors, "osm_lane.*$")
 results_roads <-
-      calc_specific_osm(vector = roads,
+      calc_specific_osm(vector = roads_osm,
                         predictors_osm = predictors_roads,
                         road_lanes = "lanes",
                         points = grid_points)
@@ -169,7 +169,7 @@ tm_basemap(c("CartoDB.Positron", "OpenStreetMap")) +
 ```{r include = FALSE}
 rm(filepath, max_radius,
    punggol, sampling_areas,
-   ndvi_mosaic, veg_classified, buildings, roads,
+   ndvi_mosaic, veg_classified, buildings_osm, roads_osm,
    predictors, predictors_veg, predictors_buildings, predictors_roads,
    results_veg, results_buildings, results_roads, grid_points, 
    bestmodels, bestmodels_info, recipe_birds,
