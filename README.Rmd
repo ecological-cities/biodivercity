@@ -38,7 +38,8 @@ Many frameworks to assess 'biodiversity' have been proposed in research and prac
 - Download and process landscape data within areas of interest (e.g., remotely sensed data, OpenStreetMap data, manually mapped data)
 - Build predictive models to assess local (_Alpha_), community (_Beta_) and total (_Gamma_) diversity for an animal group
 - Use models to make pixel-based spatial predictions across new areas and time periods
-- Summarise predictions to benchmark and compare biodiversity 'performance' between planning units across the city
+- Convert vector data generated from future design scenarios into formats suitable for model predictions
+- Summarise spatial predictions to benchmark and compare biodiversity 'performance' between planning units across the city
 
 <br>
 

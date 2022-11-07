@@ -49,7 +49,9 @@ amphibians, etc.). The key features include:
     (*Beta*) and total (*Gamma*) diversity for an animal group
 -   Use models to make pixel-based spatial predictions across new areas
     and time periods
--   Summarise predictions to benchmark and compare biodiversity
+-   Convert vector data generated from future design scenarios into
+    formats suitable for model predictions
+-   Summarise spatial predictions to benchmark and compare biodiversity
     ‘performance’ between planning units across the city
 
 <br>

@@ -13,3 +13,5 @@ Key features include:
 - Download and process landscape predictors within areas of interest (e.g., remotely sensed data, OpenStreetMap data, manually generated data)
 - Build predictive models to assess local (_Alpha_), community (_Beta_) and total (_Gamma_) diversity for an animal group
 - Use models to make pixel-based spatial predictions across new areas and time periods (currently only available for _Alpha_ diversity)
+- Convert vector data generated from future design scenarios into formats suitable for model predictions
+- Summarise spatial predictions to benchmark and compare biodiversity 'performance' between planning units across the city

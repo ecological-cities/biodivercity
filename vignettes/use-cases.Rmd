@@ -14,27 +14,31 @@ devtools::load_all()
 library("sf")
 library("dplyr")
 library("tmap")
+library("ggplot2")
 ```
 
 
 ## 1. Citywide monitoring 
 
-Models that are built using remotely sensed data can be used to predict the diversity of an animal group across time and geographical space. For example, satellite imagery processed as input predictors can be used to monitor biodiversity in the past and present.  
+Models that are built using remotely sensed data can be used to predict the diversity of an animal group across different time periods and across large areas. For example, if remotely sensed data across an entire city is available, spatial predictions can be generated citywide (see `vignette("apply-models")`). Depending on the level of detail required, the pixel resolution can be adjusted accordingly. 
 
-The interactive map below shows an example of local (_Alpha_) diversity predicted for birds across [subzones](https://data.gov.sg/dataset/master-plan-2019-subzone-boundary-no-sea) in Singapore during the year 2020, at a pixel resolution of 500 m x 500 m. Depending on the level of detail required, the pixel resolution can be adjusted accordingly.
+Load the example data for predictions of bird local (_Alpha_) diversity across the city of Singapore during the year 2020:
 
-```{r echo = FALSE, warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
-
-sg_subzones <- 
-  system.file("extdata", "sg_subzones.geojson", package="biodivercity") %>% 
-  read_sf() %>% 
-  relocate("subzone_n")
+```{r warning = FALSE, message = FALSE, fig.width=2.6, fig.height = 2.0, dpi = 300, out.width="100%"}
 
 bird_heatmap <- 
   system.file("extdata", "alpha-diversity_birds_delta-aic-2_subzones_500m.tif", package="biodivercity") %>% 
   terra::rast()
 
 
+# load zones used in city planning
+sg_subzones <- 
+  system.file("extdata", "sg_subzones.geojson", package="biodivercity") %>% 
+  read_sf() %>% 
+  relocate("subzone_n")
+
+
+# plot map
 tmap_mode("view")
 tm_basemap(c("CartoDB.Positron")) +
   tm_shape(sg_subzones) +
@@ -47,21 +51,73 @@ tm_basemap(c("CartoDB.Positron")) +
               n = 8,
               palette = "YlOrRd",
               alpha = 0.6)
-  
-  
 ```
 
 <center>
-**Map: Spatial predictions of local (_Alpha_) diversity of birds across subzones in Singapore.** The pixel resolution used for predictions in this example is 500 m x 500 m.
+**Map: Spatial predictions of local diversity of birds across [subzones](https://data.gov.sg/dataset/master-plan-2019-subzone-boundary-no-sea) in Singapore.** The pixel resolution used for predictions in this example is 500 m x 500 m.
 </center>
 
 <br>
 
-Pixel values within the zones used in city planning can be summarised, to allow comparisons to be made between these planning units. The resulting distribution of the summarised values can subsequently be used to compare the ‘performance’ of each planning unit relative to others in the city, or to a set a benchmark/target for the desired level of 'performance' (Figure 1). For example, subzones in Singapore could be benchmarked against the mean of the distribution, as shown below:
+Pixel values within the zones used in city planning can be summarised, to allow comparisons to be made between these planning units. The resulting distribution of the summarised values can subsequently be used to compare the ‘performance’ of each planning unit relative to others in the city, or to a set a benchmark/target for the desired level of 'performance'. For example, subzones in Singapore could be benchmarked against the mean of the distribution, as shown below:
+
+```{r out.width = "60%", fig.align='center', dpi = 300, fig.width = 6, fig.height = 5, fig.cap = "**Histogram showing the distribution of values for the mean number of bird species per pixel within each of the 332 subzones in Singapore.** Subzones were assigned an arbitrary score of 0-4 based on standard deviations from the mean (i.e., performance of the 'average' subzone)."}
+to_plot <- sg_subzones %>% 
+  dplyr::mutate(bird_alpha_mean = # calc mean alpha diversity per subzone
+                  terra::extract(bird_heatmap,terra:::vect(sg_subzones), 
+                                 fun = "mean", na.rm = TRUE) %>% 
+           dplyr::mutate(predicted = ifelse(is.nan(predicted), NA, predicted)) %>% 
+           dplyr::pull(predicted))
 
 
-```{r out.width = "60%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 1: Histogram showing the distribution of values for the mean number of bird species per pixel within each of the 332 subzones in Singapore.** Subzones were assigned an arbitrary score of 0-4 based on standard deviations from the mean (i.e., performance of the 'average' subzone)."}
-knitr::include_graphics("subzone-distribution-birds.png", dpi = 300)
+# set benchmark & range of values for scoring 
+benchmark <- to_plot %>% 
+  dplyr::summarise(mean = mean(bird_alpha_mean, na.rm = TRUE),
+                   sd = sd(bird_alpha_mean, na.rm = TRUE)) %>% 
+  sf::st_set_geometry(NULL)
+distribute_sd <- c(-1.5,-0.5,0.5,1.5) # score based on st dev from the mean
+
+# for visualisation of the scoring regions
+data_regions <- 
+  data.frame(start = c(benchmark$mean + head(distribute_sd, 1)*benchmark$sd-50, # start well below the minimum value
+                       benchmark$mean + distribute_sd*benchmark$sd),
+             end = c(benchmark$mean + distribute_sd*benchmark$sd,
+                     benchmark$mean + tail(distribute_sd, 1)*benchmark$sd+50), # end will above the max value
+             Score = factor(0:4)) # arbitrary score of 0-4
+
+# plot
+to_plot %>%
+  drop_na(bird_alpha_mean) %>% 
+  ggplot() +
+    geom_rect(data = data_regions,
+            aes(xmin = start,
+                xmax = end,
+                ymin = - Inf,
+                ymax = Inf,
+                fill = Score),
+            alpha = 0.5) +
+    geom_histogram(aes(x = bird_alpha_mean), bins = 30, binwidth = 1.0) + 
+    geom_label(data = data_regions[1>4,],
+               aes(label = paste(distribute_sd, "SD"), 
+                   x = head(data_regions$end, 4),
+                   y = 1.0),
+               size = 3.0,
+               label.padding = unit(0.15, "lines")) +
+    coord_cartesian(xlim=c(min(to_plot$bird_alpha_mean, na.rm = TRUE) - 1, 
+                           max(to_plot$bird_alpha_mean, na.rm = TRUE) + 1)) +
+  
+    scale_x_continuous(breaks = scales::breaks_pretty(n = 6)) +
+    scale_y_continuous(breaks = scales::breaks_pretty(n = 3), 
+                       limits = c(NA, 45),
+                       expand = c(0, 0)) +
+    scale_fill_brewer(type = "div", palette = "Greens") +
+    xlab("Average no. of bird species per pixel") +
+    ylab("Frequency (No. of subzones)") +
+    theme_bw() +
+    theme(panel.grid.minor.x = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          legend.text.align = 1)
 ```
 
 <br>
@@ -71,7 +127,8 @@ If spatial predictions were made for multiple snapshots in time, benchmarking co
 Finally, it is worth noting that full customisation of both the pixel size and boundaries within which to summarise the pixel values can be done. This provides flexibility according to the level of analysis (e.g., geographical scale) required by the user. By summarising pixel values within zones used in city planning, animal diversity may be assessed alongside other indices also summarised at the level of these planning units, thus providing a more comprehensive view of components related to biodiversity and beyond.  
 
 ```{r include = FALSE}
-rm(bird_heatmap, sg_subzones)
+rm(bird_heatmap, sg_subzones, 
+   benchmark, data_regions, to_plot, distribute_sd)
 ```
 
 
@@ -83,9 +140,9 @@ rm(bird_heatmap, sg_subzones)
 
 Other than monitoring changes in biodiversity, there is also a need to assess future urban developments, for instance, to see if proposed designs can effectively mitigate the loss of biodiversity. But since such landscapes do not exist, snapshots of remotely sensed data can not be used. It is therefore important to carefully consider data compatibility between these different use cases when building and using the predictive models.
 
-Urban design and planning involves the consideration of multiple design scenarios. Manually generated landscape elements (e.g., vector data for vegetation) may be produced from prospective designs, but the format and types of such data must be compatible with those used in the predictive models. For instance, when selecting landscape predictors to build the models, land cover classification as discrete rasters would be more compatible with manually generated data, compared to continuous rasters that cannot be feasibly calculated (e.g., spectral indices such as NDVI). Vegetation generated in design scenarios can be rasterized into discrete land cover-types (Figure 2), and used to replace the remotely sensed data within regions of interest (see Map below). Such amendments to landscape data can be made across a site slated for urban development, and then used to make spatial predictions for that particular design scenario.
+Urban design and planning involves the consideration of multiple design scenarios. Manually generated landscape elements (e.g., vector data for vegetation) may be produced from prospective designs, but the format and types of such data must be compatible with those used in the predictive models. For instance, when selecting landscape predictors to build the models, land cover classification as discrete rasters would be more compatible with manually generated data, compared to continuous rasters that cannot be feasibly calculated (e.g., spectral indices such as NDVI). Vegetation generated in design scenarios can be rasterized into discrete land cover-types (see Figure below), and used to replace the remotely sensed data within regions of interest (see Interactive Map below). Such amendments to landscape data can be made across a site slated for urban development, and then used to make spatial predictions for that particular design scenario.
 
-```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Figure 2: Example showing how manually generated vector data of vegetation can be converted into a classified raster of vegetation types used in the predictive models.**"}
+```{r out.width = "100%", fig.align='center', dpi = 300, echo = FALSE, fig.cap = "**Example showing how manually generated vector data of vegetation can be converted into a classified raster of vegetation types used in the predictive models.**"}
 knitr::include_graphics("data-compatibility-rasterize.png", dpi = 300)
 ```
 
@@ -358,6 +415,9 @@ rm(filepath, punggol, bound,
 ```
 
 
+<br>
+
+Similar to the previous section, the pixel values across a site can be summarised (e.g. calculate the mean pixel value). For a given site, summarised values between different scenarios can be compared based on their local (_Alpha_) and community (_Beta_) diversity, as well as other indices that may not be related to biodiversity.
 
 <br>
 
