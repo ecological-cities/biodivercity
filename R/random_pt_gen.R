@@ -22,9 +22,7 @@
 #'
 #'@import dplyr
 #'@importFrom sf st_read st_cast st_buffer st_difference st_area st_sample st_as_sf st_intersection st_combine st_zm
-#'@importFrom glue glue
 #'@importFrom rlang .data
-#'@importFrom magrittr '%>%'
 #'
 #'@export
 random_pt_gen <- function(boundaries, area_per_pt, pt_radius, excess_modifier = 1,
@@ -45,8 +43,7 @@ random_pt_gen <- function(boundaries, area_per_pt, pt_radius, excess_modifier = 
         dplyr::mutate(id = dplyr::row_number()) %>%
         dplyr::mutate(id = paste0("normal", id))
 
-    cat("\n", glue::glue("Total number of points required: {n}."))
-    cat("\n")
+    cat("\n", paste0("Total number of points required: ", n, ".\n"))
 
     if (!is.null(sub_areas)) {
         sub_areas <- sub_areas %>%
@@ -74,8 +71,8 @@ random_pt_gen <- function(boundaries, area_per_pt, pt_radius, excess_modifier = 
             dplyr::mutate(id = dplyr::row_number()) %>%
             dplyr::mutate(id = paste0("subarea", id))
 
-        cat("\n", glue::glue("Number of points required within 'normal' areas: {n}."))
-        cat("\n", glue::glue("Number of points required within 'sub-areas': {n_subarea}."))
+        cat("\n", paste0("Number of points required within 'normal' areas: ", n, "."))
+        cat("\n", paste0("Number of points required within 'sub-areas': ", n_subarea, "."))
         cat("\n")
 
         if (!is.null(retain) & !is.null(retain_prop)) {
@@ -114,11 +111,10 @@ random_pt_gen <- function(boundaries, area_per_pt, pt_radius, excess_modifier = 
                   ]) %>%
                 dplyr::mutate(type = "Sub-area")
 
-            cat("\n", glue::glue("Number of points within 'normal' areas that were retained: {ceiling(retain_n)} (n = {n}, retain_prop = {retain_prop})."))
-            cat("\n", glue::glue("Number of points within 'sub-areas' that were retained: {ceiling(retain_n_subarea)} (n = {n_subarea}, retain_prop = {retain_prop})."))
-            cat("\n", glue::glue("Number of new points within 'normal' areas that were generated: {ceiling((n-retain_n)*excess_modifier)} (n = {(n-retain_n)}, excess_modifier = {excess_modifier})."))
-            cat("\n", glue::glue("Number of new points within 'sub-areas' that were generated: {ceiling((n_subarea-retain_n_subarea)*excess_modifier)} (n = {(n_subarea-retain_n_subarea)}, excess_modifier = {excess_modifier})."),
-                "\n")
+            cat("\n", paste0("Number of points within 'normal' areas that were retained: ", ceiling(retain_n), " (n = ", n, ", retain_prop = ", retain_prop, ")."))
+            cat("\n", paste0("Number of points within 'sub-areas' that were retained: ", ceiling(retain_n_subarea), " (n = ", n_subarea, ", retain_prop = ", retain_prop, ")."))
+            cat("\n", paste0("Number of new points within 'normal' areas that were generated: ", ceiling((n-retain_n)*excess_modifier), " (n = ", (n-retain_n), ", excess_modifier = ", excess_modifier, ")."))
+            cat("\n", paste0("Number of new points within 'sub-areas' that were generated: ", ceiling((n_subarea-retain_n_subarea)*excess_modifier), " (n = ", (n_subarea-retain_n_subarea), ", excess_modifier = ", excess_modifier, ").\n"))
 
             rm(retain_subarea, retain_n, retain_n_subarea)
 
@@ -126,9 +122,8 @@ random_pt_gen <- function(boundaries, area_per_pt, pt_radius, excess_modifier = 
             is.null(retain_prop)) {
             stop("Either arguments 'retain' or 'retain_prop' is missing.")
         } else {
-            cat("\n", glue::glue("Number of points within 'normal' areas that were generated: {ceiling(n*excess_modifier)} (n = {n}, excess_modifier = {excess_modifier})."))
-            cat("\n", glue::glue("Number of points within 'sub-areas' that were generated: {ceiling(n_subarea*excess_modifier)} (n = {n_subarea}, excess_modifier = {excess_modifier})."),
-                "\n")
+            cat("\n", paste0("Number of points within 'normal' areas that were generated: ", ceiling(n*excess_modifier), " (n = ", n, ", excess_modifier = ", excess_modifier, ")."))
+            cat("\n", paste0("Number of points within 'sub-areas' that were generated: ", ceiling(n_subarea*excess_modifier), " (n = ", n_subarea, ", excess_modifier = ", excess_modifier, ").\n"))
         }
 
         points <- rbind(points, points_subarea)
@@ -153,16 +148,14 @@ random_pt_gen <- function(boundaries, area_per_pt, pt_radius, excess_modifier = 
                 dplyr::mutate(status = "New") %>%
                 rbind(., retain[sample(1:nrow(retain), retain_n), ]) %>%
                 dplyr::mutate(type = "Normal") %>%
-            cat("\n", glue::glue("Number of points within 'normal' areas that were retained: {retain_n} (n = {n}, retain_prop = {retain_prop})."))
-            cat("\n", glue::glue("Number of points within 'normal' areas that were generated: {ceiling((n-retain_n)*excess_modifier)} (n = {(n-retain_n)}, excess_modifier = {excess_modifier})."),
-                "\n")
+            cat("\n", paste0("Number of points within 'normal' areas that were retained: ", retain_n, " (n = ", n, ", retain_prop = ", retain_prop, ")."))
+            cat("\n", paste0("Number of points within 'normal' areas that were generated: ", ceiling((n-retain_n)*excess_modifier), " (n = ", (n-retain_n), ", excess_modifier = ", excess_modifier, ").\n"))
 
         } else if (is.null(retain) & !is.null(retain_prop) | !is.null(retain) &
             is.null(retain_prop)) {
             stop("Either arguments 'retain' or 'retain_prop' is missing.")
         } else {
-            cat("\n", glue::glue("Number of points within 'normal' areas that were generated: {ceiling(n*excess_modifier)} (n = {n}, excess_modifier = {excess_modifier})."),
-                "\n")
+            cat("\n", paste0("Number of points within 'normal' areas that were generated: ", ceiling(n*excess_modifier), " (n = ", n, ", excess_modifier = ", excess_modifier, ").\n"))
         }
     }
 

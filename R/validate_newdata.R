@@ -17,7 +17,6 @@
 #'@return A dataframe containing the predictions (column `mod.avg.pred`) and other
 #'accuracy metrics when compared to the actual data (column name as defined by the `response_var` argument).
 #'
-#'@import checkmate
 #'@importFrom dplyr select mutate
 #'@importFrom tidyselect all_of any_of
 #'@importFrom recipes bake

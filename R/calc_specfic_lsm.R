@@ -18,9 +18,9 @@
 #'
 #'@return The `points` object including new columns for the variables specified in `predictors_osm`.
 #'
-#'@import checkmate
 #'@import dplyr
 #'@import sf
+#'@importFrom checkmate makeAssertCollection assert_character assert_numeric reportAssertions
 #'@importFrom rlang .data is_empty
 #'@importFrom stringr str_extract
 #'@importFrom tidyr pivot_wider drop_na

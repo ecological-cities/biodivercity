@@ -5,17 +5,17 @@ test_that("Test threshold_otsu()", {
 
 
   # CHECK INPUTS
-  expect_error(classify_image_binary(image = imagepath, threshold = "test")) # threshold shld be "otsu" or a number
+  testthat::expect_error(classify_image_binary(image = imagepath, threshold = "test")) # threshold shld be "otsu" or a number
 
 
   # CHECK OUTPUTS
   # 'image' is filepath
   expected <- classify_image_binary(image = imagepath)
-  expect_true(attributes(expected)$class[1] == "SpatRaster")
+  testthat::expect_true(attributes(expected)$class[1] == "SpatRaster")
 
   # 'image' is SpatRaster object
   expected <- classify_image_binary(image = terra::rast(imagepath))
-  expect_true(attributes(expected)$class[1] == "SpatRaster")
+  testthat::expect_true(attributes(expected)$class[1] == "SpatRaster")
 
 })
 

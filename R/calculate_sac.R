@@ -36,8 +36,8 @@
 #'@return A dataframe with columns for the `sites`, species `richness` and `sd` (standard deviation)
 #'of results, as well as the information specified in `specify_area`, `specify_period` and `specify_taxon`.
 #'
-#'@import checkmate
 #'@import dplyr
+#'@importFrom checkmate makeAssertCollection assert_subset reportAssertions
 #'@importFrom vegan specaccum
 #'@importFrom rlang .data
 #'@importFrom stats xtabs

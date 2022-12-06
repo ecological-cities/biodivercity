@@ -43,10 +43,9 @@
 #'shows the breakdown of counts within the original dataset.
 #'
 #'
-#'@import checkmate
+#'@importFrom checkmate makeAssertCollection assert_data_frame assert_subset assert_number test_data_frame reportAssertions
 #'@importFrom dplyr left_join inner_join group_by summarise filter n slice_sample
 #'@importFrom tidyr pivot_longer
-#'@importFrom rlang .data
 #'
 #'@examples
 #'data(animal_observations)
@@ -124,7 +123,7 @@ exclude_simulator <- function(community_matrix, survey_ref,
 
   # add cols with key info
   suppressMessages(community_info <- community_matrix %>%
-                     dplyr::left_join(survey_ref %>% select(.data[[survey_id]], .data[[point_id]], .data[[area]], .data[[period]], .data[[cycle]])))
+                     dplyr::left_join(survey_ref %>% select(all_of(survey_id), all_of(point_id), all_of(area), all_of(period), all_of(cycle))))
 
   # subset data if specified
   if(!is.null(area_ignore)){ # to particular area
@@ -156,10 +155,10 @@ exclude_simulator <- function(community_matrix, survey_ref,
   sp_pointdens <- community_info %>%
     tidyr::pivot_longer(cols = -c(.data[[survey_id]], .data[[point_id]], .data[[area]], .data[[period]], .data[[cycle]]),
                         names_to = "species", values_to = "count") %>%
-    dplyr::group_by(.data[[point_id]], .data[["species"]]) %>% # counts per point per species
+    dplyr::group_by(.data[[point_id]], .data$species) %>% # counts per point per species
     dplyr::summarise(count = sum(count)) %>%
     dplyr::filter(count > 0) %>% # remove points with 0 for particular species
-    dplyr::group_by(.data[["species"]]) %>% # no. of points per species
+    dplyr::group_by(.data$species) %>% # no. of points per species
     dplyr::summarise(full = dplyr::n())
 
 
@@ -188,10 +187,10 @@ exclude_simulator <- function(community_matrix, survey_ref,
       sp_pointdens_filtered <- filtered %>%
         tidyr::pivot_longer(cols = -c(.data[[survey_id]], .data[[point_id]], .data[[area]],  .data[[period]], .data[[cycle]]),
                             names_to = "species", values_to = "count") %>%
-        dplyr::group_by(point_id, .data[["species"]]) %>%
+        dplyr::group_by(.data[[point_id]], .data$species) %>%
         dplyr::summarise(count = sum(count)) %>%
         dplyr::filter(count > 0) %>%
-        dplyr::group_by(.data[["species"]]) %>%
+        dplyr::group_by(.data$species) %>%
         dplyr::summarise(count = dplyr::n())
 
       # append to sp_pointdens
@@ -223,10 +222,10 @@ exclude_simulator <- function(community_matrix, survey_ref,
         dplyr::inner_join(points_filtered, by = c("point_id", "area", "period")) %>%
         tidyr::pivot_longer(cols = -c(.data[[survey_id]], .data[[point_id]], .data[[area]],  .data[[period]], .data[[cycle]]),
                             names_to = "species", values_to = "count") %>%
-        dplyr::group_by(point_id, .data[["species"]]) %>%
+        dplyr::group_by(.data[[point_id]], .data$species) %>%
         dplyr::summarise(count = sum(count)) %>%
         dplyr::filter(count > 0) %>%
-        dplyr::group_by(.data[["species"]]) %>%
+        dplyr::group_by(.data$species) %>%
         dplyr::summarise(count = n())
 
       # append to sp_pointdens

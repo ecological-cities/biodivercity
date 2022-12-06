@@ -24,8 +24,8 @@
 #'@return A list containing the features/metrics calculated for `points`, appended as new columns.
 #'Each element in the list corresponds to a particular buffer size.
 #'
-#'@import checkmate
 #'@import dplyr
+#'@importFrom checkmate makeAssertCollection assertTRUE assert_numeric assert_subset reportAssertions
 #'@importFrom sf st_geometry_type st_is_longlat st_is_valid st_crs st_buffer st_intersection st_set_geometry st_area st_length
 #'@importFrom rlang .data
 #'@importFrom tidyselect everything contains

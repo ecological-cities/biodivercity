@@ -109,7 +109,7 @@ XV_dfs <- lapply(list(Birds = bird_xv), # only one animal group in this example
 
 Finally, we can visualise the accuracy of the model for birds using the package `ggplot2`. This can be done in the original scale of the response variable (counts):
 
-```{r print xvalid plots for new data, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = glue::glue("**Figure: The accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.")}
+```{r print xvalid plots for new data, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = "**Figure: The accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples."}
 
 # if multiple animal groups present, combine lists into single df for plotting
 XV_dfs <- XV_dfs %>% 
@@ -152,7 +152,7 @@ XV_dfs %>%
 
 The values can also be normalised, which is especially useful when comparing between multiple animal groups (in this example, only birds are shown):
 
-```{r print xvalid plots for new data - scaled, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = glue::glue("**Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples.")}
+```{r print xvalid plots for new data - scaled, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6, out.width="70%", fig.align='center', dpi = 300, fig.cap = "**Figure: The (scaled) accuracy of predictions for each taxon based on new data supplied.** Grey points denote the mean errors, and the error bars denote their 95% confidence interval across 100 bootstrapped samples."}
 
  XV_dfs %>%  
   ggplot() +
