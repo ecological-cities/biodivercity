@@ -1,15 +1,17 @@
 Package: biodivercity
 Title: Spatial predictions of biodiversity across city landscapes
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     c(person(given = "Xiao Ping",
              family = "Song",
              role = c("aut"),
+             email = "xp.song@u.nus.edu",
              comment = c("Project management, methodology and data workflow, geospatial analysis",
                          ORCID = "0000-0002-8825-195X")),
       person(given = "Edwin",
            family = "Tan",
            role = c("aut", "cre"),
+           email = "dbsetyw@nus.edu.sg",
            comment = c("Data collection/curation, methodology, input on geospatial analysis")),                   
       person(given = "Rachel",
              family = "Lee",
@@ -29,7 +31,7 @@ Authors@R:
              comment = c("Conceptualisation, funding acquisition, methodology, supervision",
                          ORCID = "0000-0003-4754-8957"))
      )
-Description: An R package for spatial assessment of biodiversity across city landscapes
+Description: An R package for spatial assessment of biodiversity across city landscapes.
 License: GPL (>= 3)
 URL: https://github.com/ecological-cities/biodivercity
 BugReports: https://github.com/ecological-cities/biodivercity/issues
@@ -47,7 +49,8 @@ Suggests:
     ggplot2 (>= 3.3.5),
     treemapify,
     viridis,
-    geojsonsf
+    geojsonsf, 
+    scales
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
