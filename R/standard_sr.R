@@ -32,7 +32,6 @@
 #'@return A dataframe with columns for the `sites`, species `richness` or `mean` species richness and `sd` (standard deviation)
 #'of results, as well as the information specified in `specify_area`, `specify_period` and `specify_taxon`.
 #'
-#'@import checkmate
 #'@import dplyr
 #'@importFrom purrr map_dfr
 #'@importFrom rlang .data

@@ -43,8 +43,8 @@
 #'@return A dataframe containing the tally of species per survey/sampling point
 #'(depends if `level =` `'survey'` or `'point'`).
 #'
-#'@import checkmate
 #'@import dplyr
+#'@importFrom checkmate makeAssertCollection assert_subset reportAssertions
 #'@importFrom tidyr complete
 #'@importFrom rlang .data
 #'

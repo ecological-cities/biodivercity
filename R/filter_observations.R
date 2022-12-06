@@ -22,7 +22,7 @@
 #'
 #'@return The dataframe `observations` subset according to the specified criteria.
 #'
-#'@import checkmate
+#'@importFrom checkmate makeAssertCollection assert_data_frame assert_subset reportAssertions
 #'@importFrom dplyr filter mutate
 #'@importFrom rlang .data
 #'

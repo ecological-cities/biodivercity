@@ -27,7 +27,7 @@
 #'Bioinformatics, 26(7), 979-981.
 #'
 #'
-#'@import checkmate
+#'@importFrom checkmate makeAssertCollection test_vector assert_character test_true assert_true assert_numeric assert_number reportAssertions
 #'@importFrom graphics hist
 #'@importFrom terra rast minmax nlyr values
 #'

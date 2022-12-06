@@ -20,7 +20,7 @@
 #'@seealso
 #' * [threshold_otsu()] Internal function used to calculate threshold value via Otsu's method.
 #'
-#'@import checkmate
+#'@importFrom checkmate makeAssertCollection test_vector assert_character test_true assert_true reportAssertions
 #'@importFrom terra rast writeRaster
 #'
 #'@examples

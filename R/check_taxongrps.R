@@ -24,8 +24,8 @@
 #'Includes columns for the `period` and `area`/`point_id` (depending on argument `level`), as well as
 #'the number (`n`) of species in the particular taxon group.
 #'
-#'@import checkmate
 #'@import dplyr
+#'@importFrom checkmate makeAssertCollection assert_data_frame assert_subset reportAssertions
 #'@importFrom rlang .data
 #'
 #'@examples
@@ -97,8 +97,8 @@ check_taxongrps <- function(observations, level,
       { if(period %in% colnames(observations)) dplyr::group_by(., area, period, genus) else dplyr::group_by(., area, genus) } %>%
       dplyr::summarise(n = n()) %>%
       dplyr::left_join(genus_all, by = "genus") %>%
-      dplyr::filter(n == .data$n_total) %>%
-      dplyr::select(-.data$n_total) %>%
+      dplyr::filter(n == "n_total") %>%
+      dplyr::select(-"n_total") %>%
       dplyr::rename(name = "genus") %>%
       { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>% # rename back to original colname
       dplyr::rename(!!area := area)
@@ -110,8 +110,8 @@ check_taxongrps <- function(observations, level,
       { if(period %in% colnames(observations)) dplyr::group_by(., area, period, family) else dplyr::group_by(., area, family) } %>%
       dplyr::summarise(n = n()) %>%
       dplyr::left_join(family_all, by = "family") %>%
-      dplyr::filter(n == .data$n_total) %>%
-      dplyr::select(-.data$n_total) %>%
+      dplyr::filter(n == "n_total") %>%
+      dplyr::select(-"n_total") %>%
       dplyr::rename(name = "family") %>%
       { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>% # rename back to original colname
       dplyr::rename(!!area := area)
@@ -129,8 +129,8 @@ check_taxongrps <- function(observations, level,
       { if(period %in% colnames(observations)) dplyr::group_by(., point_id, period, genus) else dplyr::group_by(., point_id, genus) } %>%
       dplyr::summarise(n = n()) %>%
       dplyr::left_join(genus_all, by = "genus") %>%
-      dplyr::filter(n == .data$n_total) %>%
-      dplyr::select(-.data$n_total) %>%
+      dplyr::filter(n == "n_total") %>%
+      dplyr::select(-"n_total") %>%
       dplyr::rename(name = "genus") %>%
       { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>%
       dplyr::rename(!!point_id := point_id)
@@ -142,8 +142,8 @@ check_taxongrps <- function(observations, level,
       { if(period %in% colnames(observations)) dplyr::group_by(., point_id, period, family) else dplyr::group_by(., point_id, family) } %>%
       dplyr::summarise(n = n()) %>%
       dplyr::left_join(family_all, by = "family") %>%
-      dplyr::filter(n == .data$n_total) %>%
-      dplyr::select(-.data$n_total) %>%
+      dplyr::filter(n == "n_total") %>%
+      dplyr::select(-"n_total") %>%
       dplyr::rename(name = "family") %>%
       { if(period %in% colnames(observations)) dplyr::rename(., !!period := period) else . } %>%
       dplyr::rename(!!point_id := point_id)

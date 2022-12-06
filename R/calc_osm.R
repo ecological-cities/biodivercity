@@ -23,14 +23,14 @@
 #'@return A list containing the features/metrics calculated for `points`,  appended as new columns.
 #'Each element in the list corresponds to a particular buffer size.
 #'
-#'@import checkmate
 #'@import dplyr
 #'@import sf
+#'@importFrom checkmate makeAssertCollection assert_numeric assert_subset reportAssertions
 #'@importFrom rlang .data
 #'@importFrom stringr str_extract str_detect
 #'@importFrom tidyr pivot_wider drop_na replace_na
 #'@importFrom tibble rownames_to_column
-#'@importFrom tidyselect matches everything contains any_of
+#'@importFrom tidyselect matches everything contains any_of where
 #'@importFrom terra extract vect
 #'@importFrom units set_units
 #'
@@ -67,7 +67,8 @@ calc_osm <- function(vector, name = NULL,
                        sf::st_intersection(points %>% # for relevant buffer radius
                                              sf::st_buffer(dist = buffer_sizes[i]) %>%
                                              magrittr::set_rownames(NULL) %>%
-                                             tibble::rownames_to_column("POINTID")))
+                                             tibble::rownames_to_column("POINTID") %>%
+                                             mutate(POINTID = as.character(.data$POINTID))))
 
 
     # PROCESS BUILDINGS
@@ -94,7 +95,8 @@ calc_osm <- function(vector, name = NULL,
         # append to points
         suppressMessages(points_result <- points %>%
                            magrittr::set_rownames(NULL) %>%
-                           tibble::rownames_to_column("POINTID") %>%
+                           tibble::rownames_to_column("POINTID")  %>%
+                           mutate(POINTID = as.character(.data$POINTID)) %>%
                            dplyr::left_join(buildings_summarised,
                                             by = c("POINTID"))) #%>%
                            # dplyr::mutate(dplyr::across(.cols = everything(), # points with no buildings have a value of 0
@@ -144,7 +146,8 @@ calc_osm <- function(vector, name = NULL,
         # append to points
         suppressMessages(points_result <- points %>%
                            magrittr::set_rownames(NULL) %>%
-                           tibble::rownames_to_column("POINTID") %>%
+                           tibble::rownames_to_column("POINTID")  %>%
+                           mutate(POINTID = as.character(.data$POINTID)) %>%
                            dplyr::left_join(buildings_summarised,
                                             by = c("POINTID")) %>%
                            dplyr::mutate(dplyr::across(.cols = tidyselect::contains("osm_buildingVol_m3"), # points with no buildings have a value of 0
@@ -169,7 +172,7 @@ calc_osm <- function(vector, name = NULL,
 
                          dplyr::mutate("osm_buildingAvgLvl" := .data[["osm_buildingGFA_m2"]] / .data[["osm_buildingArea_m2"]]) %>%
                          dplyr::mutate("osm_buildingFA_ratio" := .data[["osm_buildingGFA_m2"]] / (pi * as.numeric(buffer_sizes[i]) ^ 2)) %>%
-                         dplyr::mutate(dplyr::across(.cols = tidyselect::everything(),
+                         dplyr::mutate(dplyr::across(.cols = tidyselect::where(is.numeric),
                                                      .fns = ~tidyr::replace_na(., 0))))
 
       suppressMessages(points_result <- points_result %>%
@@ -199,7 +202,8 @@ calc_osm <- function(vector, name = NULL,
 
       suppressMessages(points_result <- points %>%
                          magrittr::set_rownames(NULL) %>%
-                         tibble::rownames_to_column("POINTID") %>%
+                         tibble::rownames_to_column("POINTID")  %>%
+                         mutate(POINTID = as.character(.data$POINTID)) %>%
                          dplyr::left_join(to_append) %>%
                          dplyr::mutate(dplyr::across(.cols = tidyselect::contains(paste0("osm_", c("laneLength_m", "laneDensity"))),
                                                      .fns = ~tidyr::replace_na(., 0))) %>%

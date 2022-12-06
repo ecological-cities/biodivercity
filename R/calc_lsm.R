@@ -23,9 +23,9 @@
 #'@return A list containing the features/metrics calculated for `points`, appended as new columns.
 #'Each element in the list corresponds to a particular buffer size.
 #'
-#'@import checkmate
 #'@import dplyr
 #'@import sf
+#'@importFrom checkmate makeAssertCollection assert_character assert_numeric assert_subset reportAssertions test_numeric
 #'@importFrom rlang .data
 #'@importFrom tidyr separate pivot_wider drop_na
 #'@importFrom tibble deframe tibble
