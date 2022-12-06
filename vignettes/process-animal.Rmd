@@ -136,16 +136,35 @@ filtered_observations %>%
 
 ## Summarise data
 
-To build predictive models for a chosen animal group, the animal observations will need to be aggregated at the level of each sampling point. For example, we can tally the number of bird (animal group 'Aves') species per point using the function `tally_observations()`. Note that this function avoids double-counting group-level records, by acting as a wrapper to the function `check_taxongrps()` (see previous section).
+To build predictive models for local (alpha) diversity for a chosen animal group, the animal observations will need to be aggregated at the level of each sampling point. For example, we can tally the number of bird (animal group 'Aves') species per point using the function `tally_observations()`. Note that this function avoids double-counting group-level records, by acting as a wrapper to the function `check_taxongrps()` (see previous section).
 
 ```{r use tally_observations, message = FALSE}
-
-animals_perpoint <- 
+birds <- 
   tally_observations(observations = animal_observations, 
                      survey_ref = animal_surveys,
                      level = "point",
                      specify_taxon = "Aves")
 
-head(animals_perpoint)
+head(birds)
 ```
 
+To build predictive models for community (beta) diversity for a chosen animal group, a a presence/absence community matrix will need to be created. Presence is indicated with 1 while absence is indicated with 0 for each species at each sampling point.
+
+```{r creating a presence/absence matrix, message = FALSE, warning = FALSE}
+bird_com <- animal_observations %>% 
+  filter(taxon == "Aves") %>%
+  group_by(point_id, species) %>%
+  summarise(n = sum(abundance)) %>%
+  group_by(point_id) %>%
+  pivot_wider(names_from = species, values_from = n) %>%
+  replace(is.na(.),0) %>%
+  ungroup() %>%
+  as.data.frame() %>% 
+  dplyr::select(-point_id) %>%
+  #change to presence/absence
+  mutate(across(.cols = everything(), ~ case_when(. > 0 ~ 1,
+                                                  . == 0 ~ 0))) %>%
+  select(which(colMeans(.)>0))
+
+head(bird_com)
+```

@@ -139,7 +139,7 @@ bestmodels_info <- subset(model_glm,
                          delta < 2, 
                          recalc.weights=FALSE)
 
-knitr::kable(bestmodels_info, caption = glue::glue("**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < 2).**")) %>%
+knitr::kable(bestmodels_info, caption = paste0("**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < 2).**")) %>%
   kableExtra::kable_styling("striped") %>% kableExtra::scroll_box(width = "100%", height = "300px")
 ```
 We can also visualise the importance (based on sum-of-weights) and effect direction (based on coefficient value) for each variable within the top models:
@@ -215,82 +215,40 @@ First, load the additional package `vegan`:
 library("vegan")
 ```
 
-As before, bird and landscape data at sampling points across six areas (towns) in Singapore will be used in this example. The example dataset, `beta_model_data`, contains both animal and landscape datasets processed in the previous two articles. The variable selection output using random forest is also loaded from `beta_model_variables`.
+As before, bird and landscape data at sampling points across six areas (towns) in Singapore will be used in this example. The example dataset, `birds`, contains both animal and landscape datasets processed in the previous two articles. The variable selection output using random forest is also loaded as `landscape`.
 
 ```{r load data, message = FALSE, warning = FALSE}
 
 # # Before package release:
-# load("../inst/extdata/beta_model_data.Rdata")
-# load("../inst/extdata/beta_model_variables.Rdata")
-# load("../data/animal_observations.rda")
+# load("../inst/extdata/build-models_beta-diversity.Rdata")
 # load("../data/sampling_points.rda")
 
 # Afrer package release:
-filepath <- system.file("extdata", "beta_model_data.Rdata", package="biodivercity") # summarised landscape information per point
+filepath <- system.file("extdata", "build-models_beta-diversity.Rdata", package="biodivercity") # summarised landscape information per point
 load(filepath)
 
-filepath <- system.file("extdata", "beta_model_variables.Rdata", package="biodivercity") # variables selected from random forest
-load(filepath)
-
-data("animal_observations")
 data("sampling_points")
 
-sampling_points <- sampling_points %>% 
-  filter(period == 1)
-```
-
-Next, we process the fauna datasets into acceptable formats for analyses.
-
-```{r removing extra genus/family lvl records}
-rmspp <- check_taxongrps(animal_observations, level = "point") 
-
-animal_observations <- animal_observations %>%
-  anti_join(rmspp, by = c("species" = "name","point_id", "period")) %>% 
-  mutate(period = as.character(period))
-```
-
-Create a presence/absence community matrix is created from the observations to summarise total species incidence. Use the `birds` data from `beta_model_data` to ensure the same sampling point, sampling period, and sampling round are used for analysis.
-
-```{r creating a presence/absence matrix, message = FALSE, warning = FALSE}
-bird_com <- animal_observations %>% 
-  filter(taxon == "Aves") %>%
-  group_by(period, point_id, species) %>%
-  summarise(n = sum(abundance)) %>%
-  group_by(point_id, period) %>%
-  pivot_wider(names_from = species, values_from = n) %>%
-  replace(is.na(.),0) %>%
-  ungroup()  %>%
-  semi_join(beta_model_data, by = c("point_id", "period" = "round")) %>% # filtering for the same period
-  as.data.frame(.) %>% 
-  dplyr::select(-period, -point_id)
-
-bird_com <- bird_com %>% 
-  mutate(across(.cols = everything(), ~ case_when(. > 0 ~ 1,
-                                                  . == 0 ~ 0))) %>% 
-  select(which(colMeans(.)>0))
-  
-rm(rmspp)
 ```
 
 Add the coordinate information for PCNM analysis.
 
 ```{r appending spatial information to landscape dataset, message = FALSE, warning = FALSE}
-beta_model_data <- beta_model_data %>% 
-  select(!c(town, round, priority, sprich)) %>% #keep only point_id and landscape variables
-  arrange(point_id) %>% #sort alphabetically
-  
+birds <- birds %>%
   #adding coordinate information
-  mutate(X = {(sampling_points$geometry[match(beta_model_data$point_id,sampling_points$point_id)] %>% sf::st_coordinates())[,2]}, 
-         .after = point_id) %>% 
-  mutate(Y = {(sampling_points$geometry[match(beta_model_data$point_id,sampling_points$point_id)] %>% sf::st_coordinates())[,1]},
-         .after = X)
+    mutate(Y = {(sampling_points$geometry[match(birds$point_id,sampling_points$point_id)] %>% 
+                 sf::st_coordinates())[,1]},
+         .after = point_id) %>%
+  mutate(X = {(sampling_points$geometry[match(birds$point_id,sampling_points$point_id)] %>% 
+                 sf::st_coordinates())[,2]}, 
+         .after = point_id)
 ```
 
 Using the variables selected by random forest, we can now perform the principal component analysis (PCA) to summarise the landscape predictors. Retain only PCA axes with eigenvalues greater than one, to select for PCA axes that account for more variance than the original variables on their own.
 
 ```{r diagnosis by PCA}
-pca_birds <- beta_model_data %>% 
-  dplyr::select(any_of(beta_model_variables$var)) %>% #select impt variables from RF
+pca_birds <- birds %>% 
+  dplyr::select(any_of(landscape$var)) %>% #select impt variables from RF
   prcomp(.,scale.=TRUE) #conduct pca
 
 pca_selected_birds <- pca_birds$x[, which(pca_birds$sdev > 1)]
@@ -301,7 +259,7 @@ pca_selected_birds <- pca_birds$x[, which(pca_birds$sdev > 1)]
 Calculate the PCNM vectors using `vegan::pcnm()` and fit the animal community matrix against these PCNM vectors using `vegan::rda()`. To control for type I error while testing for significant predictors, significant PCNM vectors can first be selected using a backwards, stepwise elimination method until all vectors have a significance level smaller than the chosen significance level of 0.05 (Peres-Neto & Legendre, 2010). This can be performed using `vegan::ordistep()`.
 
 ```{r PCNM, message = FALSE, warning = FALSE, echo = TRUE, results = "hide"}
-plots.xy <- cbind(beta_model_data$X, beta_model_data$Y)
+plots.xy <- cbind(birds$X, birds$Y)
 raw_pcnm_birds <- pcnm(dist(plots.xy))
 
 pcnm_scores_birds <-data.frame(scores(raw_pcnm_birds))
@@ -319,7 +277,7 @@ Perform partial RDA with the selected PCA axes as candidate explanatory variable
 birds_selected <- cbind(pca_selected_birds, pcnm_scores_birds)
 
 birds.rda.all <- update(birds.pcnm.sub, 
-                        glue::glue("~. +", {paste((colnames(pca_selected_birds)), collapse=" +")}), #add selected PCA
+                        paste0("~. +", {paste((colnames(pca_selected_birds)), collapse=" +")}), #add selected PCA
                         data = birds_selected)
 
 birds.rda.sub <- ordistep(birds.rda.all, direction = "backward") #assess p-value for dropping
@@ -331,16 +289,20 @@ The final RDA model is fitted with the significant PC axes and PCNM vectors.
 ```{r examine rda results and fit final model, message = FALSE, warning = FALSE}
 birds.rda.sub$call
 
-birds.rda.fin <- rda(bird_com ~ PC1 + PC2 + PC4 + PC6 + PC7 + PC8 + Condition(PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5), data = birds_selected)
+birds.rda.fin <- rda(bird_com ~ PC1 + PC3 + Condition(PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + PCNM25), data = birds_selected)
 ```
 
-Calculate the average probability of each species occurring across all points. This is a required model input for the predictive _Beta_-diversity model.
+Calculate the average probability of each species occurring across all points. 
 
 ```{r p-hats}
 p_hats_birds <- apply(bird_com, 2, mean)
 ```
 
-Finally, save out all relevant model inputs to be applied in the subsequent apply model section.
+These are the required model inputs for the predictive _Beta_-diversity model.
+1. pca_birds
+2. raw_pcnm_birds
+3. birds.rda.fin
+4. p_hats_birds
 
 ```{r save beta model objs, eval = FALSE}
 save(pca_birds,
