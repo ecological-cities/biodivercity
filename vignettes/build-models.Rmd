@@ -139,11 +139,7 @@ bestmodels_info <- subset(model_glm,
                          delta < 2, 
                          recalc.weights=FALSE)
 
-<<<<<<< HEAD
-knitr::kable(bestmodels_info, caption = paste0("**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < 2).**")) %>%
-=======
 knitr::kable(bestmodels_info, caption = "**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC < 2).**") %>%
->>>>>>> 2c0e4d544ad3b31be80450808aa903f8ddfdf215
   kableExtra::kable_styling("striped") %>% kableExtra::scroll_box(width = "100%", height = "300px")
 ```
 We can also visualise the importance (based on sum-of-weights) and effect direction (based on coefficient value) for each variable within the top models:
