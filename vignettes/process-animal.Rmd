@@ -148,15 +148,27 @@ birds <-
 head(birds)
 ```
 
-To build predictive models of community (_Beta_) diversity for a chosen animal group, a a presence/absence community matrix will need to be created. Presence is indicated with 1 while absence is indicated with 0 for each species at each sampling point.
+To build predictive models of community (_Beta_) diversity for a chosen animal group, a presence/absence community matrix will need to be created. For each species (columns) at each sampling point (rows), presence is denoted as `1` while absence is denoted as `0`. For example, we can generate the community matrix for the animal group 'Aves' (birds), after manually removing genus/family records using the function `check_taxongrps()`:
 
 ```{r creating a presence/absence matrix, message = FALSE, warning = FALSE}
-bird_com <- animal_observations %>% 
-  filter(taxon == "Aves") %>%
-  group_by(point_id, species) %>%
+
+# manually exclude genus/family lvl records by point
+to_remove <- 
+  check_taxongrps(animal_observations, level = "point") 
+
+filtered_observations <- animal_observations %>%
+  anti_join(to_remove, by = c("species" = "name",
+                              "point_id", 
+                              "period"))
+
+# generate community matrix
+bird_com <- filtered_observations %>% 
+  filter(taxon == "Aves") %>% 
+  group_by(point_id, species) %>% # tally no. of individuals per point and species 
   summarise(n = sum(abundance)) %>%
   group_by(point_id) %>%
-  pivot_wider(names_from = species, values_from = n) %>%
+  pivot_wider(names_from = species, # pivot to wide format
+              values_from = n) %>%
   replace(is.na(.),0) %>%
   ungroup() %>%
   as.data.frame() %>% 
@@ -164,7 +176,7 @@ bird_com <- animal_observations %>%
   mutate(across(.cols = everything(), # change to presence/absence
                 ~ case_when(. > 0 ~ 1,
                             . == 0 ~ 0))) %>%
-  select(which(colMeans(.)>0))
+  select(which(colMeans(.) > 0)) # include species observed at least once
 
 head(bird_com)
 ```
