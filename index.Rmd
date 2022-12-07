@@ -17,8 +17,8 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![DOI](https://zenodo.org/badge/348575349.svg)](https://zenodo.org/badge/latestdoi/348575349)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/biodivercity)](https://CRAN.R-project.org/package=biodivercity)
 [![R-CMD-check](https://github.com/ecological-cities/biodivercity/workflows/R-CMD-check/badge.svg)](https://github.com/ecological-cities/biodivercity/actions)
 <!-- badges: end -->
 
@@ -52,7 +52,7 @@ knitr::include_graphics("man/figures/framework.png", dpi = 300)
 
 To cite `biodivercity` or acknowledge its use, please cite the following:
 
-*Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package for spatial assessment of biodiversity across city landscapes. R Package version 0.1.0. https://ecological-cities.github.io/biodivercity.*  
+*Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package for spatial assessment of biodiversity across city landscapes. R Package version 0.1.0. https://doi.org/10.5281/zenodo.7410415.*  
 
 To get a BibTex entry, run `citation("biodivercity")`.
 
