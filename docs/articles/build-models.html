@@ -97,7 +97,7 @@
             <h3 data-toc-skip class="subtitle">Train models that predict
 animal diversity from landscape data</h3>
             
-            <h4 data-toc-skip class="date">2022-12-06</h4>
+            <h4 data-toc-skip class="date">2022-12-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/build-models.Rmd" class="external-link"><code>vignettes/build-models.Rmd</code></a></small>
       <div class="d-none name"><code>build-models.Rmd</code></div>
@@ -1044,85 +1044,34 @@ quantified using Principle Coordinates of Neighbourhood Matrices
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/vegandevs/vegan" class="external-link">"vegan"</a></span><span class="op">)</span></code></pre></div>
 <p>As before, bird and landscape data at sampling points across six
 areas (towns) in Singapore will be used in this example. The example
-dataset, <code>beta_model_data</code>, contains both animal and
-landscape datasets processed in the previous two articles. The variable
-selection output using random forest is also loaded from
-<code>beta_model_variables</code>.</p>
+dataset, <code>birds</code>, contains both animal and landscape datasets
+processed in the previous two articles. The variable selection output
+using random forest is also loaded as <code>landscape</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># # Before package release:</span>
-<span class="co"># load("../inst/extdata/beta_model_data.Rdata")</span>
-<span class="co"># load("../inst/extdata/beta_model_variables.Rdata")</span>
-<span class="co"># load("../data/animal_observations.rda")</span>
-<span class="co"># load("../data/sampling_points.rda")</span>
-
-<span class="co"># Afrer package release:</span>
-<span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"beta_model_data.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span> <span class="co"># summarised landscape information per point</span>
+<code class="sourceCode R"><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"build-models_beta-diversity.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span>
 
-<span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"beta_model_variables.Rdata"</span>, package<span class="op">=</span><span class="st">"biodivercity"</span><span class="op">)</span> <span class="co"># variables selected from random forest</span>
-<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"animal_observations"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"sampling_points"</span><span class="op">)</span>
-
-<span class="va">sampling_points</span> <span class="op">&lt;-</span> <span class="va">sampling_points</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">period</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<p>Next, we process the fauna datasets into acceptable formats for
-analyses.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">rmspp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_taxongrps.html">check_taxongrps</a></span><span class="op">(</span><span class="va">animal_observations</span>, level <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span> 
-
-<span class="va">animal_observations</span> <span class="op">&lt;-</span> <span class="va">animal_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">anti_join</a></span><span class="op">(</span><span class="va">rmspp</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"species"</span> <span class="op">=</span> <span class="st">"name"</span>,<span class="st">"point_id"</span>, <span class="st">"period"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">period</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>Create a presence/absence community matrix is created from the
-observations to summarise total species incidence. Use the
-<code>birds</code> data from <code>beta_model_data</code> to ensure the
-same sampling point, sampling period, and sampling round are used for
-analysis.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bird_com</span> <span class="op">&lt;-</span> <span class="va">animal_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">taxon</span> <span class="op">==</span> <span class="st">"Aves"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">period</span>, <span class="va">point_id</span>, <span class="va">species</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/tidyverse.html" class="external-link">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">abundance</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">point_id</span>, <span class="va">period</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">species</span>, values_from <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/base/replace.html" class="external-link">replace</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,<span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span>  <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join</a></span><span class="op">(</span><span class="va">beta_model_data</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"point_id"</span>, <span class="st">"period"</span> <span class="op">=</span> <span class="st">"round"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># filtering for the same period</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">period</span>, <span class="op">-</span><span class="va">point_id</span><span class="op">)</span>
-
-<span class="va">bird_com</span> <span class="op">&lt;-</span> <span class="va">bird_com</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span>.cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">.</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">~</span> <span class="fl">1</span>,
-                                                  <span class="va">.</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-  
-<span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">rmspp</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"sampling_points"</span><span class="op">)</span></code></pre></div>
 <p>Add the coordinate information for PCNM analysis.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">beta_model_data</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">town</span>, <span class="va">round</span>, <span class="va">priority</span>, <span class="va">sprich</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co">#keep only point_id and landscape variables</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">point_id</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co">#sort alphabetically</span>
-  
-  <span class="co">#adding coordinate information</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>X <span class="op">=</span> <span class="op">{</span><span class="op">(</span><span class="va">sampling_points</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">beta_model_data</span><span class="op">$</span><span class="va">point_id</span>,<span class="va">sampling_points</span><span class="op">$</span><span class="va">point_id</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">}</span>, 
-         .after <span class="op">=</span> <span class="va">point_id</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="op">{</span><span class="op">(</span><span class="va">sampling_points</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">beta_model_data</span><span class="op">$</span><span class="va">point_id</span>,<span class="va">sampling_points</span><span class="op">$</span><span class="va">point_id</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">}</span>,
-         .after <span class="op">=</span> <span class="va">X</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">birds</span> <span class="op">&lt;-</span> <span class="va">birds</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="op">{</span><span class="op">(</span><span class="va">sampling_points</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">birds</span><span class="op">$</span><span class="va">point_id</span>,<span class="va">sampling_points</span><span class="op">$</span><span class="va">point_id</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+                 <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">}</span>,
+         .after <span class="op">=</span> <span class="va">point_id</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>X <span class="op">=</span> <span class="op">{</span><span class="op">(</span><span class="va">sampling_points</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">birds</span><span class="op">$</span><span class="va">point_id</span>,<span class="va">sampling_points</span><span class="op">$</span><span class="va">point_id</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+                 <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">}</span>, 
+         .after <span class="op">=</span> <span class="va">point_id</span><span class="op">)</span></code></pre></div>
 <p>Using the variables selected by random forest, we can now perform the
 principal component analysis (PCA) to summarise the landscape
 predictors. Retain only PCA axes with eigenvalues greater than one, to
 select for PCA axes that account for more variance than the original
 variables on their own.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pca_birds</span> <span class="op">&lt;-</span> <span class="va">beta_model_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">beta_model_variables</span><span class="op">$</span><span class="va">var</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co">#select impt variables from RF</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="va">.</span>,scale.<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="co">#conduct pca</span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pca_birds</span> <span class="op">&lt;-</span> <span class="va">birds</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">landscape</span><span class="op">$</span><span class="va">var</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># select impt variables from random forest output</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="va">.</span>,scale.<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="co"># conduct pca</span>
 
-<span class="va">pca_selected_birds</span> <span class="op">&lt;-</span> <span class="va">pca_birds</span><span class="op">$</span><span class="va">x</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pca_birds</span><span class="op">$</span><span class="va">sdev</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span>
-
-<span class="co"># biplot(pca_birds, choices=c(1,2))</span></code></pre></div>
+<span class="va">pca_selected_birds</span> <span class="op">&lt;-</span> <span class="va">pca_birds</span><span class="op">$</span><span class="va">x</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pca_birds</span><span class="op">$</span><span class="va">sdev</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span></code></pre></div>
 <p>Calculate the PCNM vectors using <code><a href="https://rdrr.io/pkg/vegan/man/pcnm.html" class="external-link">vegan::pcnm()</a></code> and fit
 the animal community matrix against these PCNM vectors using
 <code><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">vegan::rda()</a></code>. To control for type I error while testing for
@@ -1131,8 +1080,8 @@ using a backwards, stepwise elimination method until all vectors have a
 significance level smaller than the chosen significance level of 0.05
 (Peres-Neto &amp; Legendre, 2010). This can be performed using
 <code><a href="https://rdrr.io/pkg/vegan/man/ordistep.html" class="external-link">vegan::ordistep()</a></code>.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">plots.xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">beta_model_data</span><span class="op">$</span><span class="va">X</span>, <span class="va">beta_model_data</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">plots.xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">birds</span><span class="op">$</span><span class="va">X</span>, <span class="va">birds</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span>
 <span class="va">raw_pcnm_birds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/pcnm.html" class="external-link">pcnm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">plots.xy</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">pcnm_scores_birds</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/vegan/man/scores.html" class="external-link">scores</a></span><span class="op">(</span><span class="va">raw_pcnm_birds</span><span class="op">)</span><span class="op">)</span>
@@ -1147,35 +1096,34 @@ Perform <code><a href="https://rdrr.io/pkg/vegan/man/ordistep.html" class="exter
 axes while accounting for the effects of the covariables in the model,
 until all PCA axes have significance level smaller than the chosen
 significance level of 0.05.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">birds_selected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pca_selected_birds</span>, <span class="va">pcnm_scores_birds</span><span class="op">)</span>
 
 <span class="va">birds.rda.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">birds.pcnm.sub</span>, 
-                        <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">"~. +"</span>, <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">pca_selected_birds</span><span class="op">)</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">" +"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>, <span class="co">#add selected PCA</span>
+                        <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"~. +"</span>, <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">pca_selected_birds</span><span class="op">)</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">" +"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>, <span class="co"># add selected PCA</span>
                         data <span class="op">=</span> <span class="va">birds_selected</span><span class="op">)</span>
 
-<span class="va">birds.rda.sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/ordistep.html" class="external-link">ordistep</a></span><span class="op">(</span><span class="va">birds.rda.all</span>, direction <span class="op">=</span> <span class="st">"backward"</span><span class="op">)</span> <span class="co">#assess p-value for dropping</span></code></pre></div>
+<span class="va">birds.rda.sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/ordistep.html" class="external-link">ordistep</a></span><span class="op">(</span><span class="va">birds.rda.all</span>, direction <span class="op">=</span> <span class="st">"backward"</span><span class="op">)</span> <span class="co"># assess p-value for dropping variables</span></code></pre></div>
 <p>The final RDA model is fitted with the significant PC axes and PCNM
 vectors.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">birds.rda.sub</span><span class="op">$</span><span class="va">call</span></code></pre></div>
-<pre><code><span class="co">## rda(formula = bird_com ~ PCNM24 + PC1 + PC2 + PC3 + PC4 + PC5 + </span>
-<span class="co">##     PC6 + PC7 + PC8, data = birds_selected)</span></code></pre>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">birds.rda.fin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">bird_com</span> <span class="op">~</span> <span class="va">PC1</span> <span class="op">+</span> <span class="va">PC2</span> <span class="op">+</span> <span class="va">PC4</span> <span class="op">+</span> <span class="va">PC6</span> <span class="op">+</span> <span class="va">PC7</span> <span class="op">+</span> <span class="va">PC8</span> <span class="op">+</span> <span class="fu">Condition</span><span class="op">(</span><span class="va">PCNM1</span> <span class="op">+</span> <span class="va">PCNM2</span> <span class="op">+</span> <span class="va">PCNM3</span> <span class="op">+</span> <span class="va">PCNM4</span> <span class="op">+</span> <span class="va">PCNM5</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">birds_selected</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## rda(formula = bird_com ~ PCNM1 + PCNM2 + PCNM3 + PCNM4 + PCNM5 + </span>
+<span class="co">##     PCNM25 + PC1 + PC3, data = birds_selected)</span></code></pre>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">birds.rda.fin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">bird_com</span> <span class="op">~</span> <span class="va">PC1</span> <span class="op">+</span> <span class="va">PC3</span> <span class="op">+</span> <span class="fu">Condition</span><span class="op">(</span><span class="va">PCNM1</span> <span class="op">+</span> <span class="va">PCNM2</span> <span class="op">+</span> <span class="va">PCNM3</span> <span class="op">+</span> <span class="va">PCNM4</span> <span class="op">+</span> <span class="va">PCNM5</span> <span class="op">+</span> <span class="va">PCNM25</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">birds_selected</span><span class="op">)</span></code></pre></div>
 <p>Calculate the average probability of each species occurring across
-all points. This is a required model input for the predictive
-<em>Beta</em>-diversity model.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+all points.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_hats_birds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">bird_com</span>, <span class="fl">2</span>, <span class="va">mean</span><span class="op">)</span></code></pre></div>
-<p>Finally, save out all relevant model inputs to be applied in the
-subsequent apply model section.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">pca_birds</span>,
-     <span class="va">raw_pcnm_birds</span>,
-     <span class="va">birds.rda.fin</span>, 
-     <span class="va">p_hats_birds</span>,
-     file <span class="op">=</span> <span class="st">"./your/working/directory/beta_model_birds.Rdata"</span><span class="op">)</span></code></pre></div>
+<p>These are the required objects to use the predictive
+<em>Beta</em>-diversity model in the future.</p>
+<ol style="list-style-type: decimal">
+<li>pca_birds</li>
+<li>raw_pcnm_birds</li>
+<li>birds.rda.fin</li>
+<li>p_hats_birds</li>
+</ol>
 <p><br></p>
 <hr>
 </div>

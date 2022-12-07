@@ -148,7 +148,7 @@ birds <-
 head(birds)
 ```
 
-To build predictive models for community (beta) diversity for a chosen animal group, a a presence/absence community matrix will need to be created. Presence is indicated with 1 while absence is indicated with 0 for each species at each sampling point.
+To build predictive models of community (_Beta_) diversity for a chosen animal group, a a presence/absence community matrix will need to be created. Presence is indicated with 1 while absence is indicated with 0 for each species at each sampling point.
 
 ```{r creating a presence/absence matrix, message = FALSE, warning = FALSE}
 bird_com <- animal_observations %>% 
@@ -161,9 +161,9 @@ bird_com <- animal_observations %>%
   ungroup() %>%
   as.data.frame() %>% 
   dplyr::select(-point_id) %>%
-  #change to presence/absence
-  mutate(across(.cols = everything(), ~ case_when(. > 0 ~ 1,
-                                                  . == 0 ~ 0))) %>%
+  mutate(across(.cols = everything(), # change to presence/absence
+                ~ case_when(. > 0 ~ 1,
+                            . == 0 ~ 0))) %>%
   select(which(colMeans(.)>0))
 
 head(bird_com)

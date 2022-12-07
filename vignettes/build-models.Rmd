@@ -219,12 +219,7 @@ As before, bird and landscape data at sampling points across six areas (towns) i
 
 ```{r load data, message = FALSE, warning = FALSE}
 
-# # Before package release:
-# load("../inst/extdata/build-models_beta-diversity.Rdata")
-# load("../data/sampling_points.rda")
-
-# Afrer package release:
-filepath <- system.file("extdata", "build-models_beta-diversity.Rdata", package="biodivercity") # summarised landscape information per point
+filepath <- system.file("extdata", "build-models_beta-diversity.Rdata", package="biodivercity")
 load(filepath)
 
 data("sampling_points")
@@ -235,8 +230,7 @@ Add the coordinate information for PCNM analysis.
 
 ```{r appending spatial information to landscape dataset, message = FALSE, warning = FALSE}
 birds <- birds %>%
-  #adding coordinate information
-    mutate(Y = {(sampling_points$geometry[match(birds$point_id,sampling_points$point_id)] %>% 
+  mutate(Y = {(sampling_points$geometry[match(birds$point_id,sampling_points$point_id)] %>% 
                  sf::st_coordinates())[,1]},
          .after = point_id) %>%
   mutate(X = {(sampling_points$geometry[match(birds$point_id,sampling_points$point_id)] %>% 
@@ -248,12 +242,10 @@ Using the variables selected by random forest, we can now perform the principal 
 
 ```{r diagnosis by PCA}
 pca_birds <- birds %>% 
-  dplyr::select(any_of(landscape$var)) %>% #select impt variables from RF
-  prcomp(.,scale.=TRUE) #conduct pca
+  dplyr::select(any_of(landscape$var)) %>% # select impt variables from random forest output
+  prcomp(.,scale.=TRUE) # conduct pca
 
 pca_selected_birds <- pca_birds$x[, which(pca_birds$sdev > 1)]
-
-# biplot(pca_birds, choices=c(1,2))
 ```
 
 Calculate the PCNM vectors using `vegan::pcnm()` and fit the animal community matrix against these PCNM vectors using `vegan::rda()`. To control for type I error while testing for significant predictors, significant PCNM vectors can first be selected using a backwards, stepwise elimination method until all vectors have a significance level smaller than the chosen significance level of 0.05 (Peres-Neto & Legendre, 2010). This can be performed using `vegan::ordistep()`.
@@ -277,10 +269,10 @@ Perform partial RDA with the selected PCA axes as candidate explanatory variable
 birds_selected <- cbind(pca_selected_birds, pcnm_scores_birds)
 
 birds.rda.all <- update(birds.pcnm.sub, 
-                        paste0("~. +", {paste((colnames(pca_selected_birds)), collapse=" +")}), #add selected PCA
+                        paste0("~. +", {paste((colnames(pca_selected_birds)), collapse=" +")}), # add selected PCA
                         data = birds_selected)
 
-birds.rda.sub <- ordistep(birds.rda.all, direction = "backward") #assess p-value for dropping
+birds.rda.sub <- ordistep(birds.rda.all, direction = "backward") # assess p-value for dropping variables
 
 ```
 
@@ -298,13 +290,14 @@ Calculate the average probability of each species occurring across all points.
 p_hats_birds <- apply(bird_com, 2, mean)
 ```
 
-These are the required model inputs for the predictive _Beta_-diversity model.
+These are the required objects to use the predictive _Beta_-diversity model in the future:
+
 1. pca_birds
 2. raw_pcnm_birds
 3. birds.rda.fin
 4. p_hats_birds
 
-```{r save beta model objs, eval = FALSE}
+```{r save beta model objs, eval = FALSE, include = FALSE}
 save(pca_birds,
      raw_pcnm_birds,
      birds.rda.fin, 

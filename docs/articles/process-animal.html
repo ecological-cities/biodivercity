@@ -97,7 +97,7 @@
             <h3 data-toc-skip class="subtitle">Format, check and
 summarise data from animal surveys conducted at point locations</h3>
             
-            <h4 data-toc-skip class="date">2022-12-06</h4>
+            <h4 data-toc-skip class="date">2022-12-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ecological-cities/biodivercity/blob/HEAD/vignettes/process-animal.Rmd" class="external-link"><code>vignettes/process-animal.Rmd</code></a></small>
       <div class="d-none name"><code>process-animal.Rmd</code></div>
@@ -798,21 +798,21 @@ filtered observations. The number of species will be reduced by one:</p>
 <div class="section level2">
 <h2 id="summarise-data">Summarise data<a class="anchor" aria-label="anchor" href="#summarise-data"></a>
 </h2>
-<p>To build predictive models for a chosen animal group, the animal
-observations will need to be aggregated at the level of each sampling
-point. For example, we can tally the number of bird (animal group
-‘Aves’) species per point using the function
+<p>To build predictive models for local (alpha) diversity for a chosen
+animal group, the animal observations will need to be aggregated at the
+level of each sampling point. For example, we can tally the number of
+bird (animal group ‘Aves’) species per point using the function
 <code><a href="../reference/tally_observations.html">tally_observations()</a></code>. Note that this function avoids
 double-counting group-level records, by acting as a wrapper to the
 function <code><a href="../reference/check_taxongrps.html">check_taxongrps()</a></code> (see previous section).</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">animals_perpoint</span> <span class="op">&lt;-</span> 
+<code class="sourceCode R"><span class="va">birds</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/tally_observations.html">tally_observations</a></span><span class="op">(</span>observations <span class="op">=</span> <span class="va">animal_observations</span>, 
                      survey_ref <span class="op">=</span> <span class="va">animal_surveys</span>,
                      level <span class="op">=</span> <span class="st">"point"</span>,
                      specify_taxon <span class="op">=</span> <span class="st">"Aves"</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">animals_perpoint</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">birds</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## <span style="color: #949494;"># A tibble: 6 × 5</span></span>
 <span class="co">##   area  period taxon point_id     n</span>
 <span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
@@ -822,6 +822,321 @@ function <code><a href="../reference/check_taxongrps.html">check_taxongrps()</a>
 <span class="co">## <span style="color: #BCBCBC;">4</span> BS         1 Aves  BSa1a       18</span>
 <span class="co">## <span style="color: #BCBCBC;">5</span> BS         1 Aves  BSa2        16</span>
 <span class="co">## <span style="color: #BCBCBC;">6</span> BS         1 Aves  BSa20a_E    31</span></code></pre>
+<p>To build predictive models of community (<em>Beta</em>) diversity for
+a chosen animal group, a a presence/absence community matrix will need
+to be created. Presence is indicated with 1 while absence is indicated
+with 0 for each species at each sampling point.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bird_com</span> <span class="op">&lt;-</span> <span class="va">animal_observations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">taxon</span> <span class="op">==</span> <span class="st">"Aves"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">point_id</span>, <span class="va">species</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">abundance</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">point_id</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">species</span>, values_from <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/base/replace.html" class="external-link">replace</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,<span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">point_id</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span>.cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span>, <span class="co"># change to presence/absence</span>
+                <span class="op">~</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">.</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">~</span> <span class="fl">1</span>,
+                            <span class="va">.</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bird_com</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">##   Acridotheres javanicus Aegithina tiphia Amaurornis phoenicurus</span>
+<span class="co">## 1                      1                1                      1</span>
+<span class="co">## 2                      1                1                      1</span>
+<span class="co">## 3                      1                1                      1</span>
+<span class="co">## 4                      1                0                      0</span>
+<span class="co">## 5                      1                0                      0</span>
+<span class="co">## 6                      1                1                      0</span>
+<span class="co">##   Aplonis panayensis Apodidae Ardea purpurea Ardeola spp. Bubulcus ibis</span>
+<span class="co">## 1                  1        1              1            1             1</span>
+<span class="co">## 2                  1        1              1            0             0</span>
+<span class="co">## 3                  1        1              1            0             0</span>
+<span class="co">## 4                  1        1              0            0             1</span>
+<span class="co">## 5                  1        1              0            0             0</span>
+<span class="co">## 6                  1        1              1            0             0</span>
+<span class="co">##   Butorides striata Cinnyris jugularis Columba livia Copsychus saularis</span>
+<span class="co">## 1                 1                  1             1                  1</span>
+<span class="co">## 2                 1                  1             1                  1</span>
+<span class="co">## 3                 0                  1             1                  1</span>
+<span class="co">## 4                 0                  1             1                  0</span>
+<span class="co">## 5                 0                  1             1                  0</span>
+<span class="co">## 6                 0                  1             0                  1</span>
+<span class="co">##   Corvus splendens Dicaeum cruentatum Eudynamys scolopaceus Geopelia striata</span>
+<span class="co">## 1                1                  1                     1                1</span>
+<span class="co">## 2                1                  1                     1                1</span>
+<span class="co">## 3                1                  1                     1                1</span>
+<span class="co">## 4                1                  1                     1                0</span>
+<span class="co">## 5                1                  1                     0                0</span>
+<span class="co">## 6                0                  1                     1                1</span>
+<span class="co">##   Halcyon smyrnensis Haliastur indus Hemiprocne longipennis Hirundo rustica</span>
+<span class="co">## 1                  1               1                      1               1</span>
+<span class="co">## 2                  0               0                      0               0</span>
+<span class="co">## 3                  1               0                      0               1</span>
+<span class="co">## 4                  0               0                      0               0</span>
+<span class="co">## 5                  0               0                      0               0</span>
+<span class="co">## 6                  1               0                      1               1</span>
+<span class="co">##   Ixobrychus sinensis Lanius cristatus Lonchura punctulata Loriculus galgulus</span>
+<span class="co">## 1                   1                1                   1                  1</span>
+<span class="co">## 2                   1                0                   1                  1</span>
+<span class="co">## 3                   0                0                   0                  1</span>
+<span class="co">## 4                   0                0                   0                  1</span>
+<span class="co">## 5                   0                0                   0                  0</span>
+<span class="co">## 6                   0                0                   0                  1</span>
+<span class="co">##   Muscicapa dauurica Oriolus chinensis Orthotomus sutorius Psittacula alexandri</span>
+<span class="co">## 1                  1                 1                   1                    1</span>
+<span class="co">## 2                  1                 1                   0                    0</span>
+<span class="co">## 3                  1                 1                   1                    0</span>
+<span class="co">## 4                  0                 1                   0                    0</span>
+<span class="co">## 5                  0                 1                   0                    0</span>
+<span class="co">## 6                  1                 1                   0                    0</span>
+<span class="co">##   Psittacula krameri Psittacula longicauda Psittaculidae Pycnonotus goiavier</span>
+<span class="co">## 1                  1                     1             1                   1</span>
+<span class="co">## 2                  1                     0             0                   1</span>
+<span class="co">## 3                  1                     0             0                   1</span>
+<span class="co">## 4                  1                     0             0                   1</span>
+<span class="co">## 5                  0                     0             1                   1</span>
+<span class="co">## 6                  1                     0             0                   1</span>
+<span class="co">##   Rhipidura javanica Streptopelia chinensis Todiramphus chloris Treron vernans</span>
+<span class="co">## 1                  1                      1                   1              1</span>
+<span class="co">## 2                  1                      1                   1              1</span>
+<span class="co">## 3                  1                      1                   1              1</span>
+<span class="co">## 4                  0                      1                   0              1</span>
+<span class="co">## 5                  0                      1                   0              0</span>
+<span class="co">## 6                  1                      1                   1              1</span>
+<span class="co">##   Yungipicus moluccensis Zosterops palpebrosus Acrocephalus orientalis</span>
+<span class="co">## 1                      1                     1                       0</span>
+<span class="co">## 2                      0                     1                       1</span>
+<span class="co">## 3                      0                     1                       0</span>
+<span class="co">## 4                      0                     1                       0</span>
+<span class="co">## 5                      1                     1                       0</span>
+<span class="co">## 6                      1                     1                       0</span>
+<span class="co">##   Apus nipalensis Ardea cinerea Dinopium javanense Haliaeetus leucogaster</span>
+<span class="co">## 1               0             0                  0                      0</span>
+<span class="co">## 2               1             1                  1                      1</span>
+<span class="co">## 3               0             1                  1                      0</span>
+<span class="co">## 4               0             0                  1                      0</span>
+<span class="co">## 5               0             0                  0                      0</span>
+<span class="co">## 6               0             1                  0                      0</span>
+<span class="co">##   Lanius schach Orthotomus ruficeps Passer montanus Pelargopsis capensis</span>
+<span class="co">## 1             0                   0               0                    0</span>
+<span class="co">## 2             1                   1               1                    1</span>
+<span class="co">## 3             0                   0               1                    0</span>
+<span class="co">## 4             0                   0               1                    0</span>
+<span class="co">## 5             0                   0               1                    0</span>
+<span class="co">## 6             0                   1               0                    0</span>
+<span class="co">##   Trichoglossus haematodus Agropsar sturninus Gallus gallus (domestic type)</span>
+<span class="co">## 1                        0                  0                             0</span>
+<span class="co">## 2                        1                  0                             0</span>
+<span class="co">## 3                        1                  1                             1</span>
+<span class="co">## 4                        0                  0                             0</span>
+<span class="co">## 5                        0                  0                             0</span>
+<span class="co">## 6                        1                  0                             1</span>
+<span class="co">##   Lanius spp. Merops viridis Micropternus brachyurus Anthreptes malacensis</span>
+<span class="co">## 1           0              0                       0                     0</span>
+<span class="co">## 2           0              0                       0                     0</span>
+<span class="co">## 3           1              1                       1                     0</span>
+<span class="co">## 4           0              0                       0                     0</span>
+<span class="co">## 5           0              0                       0                     1</span>
+<span class="co">## 6           0              0                       0                     1</span>
+<span class="co">##   Hirundo tahitica Phylloscopus borealis Acridotheres tristis Ardeidae</span>
+<span class="co">## 1                0                     0                    0        0</span>
+<span class="co">## 2                0                     0                    0        0</span>
+<span class="co">## 3                0                     0                    0        0</span>
+<span class="co">## 4                0                     0                    0        0</span>
+<span class="co">## 5                1                     0                    0        0</span>
+<span class="co">## 6                1                     1                    0        0</span>
+<span class="co">##   Corvus macrorhynchos Falco peregrinus Lalage nigra Orthotomus atrogularis</span>
+<span class="co">## 1                    0                0            0                      0</span>
+<span class="co">## 2                    0                0            0                      0</span>
+<span class="co">## 3                    0                0            0                      0</span>
+<span class="co">## 4                    0                0            0                      0</span>
+<span class="co">## 5                    0                0            0                      0</span>
+<span class="co">## 6                    0                0            0                      0</span>
+<span class="co">##   Anthus rufulus Dicrurus paradiseus Egretta garzetta Pernis ptilorhynchus</span>
+<span class="co">## 1              0                   0                0                    0</span>
+<span class="co">## 2              0                   0                0                    0</span>
+<span class="co">## 3              0                   0                0                    0</span>
+<span class="co">## 4              0                   0                0                    0</span>
+<span class="co">## 5              0                   0                0                    0</span>
+<span class="co">## 6              0                   0                0                    0</span>
+<span class="co">##   Ducula bicolor Gerygone sulphurea Dicrurus annectans Ardea intermedia</span>
+<span class="co">## 1              0                  0                  0                0</span>
+<span class="co">## 2              0                  0                  0                0</span>
+<span class="co">## 3              0                  0                  0                0</span>
+<span class="co">## 4              0                  0                  0                0</span>
+<span class="co">## 5              0                  0                  0                0</span>
+<span class="co">## 6              0                  0                  0                0</span>
+<span class="co">##   Merops philippinus Anthus cervinus Cisticola juncidis Motacilla flava</span>
+<span class="co">## 1                  0               0                  0               0</span>
+<span class="co">## 2                  0               0                  0               0</span>
+<span class="co">## 3                  0               0                  0               0</span>
+<span class="co">## 4                  0               0                  0               0</span>
+<span class="co">## 5                  0               0                  0               0</span>
+<span class="co">## 6                  0               0                  0               0</span>
+<span class="co">##   Vanellus indicus Actitis hypoleucos Alcedo atthis Lanius tigrinus</span>
+<span class="co">## 1                0                  0             0               0</span>
+<span class="co">## 2                0                  0             0               0</span>
+<span class="co">## 3                0                  0             0               0</span>
+<span class="co">## 4                0                  0             0               0</span>
+<span class="co">## 5                0                  0             0               0</span>
+<span class="co">## 6                0                  0             0               0</span>
+<span class="co">##   Motacilla cinerea Elanus caeruleus Hirundo spp. Pycnonotus jocosus</span>
+<span class="co">## 1                 0                0            0                  0</span>
+<span class="co">## 2                 0                0            0                  0</span>
+<span class="co">## 3                 0                0            0                  0</span>
+<span class="co">## 4                 0                0            0                  0</span>
+<span class="co">## 5                 0                0            0                  0</span>
+<span class="co">## 6                 0                0            0                  0</span>
+<span class="co">##   Ardeola bacchus Ardeola speciosa Gallinago spp. Rallidae</span>
+<span class="co">## 1               0                0              0        0</span>
+<span class="co">## 2               0                0              0        0</span>
+<span class="co">## 3               0                0              0        0</span>
+<span class="co">## 4               0                0              0        0</span>
+<span class="co">## 5               0                0              0        0</span>
+<span class="co">## 6               0                0              0        0</span>
+<span class="co">##   Chrysococcyx minutillus Nectariniidae Pericrocotus divaricatus Accipiter spp.</span>
+<span class="co">## 1                       0             0                        0              0</span>
+<span class="co">## 2                       0             0                        0              0</span>
+<span class="co">## 3                       0             0                        0              0</span>
+<span class="co">## 4                       0             0                        0              0</span>
+<span class="co">## 5                       0             0                        0              0</span>
+<span class="co">## 6                       0             0                        0              0</span>
+<span class="co">##   Eurystomus orientalis Nycticorax nycticorax Haliaeetus ichthyaetus</span>
+<span class="co">## 1                     0                     0                      0</span>
+<span class="co">## 2                     0                     0                      0</span>
+<span class="co">## 3                     0                     0                      0</span>
+<span class="co">## 4                     0                     0                      0</span>
+<span class="co">## 5                     0                     0                      0</span>
+<span class="co">## 6                     0                     0                      0</span>
+<span class="co">##   Cacatua goffiniana Aerodramus maximus Anthracoceros albirostris</span>
+<span class="co">## 1                  0                  0                         0</span>
+<span class="co">## 2                  0                  0                         0</span>
+<span class="co">## 3                  0                  0                         0</span>
+<span class="co">## 4                  0                  0                         0</span>
+<span class="co">## 5                  0                  0                         0</span>
+<span class="co">## 6                  0                  0                         0</span>
+<span class="co">##   Picus vittatus Psilopogon haemacephalus Chalcophaps indica</span>
+<span class="co">## 1              0                        0                  0</span>
+<span class="co">## 2              0                        0                  0</span>
+<span class="co">## 3              0                        0                  0</span>
+<span class="co">## 4              0                        0                  0</span>
+<span class="co">## 5              0                        0                  0</span>
+<span class="co">## 6              0                        0                  0</span>
+<span class="co">##   Chrysophlegma miniaceum Cuculus micropterus Nisaetus cirrhatus</span>
+<span class="co">## 1                       0                   0                  0</span>
+<span class="co">## 2                       0                   0                  0</span>
+<span class="co">## 3                       0                   0                  0</span>
+<span class="co">## 4                       0                   0                  0</span>
+<span class="co">## 5                       0                   0                  0</span>
+<span class="co">## 6                       0                   0                  0</span>
+<span class="co">##   Orthotomus sericeus Pycnonotus aurigaster Mixornis gularis</span>
+<span class="co">## 1                   0                     0                0</span>
+<span class="co">## 2                   0                     0                0</span>
+<span class="co">## 3                   0                     0                0</span>
+<span class="co">## 4                   0                     0                0</span>
+<span class="co">## 5                   0                     0                0</span>
+<span class="co">## 6                   0                     0                0</span>
+<span class="co">##   Ficedula zanthopygia Muscicapa spp. Surniculus lugubris Orthotomus spp.</span>
+<span class="co">## 1                    0              0                   0               0</span>
+<span class="co">## 2                    0              0                   0               0</span>
+<span class="co">## 3                    0              0                   0               0</span>
+<span class="co">## 4                    0              0                   0               0</span>
+<span class="co">## 5                    0              0                   0               0</span>
+<span class="co">## 6                    0              0                   0               0</span>
+<span class="co">##   Centropus bengalensis Ploceus philippinus Prinia flaviventris Zapornia fusca</span>
+<span class="co">## 1                     0                   0                   0              0</span>
+<span class="co">## 2                     0                   0                   0              0</span>
+<span class="co">## 3                     0                   0                   0              0</span>
+<span class="co">## 4                     0                   0                   0              0</span>
+<span class="co">## 5                     0                   0                   0              0</span>
+<span class="co">## 6                     0                   0                   0              0</span>
+<span class="co">##   Cecropis daurica Ploceus spp. Sternula albifrons Vidua macroura</span>
+<span class="co">## 1                0            0                  0              0</span>
+<span class="co">## 2                0            0                  0              0</span>
+<span class="co">## 3                0            0                  0              0</span>
+<span class="co">## 4                0            0                  0              0</span>
+<span class="co">## 5                0            0                  0              0</span>
+<span class="co">## 6                0            0                  0              0</span>
+<span class="co">##   Aviceda leuphotes Aviceda jerdoni Aerodramus germani Psilopogon lineatus</span>
+<span class="co">## 1                 0               0                  0                   0</span>
+<span class="co">## 2                 0               0                  0                   0</span>
+<span class="co">## 3                 0               0                  0                   0</span>
+<span class="co">## 4                 0               0                  0                   0</span>
+<span class="co">## 5                 0               0                  0                   0</span>
+<span class="co">## 6                 0               0                  0                   0</span>
+<span class="co">##   Cacomantis merulinus Pycnonotus plumosus Streptopelia tranquebarica</span>
+<span class="co">## 1                    0                   0                          0</span>
+<span class="co">## 2                    0                   0                          0</span>
+<span class="co">## 3                    0                   0                          0</span>
+<span class="co">## 4                    0                   0                          0</span>
+<span class="co">## 5                    0                   0                          0</span>
+<span class="co">## 6                    0                   0                          0</span>
+<span class="co">##   Accipitriformes Cacomantis sepulcralis Merops spp. Acrocephalus bistrigiceps</span>
+<span class="co">## 1               0                      0           0                         0</span>
+<span class="co">## 2               0                      0           0                         0</span>
+<span class="co">## 3               0                      0           0                         0</span>
+<span class="co">## 4               0                      0           0                         0</span>
+<span class="co">## 5               0                      0           0                         0</span>
+<span class="co">## 6               0                      0           0                         0</span>
+<span class="co">##   Lonchura spp. Centropus sinensis Gracula religiosa Pandion haliaetus</span>
+<span class="co">## 1             0                  0                 0                 0</span>
+<span class="co">## 2             0                  0                 0                 0</span>
+<span class="co">## 3             0                  0                 0                 0</span>
+<span class="co">## 4             0                  0                 0                 0</span>
+<span class="co">## 5             0                  0                 0                 0</span>
+<span class="co">## 6             0                  0                 0                 0</span>
+<span class="co">##   Clanga clanga Accipiter trivirgatus Corvus spp. Gallus gallus (hybrid)</span>
+<span class="co">## 1             0                     0           0                      0</span>
+<span class="co">## 2             0                     0           0                      0</span>
+<span class="co">## 3             0                     0           0                      0</span>
+<span class="co">## 4             0                     0           0                      0</span>
+<span class="co">## 5             0                     0           0                      0</span>
+<span class="co">## 6             0                     0           0                      0</span>
+<span class="co">##   Aethopyga siparaja Chrysococcyx xanthorhynchus Hierococcyx nisicolor</span>
+<span class="co">## 1                  0                           0                     0</span>
+<span class="co">## 2                  0                           0                     0</span>
+<span class="co">## 3                  0                           0                     0</span>
+<span class="co">## 4                  0                           0                     0</span>
+<span class="co">## 5                  0                           0                     0</span>
+<span class="co">## 6                  0                           0                     0</span>
+<span class="co">##   Pycnonotus zeylanicus Treron curvirostra Lonchura leucogastroides</span>
+<span class="co">## 1                     0                  0                        0</span>
+<span class="co">## 2                     0                  0                        0</span>
+<span class="co">## 3                     0                  0                        0</span>
+<span class="co">## 4                     0                  0                        0</span>
+<span class="co">## 5                     0                  0                        0</span>
+<span class="co">## 6                     0                  0                        0</span>
+<span class="co">##   Garrulax leucolophus Terpsiphone paradisi Ardea spp. Muscicapa ferruginea</span>
+<span class="co">## 1                    0                    0          0                    0</span>
+<span class="co">## 2                    0                    0          0                    0</span>
+<span class="co">## 3                    0                    0          0                    0</span>
+<span class="co">## 4                    0                    0          0                    0</span>
+<span class="co">## 5                    0                    0          0                    0</span>
+<span class="co">## 6                    0                    0          0                    0</span>
+<span class="co">##   Pluvialis fulva Caprimulgus macrurus Sturnia sinensis Ducula aenea</span>
+<span class="co">## 1               0                    0                0            0</span>
+<span class="co">## 2               0                    0                0            0</span>
+<span class="co">## 3               0                    0                0            0</span>
+<span class="co">## 4               0                    0                0            0</span>
+<span class="co">## 5               0                    0                0            0</span>
+<span class="co">## 6               0                    0                0            0</span>
+<span class="co">##   Myiopsitta monachus Accipiter gularis Scolopacidae Caprimulgus affinis</span>
+<span class="co">## 1                   0                 0            0                   0</span>
+<span class="co">## 2                   0                 0            0                   0</span>
+<span class="co">## 3                   0                 0            0                   0</span>
+<span class="co">## 4                   0                 0            0                   0</span>
+<span class="co">## 5                   0                 0            0                   0</span>
+<span class="co">## 6                   0                 0            0                   0</span>
+<span class="co">##   Clamator coromandus Lonchura atricapilla Mycteria spp.</span>
+<span class="co">## 1                   0                    0             0</span>
+<span class="co">## 2                   0                    0             0</span>
+<span class="co">## 3                   0                    0             0</span>
+<span class="co">## 4                   0                    0             0</span>
+<span class="co">## 5                   0                    0             0</span>
+<span class="co">## 6                   0                    0             0</span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
