@@ -257,7 +257,7 @@ summary of the top models with values of ΔAIC &lt; 2 can be viewed:</p>
                          <span class="va">delta</span> <span class="op">&lt;</span> <span class="fl">2</span>, 
                          recalc.weights<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">bestmodels_info</span>, caption <span class="op">=</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">"**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC &lt; 2).**"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">bestmodels_info</span>, caption <span class="op">=</span> <span class="st">"**Summary of best models ranked based on automated model selection from `MuMIn::dredge()` (ΔAIC &lt; 2).**"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
   <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span><span class="st">"striped"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/scroll_box.html" class="external-link">scroll_box</a></span><span class="op">(</span>width <span class="op">=</span> <span class="st">"100%"</span>, height <span class="op">=</span> <span class="st">"300px"</span><span class="op">)</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:300px; overflow-x: scroll; width:100%; ">
 <table class="table table table-striped" style="margin-left: auto; margin-right: auto;">
@@ -1041,7 +1041,7 @@ quantified using Principle Coordinates of Neighbourhood Matrices
 (PCNM).</p>
 <p>First, load the additional package <code>vegan</code>:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://cran.r-project.org" class="external-link">"vegan"</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/vegandevs/vegan" class="external-link">"vegan"</a></span><span class="op">)</span></code></pre></div>
 <p>As before, bird and landscape data at sampling points across six
 areas (towns) in Singapore will be used in this example. The example
 dataset, <code>beta_model_data</code>, contains both animal and

@@ -199,7 +199,7 @@ veg_rasterised <-
 veg_amended <- terra::mask(veg_remote, vect(bound), inverse = TRUE)
   
 # fill in amended veg raster with rasterised veg
-veg_amended <- terra::merge(veg_amended, veg_rasterised)
+veg_amended <- terra::mosaic(veg_amended, veg_rasterised)
 
 ```
 
