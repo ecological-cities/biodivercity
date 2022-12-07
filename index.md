@@ -35,20 +35,21 @@ species in urban areas. It provides a way to directly assess the
 chosen animal groups (e.g., taxa such as birds, butterflies, odonates,
 amphibians, etc.). The key features include:
 
--   Step-by-step protocols for random point sampling of an animal group
-    within areas of interest
--   Generate data summaries of the animals surveyed, at multiple levels
-    of granularity (e.g., areas, periods, animal groups, species)
--   Download and process landscape data within areas of interest (e.g.,
-    remotely sensed data, OpenStreetMap data, manually mapped data)
--   Build predictive models to assess local (*Alpha*), community
-    (*Beta*) and total (*Gamma*) diversity for an animal group
--   Use models to make pixel-based spatial predictions across new areas
-    and time periods
--   Convert vector data generated from future design scenarios into
-    formats suitable for model predictions
--   Summarise spatial predictions to benchmark and compare biodiversity
-    ‘performance’ between planning units across the city
+- Step-by-step protocols for random point sampling of an animal group
+  within areas of interest
+- Generate data summaries of the animals surveyed, at multiple levels of
+  granularity (e.g., areas, periods, animal groups, species)
+- Download and process landscape data within areas of interest (e.g.,
+  remotely sensed data, OpenStreetMap data, manually mapped data)
+- Build predictive models to assess local (*Alpha*), community (*Beta*)
+  and total (*Gamma*) diversity for an animal group (currently available
+  only for *Alpha* diversity)
+- Use models to make pixel-based spatial predictions across new areas
+  and time periods
+- Convert vector data generated from future design scenarios into
+  formats suitable for model predictions
+- Summarise spatial predictions to benchmark and compare biodiversity
+  ‘performance’ between planning units across the city
 
 <br>
 
@@ -68,7 +69,7 @@ following:
 *Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong,
 K. Y. (2022). biodivercity: An R package for spatial assessment of
 biodiversity across city landscapes. R Package version 0.1.0.
-<https://github.com/ecological-cities/biodivercity>.*
+<https://ecological-cities.github.io/biodivercity>.*
 
 To get a BibTex entry, run `citation("biodivercity")`.
 

@@ -12,5 +12,5 @@ citEntry(
   url      = "https://github.com/ecological-cities/biodivercity",
   note     = "R package version 0.1.0",
   doi      = " ",
-  textVersion = paste("Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package for spatial assessment of biodiversity across city landscapes. R Package version 0.1.0. https://github.com/ecological-cities/biodivercity.")
+  textVersion = paste("Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package for spatial assessment of biodiversity across city landscapes. R Package version 0.1.0. https://ecological-cities.github.io/biodivercity.")
 )
