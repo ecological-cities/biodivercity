@@ -183,7 +183,7 @@ rm(filepath, max_radius,
 
 ## 2. Community (_Beta_) diversity
 
-In the works...
+To be released.
 
 <br>
 

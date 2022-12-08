@@ -36,7 +36,7 @@ Many frameworks to assess 'biodiversity' have been proposed in research and prac
 - Step-by-step protocols for random point sampling of an animal group within areas of interest
 - Generate data summaries of the animals surveyed, at multiple levels of granularity (e.g., areas, periods, animal groups, species)
 - Download and process landscape data within areas of interest (e.g., remotely sensed data, OpenStreetMap data, manually mapped data)
-- Build predictive models to assess local (_Alpha_), community (_Beta_) and total (_Gamma_) diversity for an animal group (currently available only for _Alpha_ diversity)
+- Build predictive models to assess local (_Alpha_), community (_Beta_) and total (_Gamma_) diversity for an animal group (currently available only for _Alpha_ diversity); respectively, these three types of diversity represent the local quantity of species, variety of species, and total quantity of species within an area of interest
 - Use models to make pixel-based spatial predictions across new areas and time periods
 - Convert vector data generated from future design scenarios into formats suitable for model predictions
 - Summarise spatial predictions to benchmark and compare biodiversity 'performance' between planning units across the city
@@ -75,7 +75,7 @@ devtools::load_all() # to knit manually w latest changes (not built/installed ye
 
 To cite `biodivercity` or acknowledge its use, please cite the following:
 
-*Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package for spatial assessment of biodiversity across city landscapes. R Package version 0.1.0. https://doi.org/10.5281/zenodo.7410415.*  
+*Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong, K. Y. (2022). biodivercity: An R package for spatial assessment of biodiversity across city landscapes. R Package version 0.1.0. https://doi.org/10.5281/zenodo.7410414.*  
 
 To get a BibTex entry, run `citation("biodivercity")`.
 

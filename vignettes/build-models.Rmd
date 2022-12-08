@@ -202,7 +202,7 @@ rm(birds, birds_scaled, predictors, subset_exp,
 
 ## 2. Community (_Beta_) diversity
 
-In the works...
+To be released.
 
 <br>
 

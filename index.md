@@ -42,7 +42,9 @@ amphibians, etc.). The key features include:
   remotely sensed data, OpenStreetMap data, manually mapped data)
 - Build predictive models to assess local (*Alpha*), community (*Beta*)
   and total (*Gamma*) diversity for an animal group (currently available
-  only for *Alpha* diversity)
+  only for *Alpha* diversity); respectively, these three types of
+  diversity represent the local quantity of species, variety of species,
+  and total quantity of species within an area of interest
 - Use models to make pixel-based spatial predictions across new areas
   and time periods
 - Convert vector data generated from future design scenarios into
@@ -68,7 +70,7 @@ following:
 *Song, X. P., Tan, E. Y. W., Lee, S. K. R., Sim, H. J., Nai, J., Chong,
 K. Y. (2022). biodivercity: An R package for spatial assessment of
 biodiversity across city landscapes. R Package version 0.1.0.
-<https://doi.org/10.5281/zenodo.7410415>.*
+<https://doi.org/10.5281/zenodo.7410414>.*
 
 To get a BibTex entry, run `citation("biodivercity")`.
 
