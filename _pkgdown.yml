@@ -12,6 +12,8 @@ template:
     image:
       src: man/figures/logo.png
       alt: "Spatial predictions of biodiversity across city landscapes"
+  params:
+    ganalytics: G-8E8YB47CGX
 
 development:
   mode: auto
