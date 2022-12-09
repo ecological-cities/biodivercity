@@ -51,7 +51,9 @@ Suggests:
     treemapify,
     viridis,
     geojsonsf, 
-    scales
+    scales,
+    MuMIn (>= 1.43.17),
+    methods (>= 4.1.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
@@ -63,25 +65,23 @@ Imports:
     magrittr,
     rlang (>= 0.1.2),
     dplyr (>= 1.0.7),
-    landscapemetrics (>= 1.5.4),
-    methods (>= 4.1.0),
-    osmextract (>= 0.3.1),
     sf (>= 1.0.2),
-    terra (>= 1.3.22),
     tibble (>= 3.1.4),
     tidyr (>= 1.1.3),
-    vegan (>= 2.5.7),
-    units (>= 0.7.2),
-    smoothr (>= 0.2.2),
+    tidyselect (>= 1.1.1),
     purrr (>= 0.3.4),
     stringr (>= 1.4.0),
-    tidyselect (>= 1.1.1),
-    MuMIn (>= 1.43.17),
-    AICcmodavg (>= 2.3.1),
+    terra (>= 1.3.22),
+    landscapemetrics (>= 1.5.4),
+    osmextract (>= 0.3.1),
+    vegan (>= 2.5.7),
     lme4 (>= 1.1.27.1),
+    AICcmodavg (>= 2.3.1),
     recipes (>= 0.1.17),
     stars (>= 0.5.5),
-    graphics (>= 4.1.1)
+    graphics (>= 4.1.1),
+    units (>= 0.7.2),
+    smoothr (>= 0.2.2)
 Language: en-GB
 VignetteBuilder: knitr
 Depends: 
